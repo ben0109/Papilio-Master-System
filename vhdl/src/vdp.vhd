@@ -4,6 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp is
 	port (clk 				: in  STD_LOGIC;
+			clk_n				: in  STD_LOGIC;
 			RD_n				: in  STD_LOGIC;
 			WR_n				: in  STD_LOGIC;
 			IRQ_n				: out STD_LOGIC;
@@ -52,7 +53,7 @@ architecture Behavioral of vdp is
 	end component;
 
 
-	component vram is
+	component vdp_vram is
 	port (clk	: in  STD_LOGIC;
 			en		: in  STD_LOGIC;
 			we		: in  STD_LOGIC;
@@ -86,10 +87,6 @@ architecture Behavioral of vdp is
 			dpo	: out std_logic_vector(5 downto 0));
 	end component;
 
-
-	signal hcount			: unsigned(8 downto 0) := (others => '0');
-	signal vcount			: unsigned(8 downto 0) := (others => '0');
-	
 	signal mask_column0	: std_logic;
 	signal line_irq_en	: std_logic;
 	signal shift_spr		: std_logic;			
@@ -104,7 +101,12 @@ architecture Behavioral of vdp is
 	signal scroll_y		: unsigned(7 downto 0);
 	signal line_count		: unsigned(7 downto 0);
 
+	signal hcount			: unsigned(8 downto 0) := (others => '0');
+	signal vcount			: unsigned(8 downto 0) := (others => '0');
+
+	signal x					: unsigned(8 downto 0);
 	signal y					: unsigned(7 downto 0);
+	signal line_reset		: std_logic;
 	
 	signal in_vbl			: std_logic;
 	signal screen_sync	: std_logic;
@@ -120,7 +122,6 @@ architecture Behavioral of vdp is
 	signal cram_WE			: std_logic;
 	
 	signal bg_address		: std_logic_vector(2 downto 0);
-	signal bg_reset		: std_logic;
 	signal bg_vram_A		: std_logic_vector(13 downto 0);
 	signal bg_color		: std_logic_vector(4 downto 0);
 	signal spr_reset		: std_logic;
@@ -139,6 +140,15 @@ architecture Behavioral of vdp is
 	signal irq_counter	: unsigned(3 downto 0) := (others=>'0');
 	signal vbl_irq			: std_logic;
 	signal hbl_irq			: std_logic;
+	
+	constant pal_line_length		: integer := 511;
+	constant pal_number_of_lines	: integer := 311;
+	constant pal_sync_end			: integer := 37;
+	constant pal_back_porch_end	: integer := 84;
+	constant pal_front_porch_start: integer := 500;
+
+	constant pal_line_reset			: integer := 164;
+	constant pal_first_line			: integer := 64;
 begin
 
 	vdp_control_inst: vdp_control
@@ -174,7 +184,7 @@ begin
 		cram_D_in	=> cram_D_in,
 		cram_D_out	=> cram_D_out);
 
-	cram: color_ram
+	cram_inst: color_ram
 	port map (
 		clk => clk,
 		we	 => cram_WE,
@@ -184,9 +194,9 @@ begin
 		dpra=> cram_A_out,
 		dpo => cram_D_out);
 
-	vram_inst: vram
+	vram_inst: vdp_vram
 	port map (
-		clk	=> clk,
+		clk	=> clk_n,
 		ain	=> vram_A_in,
 		din	=> vram_D_in,
 		aout	=> vram_A_out,
@@ -196,11 +206,11 @@ begin
 		
 	vdp_background_inst: vdp_background
 	port map (
-		clk => clk,
-		reset => bg_reset,
+		clk		=> clk,
+		reset		=> line_reset,
 		map_base => bg_address,
 		scroll_x => (others=>'0'),
-		y => y,
+		y			=> y,
 		
 		vram_address => bg_vram_A,
 		vram_data => vram_D_out,
@@ -211,9 +221,9 @@ begin
 	process (clk, vcount, hcount)
 	begin
 		if rising_edge(clk) then
-			if hcount=511 then
+			if hcount=pal_line_length then
 				hcount <= (others => '0');
-				if vcount=311 then
+				if vcount=pal_number_of_lines then
 					vcount <= (others=>'0');
 					if frame_irq_en='1' then
 						vbl_irq <= '1';
@@ -229,53 +239,50 @@ begin
 		end if;
 	end process;
 	
-	process (hcount,vcount)
+	process (clk,hcount,vcount)
 	begin
---		x <= std_logic_vector(hcount-(37+47+80));
-		y <= (vcount-64);
-		if hcount=248+(37+47+80) then
-			bg_reset <= '1';
-		else
-			bg_reset <= '0';
-		end if;
-	end process;
-	
-	process (display_on, hcount, vcount)
-	begin
-		if display_on='0' then
-			vram_bus_ctrl <= "00";
-		else
-			if hcount>=(37+47+80) and hcount<(37+47+80+256) then
-				vram_bus_ctrl <= "10";
+		if rising_edge(clk) then
+			if hcount=pal_line_reset then
+				line_reset <= '1';
+				x <= "111111000";
+				y <= (vcount-pal_first_line);
 			else
-				vram_bus_ctrl <= "11";
+				line_reset <= '0';
+				x <= x+1;
 			end if;
 		end if;
 	end process;
-
-	vram_A_out <= bg_vram_A;
-
-	process (hcount, bg_color)
+	
+	process (x)
 	begin
-		if hcount>=(37+47+80) and hcount<(37+47+80+256) then
+		if x>=256 and x<504 then
+--			vram_A_out <= spr_vram_A; -- sprite data
+		else
+			vram_A_out <= bg_vram_A; -- background data
+		end if;
+	end process;
+
+	process (x, y)
+	begin
+		if x<256 and y<192 then
 			cram_A_out <= bg_color;
 		else
-			cram_A_out <= "10000";
+			cram_A_out <= "1"&overscan;
 		end if;
 	end process;
 	
 	process(in_vbl,hcount,cram_D_out)
 	begin
-		if in_vbl='1' or hcount<(37+47) or hcount>=(37+47+416) then
+		if in_vbl='1' or hcount<pal_back_porch_end or hcount>=pal_front_porch_start then
 			color <= "000000";
 		else
-			color <= cram_D_out(1 downto 0)&cram_D_out(3 downto 2)&cram_D_out(5 downto 4); -- swap rgb
+			color <= cram_D_out;
 		end if;
 	end process;
 	
 	process (hcount)
 	begin
-		if hcount<37 then
+		if hcount<pal_sync_end then
 			screen_sync <= '0';
 		else
 			screen_sync <= '1';
