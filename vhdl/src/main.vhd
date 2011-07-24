@@ -1,9 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    22:19:46 04/10/2011 
--- Design Name: 
 -- Module Name:    main - Behavioral 
 -- Project Name: 
 -- Target Devices: 
@@ -40,10 +34,10 @@ end main;
 architecture Behavioral of main is
 
 	component clock is
-   port (CLKIN_IN			: in  std_logic; 
-			CLKIN_IBUFG_OUT: out std_logic; 
-			CLKDV_OUT		: out std_logic; 
-			CLK2X_OUT		: out std_logic);
+   port (CLKIN_IN		: in  std_logic;          
+			CLKFX_OUT 	: out std_logic;
+			CLKFX180_OUT: out std_logic;
+			CLK2X_OUT	: out std_logic);
 	end component;
 	
 	component glue is
@@ -76,8 +70,8 @@ architecture Behavioral of main is
 			spi_D_out		: in  STD_LOGIC_VECTOR(7 downto 0));
 	end component;
 	
-	
-	component T80s is
+	component dummy_z80 is
+--	component T80s is
 	generic(
 		Mode : integer := 0;	-- 0 => Z80, 1 => Fast Z80, 2 => 8080, 3 => GB
 		T2Write : integer := 0;	-- 0 => WR_n active in T3, /=0 => WR_n active in T2
@@ -108,6 +102,7 @@ architecture Behavioral of main is
 
 	component vdp is
 	port (clk				: in  STD_LOGIC;
+			clk_n				: in  STD_LOGIC;
 			RD_n				: in  STD_LOGIC;
 			WR_n				: in  STD_LOGIC;
 			IRQ_n				: out STD_LOGIC;
@@ -117,11 +112,13 @@ architecture Behavioral of main is
 			sync				: out STD_LOGIC;
 			color				: out STD_LOGIC_VECTOR (5 downto 0);
 			line_visible	: out STD_lOGIC;
-			line_even		: out STD_lOGIC);
+			line_even		: out STD_lOGIC;
+			pal				: in  STD_LOGIC);
 	end component;
 	
-	component pal_encoder is
+	component color_encoder is
    port (clk			: in  STD_LOGIC;
+			pal			: in  STD_LOGIC;
 			sync			: in  STD_LOGIC;
 			line_visible: in  STD_LOGIC;
 			line_even	: in  STD_LOGIC;
@@ -190,6 +187,7 @@ architecture Behavioral of main is
 	end component;
 	
 	signal clk8				: std_logic;
+	signal clk8_n			: std_logic;
 	signal clk64			: std_logic;
 	
 	signal RD_n				: std_logic;
@@ -228,13 +226,17 @@ architecture Behavioral of main is
 	
 	signal boot_rom_RD_n	: std_logic;
 	signal boot_rom_D_out: std_logic_vector(7 downto 0);
+	
+	signal pal				: std_logic := '0';
+
 begin
 
 	clock_inst: clock
 	port map (
-		clkin_in	=>clk,
-		clk2x_out=>clk64,
-		clkdv_out=>clk8);
+		clkin_in		=>clk,
+		clk2x_out	=>clk64,
+		clkfx_out	=>clk8,
+		clkfx180_out=>clk8_n);
 	
 	glue_inst: glue 
 	port map(
@@ -267,10 +269,11 @@ begin
 		spi_D_out		=> spi_D_out);
 	
 	
-	z80_inst: T80s
+	z80_inst: dummy_z80
+--	z80_inst: T80s
 	port map(
 		RESET_n	=> '1',--RESET_n,
-		CLK_n		=> not clk8,
+		CLK_n		=> clk8_n,
 		WAIT_n	=> '1',
 		INT_n		=> IRQ_n,
 		NMI_n		=> '1',
@@ -291,6 +294,7 @@ begin
 	vdp_inst: vdp
 	port map (
 		clk				=> clk8,
+		clk_n				=> clk8_n,
 		RD_n				=> vdp_RD_n,
 		WR_n				=> vdp_WR_n,
 		IRQ_n				=> IRQ_n,
@@ -300,11 +304,14 @@ begin
 		sync				=> sync,
 		color				=> color,
 		line_visible	=> line_visible,
-		line_even		=> line_even);
+		line_even		=> line_even,
 		
-	video_encoder_inst: pal_encoder
+		pal				=> pal);
+		
+	color_encoder_inst: color_encoder
 	port map (
 		clk			=> clk64,
+		pal			=> pal,
 		sync			=> sync,
 		color			=> color,
 		line_visible=> line_visible,

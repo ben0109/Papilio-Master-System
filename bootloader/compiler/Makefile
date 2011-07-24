@@ -1,14 +1,6 @@
 OBJECTS = syntax.cmo lexer.cmo parser.cmo typing.cmo assembly.cmo translate.cmo optimize.cmo output.cmo main.cmo
 
-
-bootstrap.sms: bootstrap.asm bootloader.asm $(depends)
-	z80asm -o $@ bootstrap.asm
-
-bootloader.asm: linker bootloader.mco
-	./linker bootloader.mco > bootloader.asm
-
-bootloader.mco: compiler bootloader.mc
-	./compiler bootloader.mc > bootloader.mco
+all: compiler linker conv_bin
 
 compiler: $(OBJECTS)
 	ocamlc -g -o compiler $(OBJECTS)
@@ -16,11 +8,14 @@ compiler: $(OBJECTS)
 linker: linker.ml
 	ocamlc -o linker linker.ml
 
+conv_bin: conv_bin.ml
+	ocamlc -o conv_bin conv_bin.ml
+
 %.cmo: %.ml
-	ocamlc -g -c $<
+	ocamlc -c $<
 
 %.cmi: %.mli
-	ocamlc -g -c $<
+	ocamlc -c $<
 
 %.ml %.mli: %.mly
 	ocamlyacc $<

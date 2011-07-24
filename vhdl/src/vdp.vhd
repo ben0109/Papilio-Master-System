@@ -14,7 +14,9 @@ entity vdp is
 			sync				: out STD_LOGIC;
 			color				: out STD_LOGIC_VECTOR (5 downto 0);
 			line_visible	: out STD_lOGIC;
-			line_even		: out STD_lOGIC);
+			line_even		: out STD_lOGIC;
+			
+			pal				: in  STD_LOGIC);
 end vdp;
 
 architecture Behavioral of vdp is
@@ -77,14 +79,14 @@ architecture Behavioral of vdp is
 			color			:out std_logic_vector(4 downto 0));
 	end component;
 	
-	component color_ram is
-	port (clk	: in  std_logic;
-			a		: in  std_logic_vector(4 downto 0);
-			we		: in  std_logic;
-			d		: in  std_logic_vector(5 downto 0);
-			spo	: out std_logic_vector(5 downto 0);
-			dpra	: in  std_logic_vector(4 downto 0);
-			dpo	: out std_logic_vector(5 downto 0));
+	component vdp_cram is
+	port (clk		: in  std_logic;
+			cpu_we	: in  std_logic;
+			cpu_a		: in  std_logic_vector(4 downto 0);
+			cpu_d_in	: in  std_logic_vector(5 downto 0);
+			cpu_d_out: out std_logic_vector(5 downto 0);
+			vdp_a		: in  std_logic_vector(4 downto 0);
+			vdp_d_out: out std_logic_vector(5 downto 0));
 	end component;
 
 	signal mask_column0	: std_logic;
@@ -107,10 +109,6 @@ architecture Behavioral of vdp is
 	signal x					: unsigned(8 downto 0);
 	signal y					: unsigned(7 downto 0);
 	signal line_reset		: std_logic;
-	
-	signal in_vbl			: std_logic;
-	signal screen_sync	: std_logic;
-	signal vbl_sync		: std_logic;
 	
 	signal address_ff		: std_logic := '0';
 	signal address			: unsigned(15 downto 0);
@@ -140,15 +138,6 @@ architecture Behavioral of vdp is
 	signal irq_counter	: unsigned(3 downto 0) := (others=>'0');
 	signal vbl_irq			: std_logic;
 	signal hbl_irq			: std_logic;
-	
-	constant pal_line_length		: integer := 511;
-	constant pal_number_of_lines	: integer := 311;
-	constant pal_sync_end			: integer := 37;
-	constant pal_back_porch_end	: integer := 84;
-	constant pal_front_porch_start: integer := 500;
-
-	constant pal_line_reset			: integer := 164;
-	constant pal_first_line			: integer := 64;
 begin
 
 	vdp_control_inst: vdp_control
@@ -184,17 +173,17 @@ begin
 		cram_D_in	=> cram_D_in,
 		cram_D_out	=> cram_D_out);
 
-	cram_inst: color_ram
+	vdp_cram_inst: vdp_cram
 	port map (
-		clk => clk,
-		we	 => cram_WE,
-		a	 => cram_A_in,
-		d	 => cram_D_in,
-		spo => open,
-		dpra=> cram_A_out,
-		dpo => cram_D_out);
+		clk 		=> clk,
+		cpu_we	=> cram_WE,
+		cpu_a		=> cram_A_in,
+		cpu_d_in	=> cram_D_in,
+		cpu_d_out=> open,
+		vdp_a		=> cram_A_out,
+		vdp_d_out=> cram_D_out);
 
-	vram_inst: vdp_vram
+	vdp_vram_inst: vdp_vram
 	port map (
 		clk	=> clk_n,
 		ain	=> vram_A_in,
@@ -221,9 +210,9 @@ begin
 	process (clk, vcount, hcount)
 	begin
 		if rising_edge(clk) then
-			if hcount=pal_line_length then
+			if (pal='1' and hcount=511) or (pal='0' and hcount=509) then
 				hcount <= (others => '0');
-				if vcount=pal_number_of_lines then
+				if (pal='1' and vcount=311) or (pal='0' and vcount=261)  then
 					vcount <= (others=>'0');
 					if frame_irq_en='1' then
 						vbl_irq <= '1';
@@ -236,16 +225,15 @@ begin
 				vbl_irq <= '0';
 				hbl_irq <= '0';
 			end if;
-		end if;
-	end process;
-	
-	process (clk,hcount,vcount)
-	begin
-		if rising_edge(clk) then
-			if hcount=pal_line_reset then
+
+			if hcount=156 then
 				line_reset <= '1';
 				x <= "111111000";
-				y <= (vcount-pal_first_line);
+				if pal='1' then
+					y <= (vcount-64);
+				else
+					y <= (vcount-48);
+				end if;
 			else
 				line_reset <= '0';
 				x <= x+1;
@@ -253,14 +241,56 @@ begin
 		end if;
 	end process;
 	
-	process (x)
+	process (vcount, hcount,cram_D_out)
 	begin
-		if x>=256 and x<504 then
---			vram_A_out <= spr_vram_A; -- sprite data
-		else
-			vram_A_out <= bg_vram_A; -- background data
+		if rising_edge(clk) then
+			if vcount<7 then
+				if vcount<3 then
+					if hcount<19 or (hcount>=256 and hcount<275) then
+						sync <= '0';
+					else
+						sync <= '1';
+					end if;
+				elsif vcount<5 then
+					if hcount<219 or (hcount>=256 and hcount<475) then
+						sync <= '0';
+					else
+						sync <= '1';
+					end if;
+				elsif vcount=5 then
+					if hcount<219 or (hcount>=256 and hcount<275) then
+						sync <= '0';
+					else
+						sync <= '1';
+					end if;
+				elsif vcount<7 then
+					if hcount<19 or (hcount>=256 and hcount<275) then
+						sync <= '0';
+					else
+						sync <= '1';
+					end if;
+				end if;
+				line_visible <= '0';
+				color <= "000000";
+				
+			else
+				if hcount<37 then
+					sync <= '0';
+				else
+					sync <= '1';
+				end if;
+				line_visible <= '1';
+				
+				if vcount<25 or hcount<84 or hcount>=500 then
+					color <= "000000";
+				else
+					color <= cram_D_out;
+				end if;
+			end if;
 		end if;
 	end process;
+	
+	line_even <= vcount(0);
 
 	process (x, y)
 	begin
@@ -269,69 +299,13 @@ begin
 		else
 			cram_A_out <= "1"&overscan;
 		end if;
-	end process;
-	
-	process(in_vbl,hcount,cram_D_out)
-	begin
-		if in_vbl='1' or hcount<pal_back_porch_end or hcount>=pal_front_porch_start then
-			color <= "000000";
+		
+		if x>=256 and x<504 then
+--			vram_A_out <= spr_vram_A; -- sprite data
 		else
-			color <= cram_D_out;
+			vram_A_out <= bg_vram_A; -- background data
 		end if;
 	end process;
-	
-	process (hcount)
-	begin
-		if hcount<pal_sync_end then
-			screen_sync <= '0';
-		else
-			screen_sync <= '1';
-		end if;
-	end process;
-	
-	process (vcount)
-	begin
-		if vcount>=5 and vcount<309 then
-			in_vbl <= '0';
-		else
-			in_vbl <= '1';
-		end if;
-	end process;
-	
-	process (vcount,hcount)
-	begin
-		if vcount<2 then
-			if hcount<240 or (hcount>=256 and hcount<496) then
-				vbl_sync <= '0';
-			else
-				vbl_sync <= '1';
-			end if;
-		elsif vcount=2 then
-			if hcount<240 or (hcount>=256 and hcount<272) then
-				vbl_sync <= '0';
-			else
-				vbl_sync <= '1';
-			end if;
-		else
-			if hcount<16 or (hcount>=256 and hcount<272) then
-				vbl_sync <= '0';
-			else
-				vbl_sync <= '1';
-			end if;
-		end if;
-	end process;
-	
-	process (in_vbl,screen_sync,vbl_sync)
-	begin
-		if in_vbl='1' then
-			sync <= vbl_sync;
-		else
-			sync <= screen_sync;
-		end if;
-	end process;
-	
-	line_visible <= not in_vbl;
-	line_even <= vcount(0);
 	
 	process (clk,vbl_irq,hbl_irq)
 	begin
