@@ -4,7 +4,6 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp is
 	port (clk 				: in  STD_LOGIC;
-			clk_n				: in  STD_LOGIC;
 			RD_n				: in  STD_LOGIC;
 			WR_n				: in  STD_LOGIC;
 			IRQ_n				: out STD_LOGIC;
@@ -15,7 +14,6 @@ entity vdp is
 			color				: out STD_LOGIC_VECTOR (5 downto 0);
 			line_visible	: out STD_lOGIC;
 			line_even		: out STD_lOGIC;
-			
 			pal				: in  STD_LOGIC);
 end vdp;
 
@@ -138,6 +136,7 @@ architecture Behavioral of vdp is
 	signal irq_counter	: unsigned(3 downto 0) := (others=>'0');
 	signal vbl_irq			: std_logic;
 	signal hbl_irq			: std_logic;
+	
 begin
 
 	vdp_control_inst: vdp_control
@@ -185,7 +184,7 @@ begin
 
 	vdp_vram_inst: vdp_vram
 	port map (
-		clk	=> clk_n,
+		clk	=> clk,
 		ain	=> vram_A_in,
 		din	=> vram_D_in,
 		aout	=> vram_A_out,
@@ -207,7 +206,7 @@ begin
 		color => bg_color);
 		
 
-	process (clk, vcount, hcount)
+	process (clk,pal,vcount,hcount)
 	begin
 		if rising_edge(clk) then
 			if (pal='1' and hcount=511) or (pal='0' and hcount=509) then
@@ -228,11 +227,11 @@ begin
 
 			if hcount=156 then
 				line_reset <= '1';
-				x <= "111111000";
+				x <= "111110000";
 				if pal='1' then
-					y <= (vcount-64);
+					y <= (vcount(7 downto 0)-64);
 				else
-					y <= (vcount-48);
+					y <= (vcount(7 downto 0)-48);
 				end if;
 			else
 				line_reset <= '0';
@@ -241,7 +240,7 @@ begin
 		end if;
 	end process;
 	
-	process (vcount, hcount,cram_D_out)
+	process (clk,vcount,hcount,cram_D_out)
 	begin
 		if rising_edge(clk) then
 			if vcount<7 then
@@ -300,7 +299,7 @@ begin
 			cram_A_out <= "1"&overscan;
 		end if;
 		
-		if x>=256 and x<504 then
+		if x>=256 and x<384 then
 --			vram_A_out <= spr_vram_A; -- sprite data
 		else
 			vram_A_out <= bg_vram_A; -- background data

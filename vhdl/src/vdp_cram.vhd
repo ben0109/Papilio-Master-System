@@ -15,7 +15,7 @@ end vdp_cram;
 architecture Behavioral of vdp_cram is
 
 	type t_ram is array (0 to 31) of std_logic_vector(5 downto 0);
-	signal ram : t_ram;
+	signal ram : t_ram := (others => "000000");
 	
 begin
 

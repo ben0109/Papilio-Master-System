@@ -23,6 +23,9 @@ entity main is
 			video_out: out STD_LOGIC_VECTOR(5 downto 0);
 			audio_out: out STD_LOGIC;
 			
+			color2: out STD_LOGIC_VECTOR(5 downto 0);
+			sync2: out STD_LOGIC;
+			
 			spi_ss	: out STD_LOGIC;
 			spi_sck	: out STD_LOGIC;
 			spi_miso	: in  STD_LOGIC;
@@ -97,12 +100,9 @@ architecture Behavioral of main is
 		DO			: out std_logic_vector(7 downto 0)
 	);
 	end component;
-
-
-
+	
 	component vdp is
 	port (clk				: in  STD_LOGIC;
-			clk_n				: in  STD_LOGIC;
 			RD_n				: in  STD_LOGIC;
 			WR_n				: in  STD_LOGIC;
 			IRQ_n				: out STD_LOGIC;
@@ -231,6 +231,9 @@ architecture Behavioral of main is
 
 begin
 
+color2 <= color;
+sync2 <= sync;
+
 	clock_inst: clock
 	port map (
 		clkin_in		=>clk,
@@ -294,7 +297,6 @@ begin
 	vdp_inst: vdp
 	port map (
 		clk				=> clk8,
-		clk_n				=> clk8_n,
 		RD_n				=> vdp_RD_n,
 		WR_n				=> vdp_WR_n,
 		IRQ_n				=> IRQ_n,

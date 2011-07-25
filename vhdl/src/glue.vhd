@@ -36,31 +36,47 @@ architecture Behavioral of glue is
 	signal bootloader : std_logic := '0';
 	signal internal_D_out : std_logic_vector(7 downto 0);
 	signal irom_RD_n : std_logic := '1';
+	
+	signal RD_n_reg	: std_logic := '1';
+	signal WR_n_reg	: std_logic := '1';
+	signal RD_n_clk	: std_logic := '1';
+	signal WR_n_clk	: std_logic := '1';
+	
 begin
-	
-	vdp_WR_n <= io_n or WR_n or not A(7) or A(6);
-	vdp_RD_n <= io_n or RD_n or not (A(7) xor A(6));
-	
-	psg_WR_n <= io_n or WR_n or A(7) or not A(6);
 
-	io_WR_n <= io_n or WR_n or A(7) or A(6) or not A(0);
-	io_RD_n <= io_n or RD_n or not (A(7) and A(6));
+	process (clk,RD_n_clk,WR_n_clk)
+	begin
+		if rising_edge(clk) then
+			RD_n_clk <= RD_n or not RD_n_reg;
+			WR_n_clk <= WR_n or not WR_n_reg;
+			RD_n_reg <= RD_n;
+			WR_n_reg <= WR_n;
+		end if;
+	end process;
+	
+	vdp_WR_n <= io_n or WR_n_clk or not A(7) or A(6);
+	vdp_RD_n <= io_n or RD_n_clk or not (A(7) xor A(6));
+	
+	psg_WR_n <= io_n or WR_n_clk or A(7) or not A(6);
 
-	spi_WR_n <= bootloader or io_n or WR_n or not (A(7) and A(6));
-	spi_RD_n <= bootloader or io_n or RD_n or A(7) or A(6);
+	io_WR_n <= io_n or WR_n_clk or A(7) or A(6) or not A(0);
+	io_RD_n <= io_n or RD_n_clk or not (A(7) and A(6));
+
+	spi_WR_n <= bootloader or io_n or WR_n_clk or not (A(7) and A(6));
+	spi_RD_n <= bootloader or io_n or RD_n_clk or A(7) or A(6);
 	
-	rom_WR_n <= not io_n or WR_n or (A(15) and A(14));
-	irom_RD_n <= not io_n or RD_n or (A(15) and A(14));
+	rom_WR_n <= not io_n or WR_n_clk or (A(15) and A(14));
+	irom_RD_n <= not io_n or RD_n_clk or (A(15) and A(14));
 	
-	ram_WR_n <= not io_n or WR_n or not (A(15) and A(14));
-	ram_RD_n <= not io_n or RD_n or not (A(15) and A(14));
+	ram_WR_n <= not io_n or WR_n_clk or not (A(15) and A(14));
+	ram_RD_n <= not io_n or RD_n_clk or not (A(15) and A(14));
 	
 	boot_rom_RD_n <= bootloader or irom_RD_n;
 	rom_RD_n <= not bootloader or irom_RD_n;
 	
 	process (clk,io_n,WR_n,A,D_in)
 	begin
-		if rising_edge(clk) and WR_n='0' then
+		if rising_edge(clk) and WR_n_clk='0' then
 			if io_n='0' and A(7)='0' and A(6)='0' and A(0)='0' then
 				-- memory control
 				if bootloader='0' then

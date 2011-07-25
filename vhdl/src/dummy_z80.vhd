@@ -124,20 +124,18 @@ begin
 	begin
 		if falling_edge(clk_n) then
 			if count(8 downto 2)<32 then
+				a <= "0000000010111111"; -- bf
 				if count(2)='0' then
-					a <= "0000000010111111"; -- bf
 					do <= registers(to_integer(count(6 downto 3)));
 				else
-					a <= "0000000010111111"; -- bf
 					do <= "1000"&std_logic_vector(count(6 downto 3)); -- register write
 				end if;
 			elsif count(8 downto 2)<62 then
 			elsif count(8 downto 2)<64 then
+				a <= "0000000010111111"; -- bf
 				if count(2)='0' then
-					a <= "0000000010111111"; -- bf
 					do <= "00000000";
 				else
-					a <= "0000000010111111"; -- bf
 					do <= "11000000";
 				end if;
 			elsif count(8 downto 2)<96 then
@@ -148,7 +146,7 @@ begin
 				case count(1 downto 0) is
 				when "00" => iorq_n <= '1'; wr_n<='1';
 				when "01" => iorq_n <= '0'; wr_n<='0';
-				when "10" => iorq_n <= '0'; wr_n<='0';
+				when "10" => iorq_n <= '0'; wr_n<='1';
 				when "11" => iorq_n <= '1'; wr_n<='1';
 				when others =>
 				end case;
