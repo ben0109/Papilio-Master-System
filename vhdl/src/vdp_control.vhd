@@ -4,11 +4,11 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_control is
 	port (clk			: in  STD_LOGIC;
-			RD_n			: in  STD_LOGIC;
-			WR_n			: in  STD_LOGIC;
-			A				: in  STD_LOGIC_VECTOR (7 downto 0);
-			D_in			: in  STD_LOGIC_VECTOR (7 downto 0);
-			D_out			: out STD_LOGIC_VECTOR (7 downto 0);
+			cpu_RD_n		: in  STD_LOGIC;
+			cpu_WR_n		: in  STD_LOGIC;
+			cpu_A			: in  STD_LOGIC_VECTOR (7 downto 0);
+			cpu_D_in		: in  STD_LOGIC_VECTOR (7 downto 0);
+			cpu_D_out	: out STD_LOGIC_VECTOR (7 downto 0);
 			
 			mask_column0: out STD_LOGIC;
 			line_irq_en	: out STD_LOGIC;
@@ -45,42 +45,42 @@ architecture Behavioral of vdp_control is
 begin
 
 	cram_A <= std_logic_vector(address(4 downto 0));
-	cram_D_in <= D_in(5 downto 0);
-	cram_WE <= not WR_n and not A(0) and address(15) and address(14);
+	cram_D_in <= cpu_D_in(5 downto 0);
+	cram_WE <= not cpu_WR_n and not cpu_A(0) and address(15) and address(14);
 				
 	vram_A <= std_logic_vector(address(13 downto 0));
-	vram_D_in <= D_in;
-	vram_WE <= not WR_n and not A(0) and not (address(15) and address(14));
+	vram_D_in <= cpu_D_in;
+	vram_WE <= not cpu_WR_n and not cpu_A(0) and not (address(15) and address(14));
 				
 	process (address,vram_D_out,cram_D_out)
 	begin
 		if address(15)='1' and address(14)='1' then
-			D_out <= "00"&cram_D_out;
+			cpu_D_out <= "00"&cram_D_out;
 		else
-			D_out <= vram_D_out;
+			cpu_D_out <= vram_D_out;
 		end if;
 	end process;
 
-	process (clk,RD_n,WR_n,A,D_in,address_ff)
+	process (clk,cpu_RD_n,cpu_WR_n,cpu_A,cpu_D_in,address_ff)
 	begin
 		if rising_edge(clk) then
-			if WR_n='1' then
+			if cpu_WR_n='1' then
 				if vram_write='1' then
 					vram_write <= '0';
 					address <= address + 1;
 				end if;
 				
-			elsif WR_n='0' then
-				if A(0)='0' then
+			elsif cpu_WR_n='0' then
+				if cpu_A(0)='0' then
 					vram_write <= '1';
 				else
 					if address_ff='0' then
-						address(7 downto 0) <= unsigned(D_in);
+						address(7 downto 0) <= unsigned(cpu_D_in);
 					else
-						address(15 downto 8) <= unsigned(D_in);
+						address(15 downto 8) <= unsigned(cpu_D_in);
 						
-						if D_in(7)='1' and D_in(6)='0' then
-							case D_in(5 downto 0) is
+						if cpu_D_in(7)='1' and cpu_D_in(6)='0' then
+							case cpu_D_in(5 downto 0) is
 							when "000000" =>
 								mask_column0 <= address(5);
 								line_irq_en <= address(4);

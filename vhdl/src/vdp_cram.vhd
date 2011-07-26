@@ -3,13 +3,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_cram is
-	Port (clk		: in  STD_LOGIC;
-			cpu_we	: in  STD_LOGIC;
-			cpu_a		: in  STD_LOGIC_VECTOR (4 downto 0);
-			cpu_d_in	: in  STD_LOGIC_VECTOR (5 downto 0);
-			cpu_d_out: out STD_LOGIC_VECTOR (5 downto 0);
-			vdp_a		: in  STD_LOGIC_VECTOR (4 downto 0);
-			vdp_d_out: out STD_LOGIC_VECTOR (5 downto 0));
+	Port (clk	: in  STD_LOGIC;
+			WE		: in  STD_LOGIC;
+			A_in	: in  STD_LOGIC_VECTOR (4 downto 0);
+			D_in	: in  STD_LOGIC_VECTOR (5 downto 0);
+			A_out	: in  STD_LOGIC_VECTOR (4 downto 0);
+			D_out	: out STD_LOGIC_VECTOR (5 downto 0));
 end vdp_cram;
 
 architecture Behavioral of vdp_cram is
@@ -19,24 +18,21 @@ architecture Behavioral of vdp_cram is
 	
 begin
 
-	process (clk,cpu_a,cpu_we)
+	process (clk,WE,A_in)
 		variable i : integer range 0 to 31;
 	begin
-		if rising_edge(clk) then
-			i := to_integer(unsigned(cpu_a));
-			if cpu_we='1' then
-				ram(i) <= cpu_d_in;
-			end if;
-			cpu_d_out <= ram(i);
+		if rising_edge(clk) and WE='1'then
+			i := to_integer(unsigned(A_in));
+			ram(i) <= D_in;
 		end if;
 	end process;
 
-	process (clk,vdp_a)
+	process (clk,A_out)
 		variable i : integer range 0 to 31;
 	begin
 		if rising_edge(clk) then
-			i := to_integer(unsigned(vdp_a));
-			vdp_d_out <= ram(i);
+			i := to_integer(unsigned(A_out));
+			D_out <= ram(i);
 		end if;
 	end process;
 

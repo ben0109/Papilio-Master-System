@@ -21,11 +21,11 @@ architecture Behavioral of vdp is
 
 	component vdp_control is
 	port (clk				: in  STD_LOGIC;
-			RD_n				: in  STD_LOGIC;
-			WR_n				: in  STD_LOGIC;
-			A					: in  STD_LOGIC_VECTOR (7 downto 0);
-			D_in				: in  STD_LOGIC_VECTOR (7 downto 0);
-			D_out				: out STD_LOGIC_VECTOR (7 downto 0);
+			cpu_RD_n			: in  STD_LOGIC;
+			cpu_WR_n			: in  STD_LOGIC;
+			cpu_A				: in  STD_LOGIC_VECTOR (7 downto 0);
+			cpu_D_in			: in  STD_LOGIC_VECTOR (7 downto 0);
+			cpu_D_out		: out STD_LOGIC_VECTOR (7 downto 0);
 			
 			mask_column0	: out STD_LOGIC;
 			line_irq_en		: out STD_LOGIC;
@@ -55,7 +55,6 @@ architecture Behavioral of vdp is
 
 	component vdp_vram is
 	port (clk	: in  STD_LOGIC;
-			en		: in  STD_LOGIC;
 			we		: in  STD_LOGIC;
 			ain	: in  STD_LOGIC_VECTOR (13 downto 0);
 			din	: in  STD_LOGIC_VECTOR (7 downto 0);
@@ -64,27 +63,23 @@ architecture Behavioral of vdp is
 	end component;
 	
 	component vdp_background is
-	port (clk			:in std_logic;
-			reset			:in std_logic;
-			map_base		:in std_logic_vector(2 downto 0);
-			scroll_x		:in unsigned(7 downto 0);
-			y				:in unsigned(7 downto 0);
-
-			vram_address:out std_logic_vector(13 downto 0);
-			vram_read	:out std_logic;
-			vram_data	:in std_logic_vector(7 downto 0);
-
-			color			:out std_logic_vector(4 downto 0));
+	port (clk		: in  std_logic;
+			reset		: in  std_logic;
+			map_base	: in  std_logic_vector(2 downto 0);
+			scroll_x	: in  unsigned(7 downto 0);
+			y			: in  unsigned(7 downto 0);
+			vram_A	: out std_logic_vector(13 downto 0);
+			vram_D	: in  std_logic_vector(7 downto 0);
+			color		: out std_logic_vector(4 downto 0));
 	end component;
 	
 	component vdp_cram is
-	port (clk		: in  std_logic;
-			cpu_we	: in  std_logic;
-			cpu_a		: in  std_logic_vector(4 downto 0);
-			cpu_d_in	: in  std_logic_vector(5 downto 0);
-			cpu_d_out: out std_logic_vector(5 downto 0);
-			vdp_a		: in  std_logic_vector(4 downto 0);
-			vdp_d_out: out std_logic_vector(5 downto 0));
+	port (clk	: in  std_logic;
+			WE		: in  std_logic;
+			A_in	: in  std_logic_vector(4 downto 0);
+			D_in	: in  std_logic_vector(5 downto 0);
+			A_out	: in  std_logic_vector(4 downto 0);
+			D_out	: out std_logic_vector(5 downto 0));
 	end component;
 
 	signal mask_column0	: std_logic;
@@ -102,7 +97,7 @@ architecture Behavioral of vdp is
 	signal line_count		: unsigned(7 downto 0);
 
 	signal hcount			: unsigned(8 downto 0) := (others => '0');
-	signal vcount			: unsigned(8 downto 0) := (others => '0');
+	signal vcount			: unsigned(8 downto 0) := "000101000";
 
 	signal x					: unsigned(8 downto 0);
 	signal y					: unsigned(7 downto 0);
@@ -128,7 +123,6 @@ architecture Behavioral of vdp is
 	signal vram_D_in		: std_logic_vector(7 downto 0);
 	signal vram_A_out		: std_logic_vector(13 downto 0);
 	signal vram_D_out		: std_logic_vector(7 downto 0);
-	signal vram_read		: std_logic;
 	signal vram_WE			: std_logic;
 
 	signal vram_bus_ctrl	: std_logic_vector(1 downto 0);
@@ -142,11 +136,11 @@ begin
 	vdp_control_inst: vdp_control
 	port map (
 		clk			=> clk,
-		RD_n			=> RD_n,
-		WR_n			=> WR_n,
-		A				=> A,
-		D_in			=> D_in,
-		D_out			=> D_out,
+		cpu_RD_n		=> RD_n,
+		cpu_WR_n		=> WR_n,
+		cpu_A			=> A,
+		cpu_D_in		=> D_in,
+		cpu_D_out	=> D_out,
 			
 		mask_column0=> mask_column0,
 		line_irq_en	=> line_irq_en,
@@ -174,13 +168,12 @@ begin
 
 	vdp_cram_inst: vdp_cram
 	port map (
-		clk 		=> clk,
-		cpu_we	=> cram_WE,
-		cpu_a		=> cram_A_in,
-		cpu_d_in	=> cram_D_in,
-		cpu_d_out=> open,
-		vdp_a		=> cram_A_out,
-		vdp_d_out=> cram_D_out);
+		clk 	=> clk,
+		WE		=> cram_WE,
+		A_in	=> cram_A_in,
+		D_in	=> cram_D_in,
+		A_out	=> cram_A_out,
+		D_out	=> cram_D_out);
 
 	vdp_vram_inst: vdp_vram
 	port map (
@@ -189,7 +182,6 @@ begin
 		din	=> vram_D_in,
 		aout	=> vram_A_out,
 		dout	=> vram_D_out,
-		en		=> '1',
 		we		=> vram_WE);
 		
 	vdp_background_inst: vdp_background
@@ -200,10 +192,10 @@ begin
 		scroll_x => (others=>'0'),
 		y			=> y,
 		
-		vram_address => bg_vram_A,
-		vram_data => vram_D_out,
-		vram_read => vram_read,
-		color => bg_color);
+		vram_A	=> bg_vram_A,
+		vram_D	=> vram_D_out,
+		
+		color		=> bg_color);
 		
 
 	process (clk,pal,vcount,hcount)

@@ -6,7 +6,6 @@ use UNISIM.vcomponents.all;
 
 entity vdp_vram is
 	Port (clk	: in   STD_LOGIC;
-			en		: in   STD_LOGIC;
 			we		: in   STD_LOGIC;
 			ain		: in   STD_LOGIC_VECTOR (13 downto 0);
 			din		: in   STD_LOGIC_VECTOR (7 downto 0);
@@ -96,7 +95,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(0 downto 0),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -181,7 +180,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(1 downto 1),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -266,7 +265,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(2 downto 2),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -351,7 +350,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(3 downto 3),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -436,7 +435,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(4 downto 4),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -521,7 +520,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(5 downto 5),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -606,7 +605,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(6 downto 6),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
@@ -691,7 +690,7 @@ begin
 		ADDRB => aout,
 		DIB => "0",
 		DOB => dout(7 downto 7),
-		ENB => en,
+		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
 	);
