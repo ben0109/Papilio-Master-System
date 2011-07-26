@@ -73,7 +73,20 @@ architecture Behavioral of vdp is
 			y			: in  unsigned(7 downto 0);
 			vram_A	: out std_logic_vector(13 downto 0);
 			vram_D	: in  std_logic_vector(7 downto 0);
-			color		: out std_logic_vector(4 downto 0));
+			color		: out std_logic_vector(4 downto 0);
+			priority	: out std_logic);
+	end component;
+	
+	component vdp_sprites is
+	port (clk				: in  std_logic;
+			table_address	: in  std_logic_vector(5 downto 0);
+			char_high_bit	: in  std_logic;
+			big_sprites		: in  STD_LOGIC;
+			x					: in  unsigned(8 downto 0);
+			y					: in  unsigned(7 downto 0);
+			vram_A			: out std_logic_vector(13 downto 0);
+			vram_D			: in  std_logic_vector(7 downto 0);
+			color				: out std_logic_vector(3 downto 0));
 	end component;
 	
 	signal control_A		: std_logic_vector(13 downto 0);
@@ -109,6 +122,7 @@ architecture Behavioral of vdp is
 	signal bg_address		: std_logic_vector(2 downto 0);
 	signal bg_vram_A		: std_logic_vector(13 downto 0);
 	signal bg_color		: std_logic_vector(4 downto 0);
+	signal bg_priority	: std_logic;
 	
 	signal spr_vram_A		: std_logic_vector(13 downto 0);
 	signal spr_color		: std_logic_vector(3 downto 0);
@@ -165,7 +179,7 @@ begin
 		vdp_A		=> cram_vdp_A,
 		vdp_D		=> cram_vdp_D);
 		
-	vdp_background_inst: vdp_background
+	vdp_bg_inst: vdp_background
 	port map (
 		clk		=> clk,
 		map_base => bg_address,
@@ -175,10 +189,24 @@ begin
 		
 		vram_A	=> bg_vram_A,
 		vram_D	=> vram_vdp_D,		
-		color		=> bg_color);
+		color		=> bg_color,
+		priority	=> bg_priority);
+		
+	vdp_spr_inst: vdp_sprites
+	port map (
+		clk				=> clk,
+		table_address	=> spr_address,
+		char_high_bit	=> spr_high_bit,
+		big_sprites		=> big_sprites,
+		x					=> x,
+		y					=> y,
+		
+		vram_A			=> spr_vram_A,
+		vram_D			=> vram_vdp_D,		
+		color				=> spr_color);
 		
 
-	process (clk,pal,vcount,hcount)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			if (pal='1' and hcount=511) or (pal='0' and hcount=509) then
@@ -212,7 +240,7 @@ begin
 		end if;
 	end process;
 	
-	process (clk,vcount,hcount,cram_vdp_D)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			if vcount<7 then
@@ -264,9 +292,17 @@ begin
 	line_even <= vcount(0);
 
 	process (x, y)
+		variable spr_active : std_logic;
+		variable bg_active : std_logic;
 	begin
 		if x<256 and y<192 then
-			cram_vdp_A <= bg_color;
+			spr_active := spr_color(0) or spr_color(1) or spr_color(2) or spr_color(3);
+			bg_active := bg_color(0) or bg_color(1) or bg_color(2) or bg_color(3);
+			if (bg_priority='0' and spr_active='1') or (bg_priority='1' and bg_active='0') then
+				cram_vdp_A <= "1"&spr_color;
+			else
+				cram_vdp_A <= bg_color;
+			end if;
 		else
 			cram_vdp_A <= "1"&overscan;
 		end if;
@@ -278,7 +314,7 @@ begin
 		end if;
 	end process;
 	
-	process (clk,vbl_irq,hbl_irq)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			if vbl_irq='1' or hbl_irq='1' then

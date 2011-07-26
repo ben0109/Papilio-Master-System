@@ -13,7 +13,8 @@ port (
 	vram_A	: out std_logic_vector(13 downto 0);
 	vram_D	: in  std_logic_vector(7 downto 0);
 
-	color		: out std_logic_vector(4 downto 0)
+	color		: out std_logic_vector(4 downto 0);
+	priority	: out std_logic
 );
 end entity;
 
@@ -23,7 +24,7 @@ architecture rtl of vdp_background is
 	signal x					: unsigned (7 downto 0);
 	signal tile_y			: std_logic_vector (2 downto 0);
 	signal palette			: std_logic;
-	signal priority		: std_logic;
+	signal priority_latch: std_logic;
 	signal flip_x			: std_logic;
 
 	signal data0			: std_logic_vector(7 downto 0);
@@ -38,7 +39,7 @@ architecture rtl of vdp_background is
 	
 begin
 	
-	process (clk,x) begin
+	process (clk) begin
 		if (rising_edge(clk)) then
 			if (reset='1') then
 				x <= scroll_x+248;
@@ -48,7 +49,7 @@ begin
 		end if;
 	end process;
 
-	process (clk, x)
+	process (clk)
 		variable table_address	: std_logic_vector(12 downto 0);
 		variable char_address	: std_logic_vector(11 downto 0);
 	begin
@@ -70,7 +71,7 @@ begin
 		end if;
 	end process;
 	
-	process (clk,x) begin
+	process (clk) begin
 		if (rising_edge(clk)) then
 			case x(2 downto 0) is
 			when "010" =>
@@ -82,7 +83,7 @@ begin
 				tile_y(1) <= y(1) xor vram_D(2);
 				tile_y(2) <= y(2) xor vram_D(2);
 				palette <= vram_D(3);
-				priority <= vram_D(4);
+				priority_latch <= vram_D(4);
 			when "100" =>
 				data0 <= vram_D;
 			when "101" =>
@@ -96,7 +97,7 @@ begin
 		end if;
 	end process;
 	
-	process (clk,x) begin
+	process (clk) begin
 		if (rising_edge(clk)) then
 			color(0) <= shift0(7);
 			color(1) <= shift1(7);
@@ -109,6 +110,7 @@ begin
 				shift2 <= data2;
 				shift3 <= data3;
 				color(4) <= palette;
+				priority <= priority_latch;
 			when others =>
 				shift0(7 downto 1) <= shift0(6 downto 0);
 				shift1(7 downto 1) <= shift1(6 downto 0);

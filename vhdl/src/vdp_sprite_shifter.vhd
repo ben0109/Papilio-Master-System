@@ -4,12 +4,12 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vpd_sprite_shifter is
 	Port( clk	: in  std_logic;
-			scr_x	: in  unsigned (7 downto 0);
 			x		: in  unsigned (7 downto 0);
-			d0		: in  std_logic_vector (7 downto 0);
-			d1		: in  std_logic_vector (7 downto 0);
-			d2		: in  std_logic_vector (7 downto 0);
-			d3		: in  std_logic_vector (7 downto 0);
+			spr_x	: in  unsigned (7 downto 0);
+			spr_d0: in  std_logic_vector (7 downto 0);
+			spr_d1: in  std_logic_vector (7 downto 0);
+			spr_d2: in  std_logic_vector (7 downto 0);
+			spr_d3: in  std_logic_vector (7 downto 0);
 			color : out std_logic_vector (3 downto 0);
 			active: out std_logic);
 end vpd_sprite_shifter;
@@ -24,16 +24,16 @@ architecture Behavioral of vpd_sprite_shifter is
 
 begin
 
-	process (clk, x, scr_x, d0, d1, d2, d3)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			color <= shift3(7)&shift2(7)&shift1(7)&shift0(7);
 			active <= shift3(7) or shift2(7) or shift1(7) or shift0(7);
-			if scr_x=x then
-				shift0 <= d0;
-				shift1 <= d1;
-				shift2 <= d2;
-				shift3 <= d3;
+			if spr_x=x then
+				shift0 <= spr_d0;
+				shift1 <= spr_d1;
+				shift2 <= spr_d2;
+				shift3 <= spr_d3;
 			else
 				shift0 <= shift0(6 downto 0)&"0";
 				shift1 <= shift1(6 downto 0)&"0";

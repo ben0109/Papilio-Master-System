@@ -42,7 +42,7 @@ begin
 	cram_WE <= not cpu_WR_n and not cpu_A(0) and address(15) and address(14);
 	vram_WE <= not cpu_WR_n and not cpu_A(0) and not (address(15) and address(14));
 
-	process (clk,cpu_RD_n,cpu_WR_n,cpu_A,cpu_D_in,address_ff)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			if cpu_WR_n='1' then
