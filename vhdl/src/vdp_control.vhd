@@ -4,11 +4,15 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_control is
 	port (clk			: in  STD_LOGIC;
+	
 			cpu_RD_n		: in  STD_LOGIC;
 			cpu_WR_n		: in  STD_LOGIC;
 			cpu_A			: in  STD_LOGIC_VECTOR (7 downto 0);
 			cpu_D_in		: in  STD_LOGIC_VECTOR (7 downto 0);
-			cpu_D_out	: out STD_LOGIC_VECTOR (7 downto 0);
+			
+			A				: out STD_LOGIC_VECTOR (13 downto 0);
+			vram_WE		: out STD_LOGIC;
+			cram_WE		: out STD_LOGIC;
 			
 			mask_column0: out STD_LOGIC;
 			line_irq_en	: out STD_LOGIC;
@@ -22,17 +26,7 @@ entity vdp_control is
 			overscan		: out STD_LOGIC_VECTOR (3 downto 0);
 			scroll_x		: out unsigned (7 downto 0);
 			scroll_y		: out unsigned (7 downto 0);
-			line_count	: out unsigned (7 downto 0);
-			
-			vram_A		: out STD_LOGIC_VECTOR (13 downto 0);
-			vram_WE		: out STD_LOGIC;
-			vram_D_in	: out STD_LOGIC_VECTOR (7 downto 0);
-			vram_D_out	: in  STD_LOGIC_VECTOR (7 downto 0);
-			
-			cram_A		: out STD_LOGIC_VECTOR (4 downto 0);
-			cram_WE		: out STD_LOGIC;
-			cram_D_in	: out STD_LOGIC_VECTOR (5 downto 0);
-			cram_D_out	: in  STD_LOGIC_VECTOR (5 downto 0));
+			line_count	: out unsigned (7 downto 0));
 end vdp_control;
 
 architecture Behavioral of vdp_control is
@@ -44,22 +38,9 @@ architecture Behavioral of vdp_control is
 
 begin
 
-	cram_A <= std_logic_vector(address(4 downto 0));
-	cram_D_in <= cpu_D_in(5 downto 0);
+	A <= std_logic_vector(address(13 downto 0));
 	cram_WE <= not cpu_WR_n and not cpu_A(0) and address(15) and address(14);
-				
-	vram_A <= std_logic_vector(address(13 downto 0));
-	vram_D_in <= cpu_D_in;
 	vram_WE <= not cpu_WR_n and not cpu_A(0) and not (address(15) and address(14));
-				
-	process (address,vram_D_out,cram_D_out)
-	begin
-		if address(15)='1' and address(14)='1' then
-			cpu_D_out <= "00"&cram_D_out;
-		else
-			cpu_D_out <= vram_D_out;
-		end if;
-	end process;
 
 	process (clk,cpu_RD_n,cpu_WR_n,cpu_A,cpu_D_in,address_ff)
 	begin

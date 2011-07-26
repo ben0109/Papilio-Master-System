@@ -5,12 +5,13 @@ library UNISIM;
 use UNISIM.vcomponents.all;
 
 entity vdp_vram is
-	Port (clk	: in   STD_LOGIC;
-			we		: in   STD_LOGIC;
-			ain		: in   STD_LOGIC_VECTOR (13 downto 0);
-			din		: in   STD_LOGIC_VECTOR (7 downto 0);
-			aout	: in   STD_LOGIC_VECTOR (13 downto 0);
-			dout	: out  STD_LOGIC_VECTOR (7 downto 0));
+	Port (clk		: in  STD_LOGIC;
+		cpu_WE		: in  STD_LOGIC;
+			cpu_A		: in  STD_LOGIC_VECTOR (13 downto 0);
+			cpu_D_in	: in  STD_LOGIC_VECTOR (7 downto 0);
+			cpu_D_out: out STD_LOGIC_VECTOR (7 downto 0);
+			vdp_A		: in  STD_LOGIC_VECTOR (13 downto 0);
+			vdp_D_out: out STD_LOGIC_VECTOR (7 downto 0));
 end vdp_vram;
 
 architecture Behavioral of vdp_vram is
@@ -84,17 +85,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(0 downto 0),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(0 downto 0),
+		DOA => cpu_D_out(0 downto 0),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(0 downto 0),
+		DOB => vdp_D_out(0 downto 0),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -169,17 +170,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(1 downto 1),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(1 downto 1),
+		DOA => cpu_D_out(1 downto 1),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(1 downto 1),
+		DOB => vdp_D_out(1 downto 1),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -254,17 +255,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(2 downto 2),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(2 downto 2),
+		DOA => cpu_D_out(2 downto 2),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(2 downto 2),
+		DOB => vdp_D_out(2 downto 2),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -339,17 +340,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(3 downto 3),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(3 downto 3),
+		DOA => cpu_D_out(3 downto 3),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(3 downto 3),
+		DOB => vdp_D_out(3 downto 3),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -424,17 +425,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(4 downto 4),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(4 downto 4),
+		DOA => cpu_D_out(4 downto 4),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(4 downto 4),
+		DOB => vdp_D_out(4 downto 4),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -509,17 +510,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(5 downto 5),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(5 downto 5),
+		DOA => cpu_D_out(5 downto 5),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(5 downto 5),
+		DOB => vdp_D_out(5 downto 5),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -594,17 +595,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(6 downto 6),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(6 downto 6),
+		DOA => cpu_D_out(6 downto 6),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(6 downto 6),
+		DOB => vdp_D_out(6 downto 6),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
@@ -679,17 +680,17 @@ begin
 	)
 	port map (
 		CLKA => clk,
-		ADDRA => ain,
-		DIA => din(7 downto 7),
-		DOA => open,
+		ADDRA => cpu_A,
+		DIA => cpu_D_in(7 downto 7),
+		DOA => cpu_D_out(7 downto 7),
 		ENA => '1',
 		SSRA => '0',
-		WEA => we,
+		WEA => cpu_WE,
 
 		CLKB => clk,
-		ADDRB => aout,
+		ADDRB => vdp_A,
 		DIB => "0",
-		DOB => dout(7 downto 7),
+		DOB => vdp_D_out(7 downto 7),
 		ENB => '1',
 		SSRB => '0',
 		WEB => '0'
