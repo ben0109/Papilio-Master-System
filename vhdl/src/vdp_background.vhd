@@ -6,7 +6,7 @@ entity vdp_background is
 port (
 	clk		: in  std_logic;
 	reset		: in  std_logic;
-	map_base	: in  std_logic_vector(2 downto 0);
+	address	: in  std_logic_vector(2 downto 0);
 	scroll_x	: in  unsigned(7 downto 0);
 	y			: in  unsigned(7 downto 0);
 
@@ -54,7 +54,7 @@ begin
 		variable char_address	: std_logic_vector(11 downto 0);
 	begin
 		if (rising_edge(clk)) then
-			table_address(12 downto 10) := map_base;
+			table_address(12 downto 10) := address;
 			table_address(9 downto 5) := std_logic_vector(y(7 downto 3));
 			table_address(4 downto 0) := std_logic_vector(x(7 downto 3) + 1);
 			char_address := tile_index & tile_y;

@@ -45,6 +45,37 @@ architecture Behavioral of vdp is
 			scroll_y		: out unsigned (7 downto 0);
 			line_count	: out unsigned (7 downto 0));
 	end component;
+	
+	component vdp_main is
+		port (clk				: in  std_logic;			
+				vram_A			: out std_logic_vector(13 downto 0);
+				vram_D			: in  std_logic_vector(7 downto 0);
+				cram_A			: out std_logic_vector(4 downto 0);
+				cram_D			: in  std_logic_vector(5 downto 0);
+				sync				: out std_logic;
+				color				: out std_logic_vector (5 downto 0);
+				line_visible	: out STD_lOGIC;
+				line_even		: out STD_lOGIC;
+				irq_n				: out std_logic;
+						
+				pal				: in  std_logic;
+				display_on		: in  std_logic;
+				mask_column0	: in  std_logic;
+				overscan			: in  std_logic_vector (3 downto 0);
+
+				bg_address		: in  std_logic_vector (2 downto 0);
+				bg_scroll_x		: in  unsigned(7 downto 0);
+				bg_scroll_y		: in  unsigned(7 downto 0);
+				
+				irq_frame_en	: in  std_logic;
+				irq_line_en		: in  std_logic;
+				irq_line_count	: in  unsigned(7 downto 0);
+				
+				spr_address		: in  std_logic_vector (5 downto 0);
+				spr_high_bit	: in  std_logic;
+				spr_shift		: in  std_logic;	
+				spr_tall			: in  std_logic);	
+	end component;
 
 	component vdp_vram is
 	port (clk		: in  STD_LOGIC;
@@ -65,30 +96,6 @@ architecture Behavioral of vdp is
 			vdp_D	: out std_logic_vector(5 downto 0));
 	end component;
 	
-	component vdp_background is
-	port (clk		: in  std_logic;
-			reset		: in  std_logic;
-			map_base	: in  std_logic_vector(2 downto 0);
-			scroll_x	: in  unsigned(7 downto 0);
-			y			: in  unsigned(7 downto 0);
-			vram_A	: out std_logic_vector(13 downto 0);
-			vram_D	: in  std_logic_vector(7 downto 0);
-			color		: out std_logic_vector(4 downto 0);
-			priority	: out std_logic);
-	end component;
-	
-	component vdp_sprites is
-	port (clk				: in  std_logic;
-			table_address	: in  std_logic_vector(5 downto 0);
-			char_high_bit	: in  std_logic;
-			big_sprites		: in  STD_LOGIC;
-			x					: in  unsigned(8 downto 0);
-			y					: in  unsigned(7 downto 0);
-			vram_A			: out std_logic_vector(13 downto 0);
-			vram_D			: in  std_logic_vector(7 downto 0);
-			color				: out std_logic_vector(3 downto 0));
-	end component;
-	
 	signal control_A		: std_logic_vector(13 downto 0);
 	signal vram_cpu_WE	: std_logic;
 	signal vram_vdp_A		: std_logic_vector(13 downto 0);
@@ -97,20 +104,22 @@ architecture Behavioral of vdp is
 	signal cram_cpu_WE	: std_logic;
 	signal cram_vdp_A		: std_logic_vector(4 downto 0);
 	signal cram_vdp_D		: std_logic_vector(5 downto 0);
-
-	signal mask_column0	: std_logic;
-	signal line_irq_en	: std_logic;
-	signal shift_spr		: std_logic;			
+			
 	signal display_on		: std_logic;
-	signal frame_irq_en	: std_logic;
-	signal big_sprites	: std_logic;
-	signal text_address	: std_logic_vector (2 downto 0);
-	signal spr_address	: std_logic_vector (5 downto 0);
-	signal spr_high_bit	: std_logic;
+	signal mask_column0	: std_logic;
 	signal overscan		: std_logic_vector (3 downto 0);
-	signal scroll_x		: unsigned(7 downto 0);
-	signal scroll_y		: unsigned(7 downto 0);
-	signal line_count		: unsigned(7 downto 0);
+	
+	signal irq_frame_en	: std_logic;
+	signal irq_line_en	: std_logic;
+	signal irq_line_count: unsigned(7 downto 0);
+	
+	signal bg_address		: std_logic_vector (2 downto 0);
+	signal bg_scroll_x	: unsigned(7 downto 0);
+	signal bg_scroll_y	: unsigned(7 downto 0);
+	signal spr_address	: std_logic_vector (5 downto 0);
+	signal spr_shift		: std_logic;
+	signal spr_tall		: std_logic;
+	signal spr_high_bit	: std_logic;
 
 	signal hcount			: unsigned(8 downto 0) := (others => '0');
 	signal vcount			: unsigned(8 downto 0) := "000101000";
@@ -119,7 +128,6 @@ architecture Behavioral of vdp is
 	signal y					: unsigned(7 downto 0);
 	signal line_reset		: std_logic;
 
-	signal bg_address		: std_logic_vector(2 downto 0);
 	signal bg_vram_A		: std_logic_vector(13 downto 0);
 	signal bg_color		: std_logic_vector(4 downto 0);
 	signal bg_priority	: std_logic;
@@ -146,19 +154,51 @@ begin
 		vram_WE		=> vram_cpu_WE,
 		cram_WE		=> cram_cpu_WE,
 			
-		mask_column0=> mask_column0,
-		line_irq_en	=> line_irq_en,
-		shift_spr	=> shift_spr,
 		display_on	=> display_on,
-		frame_irq_en=> frame_irq_en,
-		big_sprites	=> big_sprites,
+		mask_column0=> mask_column0,
+		overscan		=> overscan,
+		
+		frame_irq_en=> irq_frame_en,
+		line_irq_en	=> irq_line_en,
+		line_count	=> irq_line_count,
+		
 		text_address=> bg_address,
+		scroll_x		=> bg_scroll_x,
+		scroll_y		=> bg_scroll_y,
 		spr_address	=> spr_address,
 		spr_high_bit=> spr_high_bit,
-		overscan		=> overscan,
-		scroll_x		=> scroll_x,
-		scroll_y		=> scroll_y,
-		line_count	=> line_count);
+		shift_spr	=> spr_shift,
+		big_sprites	=> spr_tall);
+		
+	vdp_main_inst: vdp_main
+	port map(clk				=> clk,
+				vram_A			=> vram_vdp_A,
+				vram_D			=> vram_vdp_D,
+				cram_A			=> cram_vdp_A,
+				cram_D			=> cram_vdp_D,
+				sync				=> sync,
+				color				=> color,
+				line_visible	=> line_visible,
+				line_even		=> line_even,
+				irq_n				=> irq_n,
+						
+				pal				=> pal,
+				display_on		=> display_on,
+				mask_column0	=> mask_column0,
+				overscan			=> overscan,
+				
+				irq_frame_en	=> irq_frame_en,
+				irq_line_en		=> irq_line_en,
+				irq_line_count	=> irq_line_count,
+
+				bg_address		=> bg_address,
+				bg_scroll_x		=> bg_scroll_x,
+				bg_scroll_y		=> bg_scroll_y,
+				
+				spr_address		=> spr_address,
+				spr_high_bit	=> spr_high_bit,
+				spr_shift		=> spr_shift,
+				spr_tall			=> spr_tall);
 
 	vdp_vram_inst: vdp_vram
 	port map (
@@ -178,155 +218,5 @@ begin
 		cpu_D		=> D_in(5 downto 0),
 		vdp_A		=> cram_vdp_A,
 		vdp_D		=> cram_vdp_D);
-		
-	vdp_bg_inst: vdp_background
-	port map (
-		clk		=> clk,
-		map_base => bg_address,
-		scroll_x => (others=>'0'),
-		reset		=> line_reset,
-		y			=> y,
-		
-		vram_A	=> bg_vram_A,
-		vram_D	=> vram_vdp_D,		
-		color		=> bg_color,
-		priority	=> bg_priority);
-		
-	vdp_spr_inst: vdp_sprites
-	port map (
-		clk				=> clk,
-		table_address	=> spr_address,
-		char_high_bit	=> spr_high_bit,
-		big_sprites		=> big_sprites,
-		x					=> x,
-		y					=> y,
-		
-		vram_A			=> spr_vram_A,
-		vram_D			=> vram_vdp_D,		
-		color				=> spr_color);
-		
-
-	process (clk)
-	begin
-		if rising_edge(clk) then
-			if (pal='1' and hcount=511) or (pal='0' and hcount=509) then
-				hcount <= (others => '0');
-				if (pal='1' and vcount=311) or (pal='0' and vcount=261)  then
-					vcount <= (others=>'0');
-					if frame_irq_en='1' then
-						vbl_irq <= '1';
-					end if;
-				else
-					vcount <= vcount + 1;
-				end if;
-			else
-				hcount <= hcount + 1;
-				vbl_irq <= '0';
-				hbl_irq <= '0';
-			end if;
-
-			if hcount=156 then
-				line_reset <= '1';
-				x <= "111110000";
-				if pal='1' then
-					y <= (vcount(7 downto 0)-64);
-				else
-					y <= (vcount(7 downto 0)-48);
-				end if;
-			else
-				line_reset <= '0';
-				x <= x+1;
-			end if;
-		end if;
-	end process;
-	
-	process (clk)
-	begin
-		if rising_edge(clk) then
-			if vcount<7 then
-				if vcount<3 then
-					if hcount<19 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount<5 then
-					if hcount<219 or (hcount>=256 and hcount<475) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount=5 then
-					if hcount<219 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount<7 then
-					if hcount<19 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				end if;
-				line_visible <= '0';
-				color <= "000000";
-				
-			else
-				if hcount<37 then
-					sync <= '0';
-				else
-					sync <= '1';
-				end if;
-				line_visible <= '1';
-				
-				if vcount<25 or hcount<84 or hcount>=500 then
-					color <= "000000";
-				else
-					color <= cram_vdp_D;
-				end if;
-			end if;
-		end if;
-	end process;
-	
-	line_even <= vcount(0);
-
-	process (x, y)
-		variable spr_active : std_logic;
-		variable bg_active : std_logic;
-	begin
-		if x<256 and y<192 then
-			spr_active := spr_color(0) or spr_color(1) or spr_color(2) or spr_color(3);
-			bg_active := bg_color(0) or bg_color(1) or bg_color(2) or bg_color(3);
-			if (bg_priority='0' and spr_active='1') or (bg_priority='1' and bg_active='0') then
-				cram_vdp_A <= "1"&spr_color;
-			else
-				cram_vdp_A <= bg_color;
-			end if;
-		else
-			cram_vdp_A <= "1"&overscan;
-		end if;
-		
-		if x>=256 and x<384 then
-			vram_vdp_A <= spr_vram_A; -- sprite data
-		else
-			vram_vdp_A <= bg_vram_A; -- background data
-		end if;
-	end process;
-	
-	process (clk)
-	begin
-		if rising_edge(clk) then
-			if vbl_irq='1' or hbl_irq='1' then
-				irq_counter <= to_unsigned(15,4);
-				IRQ_n <= '0';
-			elsif irq_counter=0 then
-				IRQ_n <= '1';
-			else
-				irq_counter <= irq_counter-1;
-				IRQ_n <= '0';
-			end if;
-		end if;
-	end process;
 	
 end Behavioral;

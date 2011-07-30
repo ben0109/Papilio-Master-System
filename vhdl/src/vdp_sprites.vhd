@@ -4,9 +4,9 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_sprites is
 	port (clk				: in  std_logic;
-			table_address	: in  STD_LOGIC_VECTOR (5 downto 0);
+			address			: in  STD_LOGIC_VECTOR (5 downto 0);
 			char_high_bit	: in  std_logic;
-			big_sprites		: in  std_logic;
+			tall				: in  std_logic;
 			vram_A			: out STD_LOGIC_VECTOR (13 downto 0);
 			vram_D			: in  STD_LOGIC_VECTOR (7 downto 0);
 			x					: in  unsigned (8 downto 0);
@@ -148,13 +148,13 @@ begin
 			if x<256 then
 			
 			elsif x<320 then
-				vram_a(13 downto 8) <= table_address;
+				vram_a(13 downto 8) <= address;
 				vram_a(7 downto 0) <= "00" & std_logic_vector(x(5 downto 0));
 				
 			elsif x<384 then
 				i := to_integer(x(5 downto 3));
 				if x(2)='0' then
-					vram_a(13 downto 8) <= table_address;
+					vram_a(13 downto 8) <= address;
 					case x(2 downto 0) is
 					when "000" => vram_a(7 downto 0) <=  "00" & index(i);
 					when "001" => vram_a(7 downto 0) <= "1" & index(i) & "1";
@@ -164,7 +164,7 @@ begin
 				else
 					vram_a(13) <= char_high_bit;
 					vram_a(12 downto 6) <= spr_n(7 downto 1);
-					if big_sprites='1' then
+					if tall='1' then
 						vram_a(5) <= std_logic(spr_y(3));
 					else
 						vram_a(5) <= spr_n(0);
@@ -196,7 +196,7 @@ begin
 				enable <= (others=>'0');
 				
 			elsif x2<320 then
-				if 0<=delta and ((delta<8 and big_sprites='0') or (delta<16 and big_sprites='1')) then
+				if 0<=delta and ((delta<8 and tall='0') or (delta<16 and tall='1')) then
 					if count<8 then
 						index(count) <= std_logic_vector(x2(5 downto 0));
 						enable(count) <= '1';
