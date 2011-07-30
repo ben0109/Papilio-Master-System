@@ -31,19 +31,22 @@ architecture Behavioral of vdp is
 			vram_WE		: out STD_LOGIC;
 			cram_WE		: out STD_LOGIC;
 			
-			mask_column0: out STD_LOGIC;
-			line_irq_en	: out STD_LOGIC;
-			shift_spr	: out STD_LOGIC;			
 			display_on	: out STD_LOGIC;
-			frame_irq_en: out STD_LOGIC;
-			big_sprites	: out STD_LOGIC;
-			text_address: out STD_LOGIC_VECTOR (2 downto 0);
-			spr_address	: out STD_LOGIC_VECTOR (5 downto 0);
-			spr_high_bit: out STD_LOGIC;
+			mask_column0: out STD_LOGIC;
 			overscan		: out STD_LOGIC_VECTOR (3 downto 0);
-			scroll_x		: out unsigned (7 downto 0);
-			scroll_y		: out unsigned (7 downto 0);
-			line_count	: out unsigned (7 downto 0));
+			
+			irq_frame_en: out STD_LOGIC;
+			irq_line_en	: out STD_LOGIC;
+			irq_line_count	: out unsigned (7 downto 0);
+			
+			bg_address	: out STD_LOGIC_VECTOR (2 downto 0);
+			bg_scroll_x	: out unsigned (7 downto 0);
+			bg_scroll_y	: out unsigned (7 downto 0);
+
+			spr_address	: out STD_LOGIC_VECTOR (5 downto 0);
+			spr_shift	: out STD_LOGIC;
+			spr_high_bit: out STD_LOGIC;
+			spr_tall		: out STD_LOGIC);
 	end component;
 	
 	component vdp_main is
@@ -143,32 +146,32 @@ begin
 
 	vdp_control_inst: vdp_control
 	port map (
-		clk			=> clk,
+		clk				=> clk,
 		
-		cpu_RD_n		=> RD_n,
-		cpu_WR_n		=> WR_n,
-		cpu_A			=> A,
-		cpu_D_in		=> D_in,
+		cpu_RD_n			=> RD_n,
+		cpu_WR_n			=> WR_n,
+		cpu_A				=> A,
+		cpu_D_in			=> D_in,
 
-		A				=> control_A,
-		vram_WE		=> vram_cpu_WE,
-		cram_WE		=> cram_cpu_WE,
+		A					=> control_A,
+		vram_WE			=> vram_cpu_WE,
+		cram_WE			=> cram_cpu_WE,
 			
-		display_on	=> display_on,
-		mask_column0=> mask_column0,
-		overscan		=> overscan,
+		display_on		=> display_on,
+		mask_column0	=> mask_column0,
+		overscan			=> overscan,
 		
-		frame_irq_en=> irq_frame_en,
-		line_irq_en	=> irq_line_en,
-		line_count	=> irq_line_count,
+		irq_frame_en	=> irq_frame_en,
+		irq_line_en		=> irq_line_en,
+		irq_line_count	=> irq_line_count,
 		
-		text_address=> bg_address,
-		scroll_x		=> bg_scroll_x,
-		scroll_y		=> bg_scroll_y,
-		spr_address	=> spr_address,
-		spr_high_bit=> spr_high_bit,
-		shift_spr	=> spr_shift,
-		big_sprites	=> spr_tall);
+		bg_address		=> bg_address,
+		bg_scroll_x		=> bg_scroll_x,
+		bg_scroll_y		=> bg_scroll_y,
+		spr_address		=> spr_address,
+		spr_high_bit	=> spr_high_bit,
+		spr_shift		=> spr_shift,
+		spr_tall			=> spr_tall);
 		
 	vdp_main_inst: vdp_main
 	port map(clk				=> clk,

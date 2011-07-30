@@ -14,19 +14,22 @@ entity vdp_control is
 			vram_WE		: out STD_LOGIC;
 			cram_WE		: out STD_LOGIC;
 			
-			mask_column0: out STD_LOGIC;
-			line_irq_en	: out STD_LOGIC;
-			shift_spr	: out STD_LOGIC;			
 			display_on	: out STD_LOGIC;
-			frame_irq_en: out STD_LOGIC;
-			big_sprites	: out STD_LOGIC;
-			text_address: out STD_LOGIC_VECTOR (2 downto 0);
-			spr_address	: out STD_LOGIC_VECTOR (5 downto 0);
-			spr_high_bit: out STD_LOGIC;
+			mask_column0: out STD_LOGIC;
 			overscan		: out STD_LOGIC_VECTOR (3 downto 0);
-			scroll_x		: out unsigned (7 downto 0);
-			scroll_y		: out unsigned (7 downto 0);
-			line_count	: out unsigned (7 downto 0));
+			
+			irq_frame_en: out STD_LOGIC;
+			irq_line_en	: out STD_LOGIC;
+			irq_line_count	: out unsigned (7 downto 0);
+			
+			bg_address	: out STD_LOGIC_VECTOR (2 downto 0);
+			bg_scroll_x	: out unsigned (7 downto 0);
+			bg_scroll_y	: out unsigned (7 downto 0);
+
+			spr_address	: out STD_LOGIC_VECTOR (5 downto 0);
+			spr_shift	: out STD_LOGIC;
+			spr_high_bit: out STD_LOGIC;
+			spr_tall		: out STD_LOGIC);
 end vdp_control;
 
 architecture Behavioral of vdp_control is
@@ -64,14 +67,14 @@ begin
 							case cpu_D_in(5 downto 0) is
 							when "000000" =>
 								mask_column0 <= address(5);
-								line_irq_en <= address(4);
-								shift_spr <= address(3);
+								irq_line_en <= address(4);
+								spr_shift <= address(3);
 							when "000001" =>
 								display_on <= address(6);
-								frame_irq_en <= address(5);
-								big_sprites <= address(1);
+								irq_frame_en <= address(5);
+								spr_tall <= address(1);
 							when "000010" =>
-								text_address <= std_logic_vector(address(3 downto 1));
+								bg_address <= std_logic_vector(address(3 downto 1));
 							when "000101" =>
 								spr_address <= std_logic_vector(address(6 downto 1));
 							when "000110" =>
@@ -79,11 +82,11 @@ begin
 							when "000111" =>
 								overscan <= std_logic_vector(address(3 downto 0));
 							when "001000" =>
-								scroll_x <= address(7 downto 0);
+								bg_scroll_x <= address(7 downto 0);
 							when "001001" =>
-								scroll_y <= address(7 downto 0);
+								bg_scroll_y <= address(7 downto 0);
 							when "001010" =>
-								line_count <= address(7 downto 0);
+								irq_line_count <= address(7 downto 0);
 							when others =>
 							end case;
 						end if;
