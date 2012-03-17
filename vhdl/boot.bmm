@@ -1,14 +1,25 @@
 ADDRESS_MAP bootrom PPC405 0
-	ADDRESS_SPACE rom_code RAMB16[0x00000000:0x00003FFF]
+	// BOOT ROM
+	ADDRESS_SPACE boot_code RAMB16[0x00000000:0x00001FFF]
 		BUS_BLOCK
-			boot_rom_inst/RAMB16_S9_inst7 [7:7] PLACED=X1Y3;
-			boot_rom_inst/RAMB16_S9_inst6 [6:6] PLACED=X1Y2;
-			boot_rom_inst/RAMB16_S9_inst5 [5:5] PLACED=X1Y1;
-			boot_rom_inst/RAMB16_S9_inst4 [4:4] PLACED=X1Y0;
-			boot_rom_inst/RAMB16_S9_inst3 [3:3] PLACED=X0Y3;
-			boot_rom_inst/RAMB16_S9_inst2 [2:2] PLACED=X0Y2;
-			boot_rom_inst/RAMB16_S9_inst1 [1:1] PLACED=X0Y1;
-			boot_rom_inst/RAMB16_S9_inst0 [0:0] PLACED=X0Y0;
+			boot_rom_inst/RAMB16_S2_inst3 [7:6] PLACED=X1Y3;
+			boot_rom_inst/RAMB16_S2_inst2 [5:4] PLACED=X1Y2;
+			boot_rom_inst/RAMB16_S2_inst1 [3:2] PLACED=X1Y1;
+			boot_rom_inst/RAMB16_S2_inst0 [1:0] PLACED=X1Y0;
+		END_BUS_BLOCK;
+	END_ADDRESS_SPACE;
+
+	// VRAM
+	ADDRESS_SPACE vram_code RAMB16[0x00008000:0x0000BFFF]
+		BUS_BLOCK
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst7 [7:7] PLACED=X0Y7;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst6 [6:6] PLACED=X0Y6;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst5 [5:5] PLACED=X0Y5;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst4 [4:4] PLACED=X0Y4;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst3 [3:3] PLACED=X0Y3;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst2 [2:2] PLACED=X0Y2;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst1 [1:1] PLACED=X0Y1;
+			vdp_inst/vdp_vram_inst/RAMB16_S1_inst0 [0:0] PLACED=X0Y0;
 		END_BUS_BLOCK;
 	END_ADDRESS_SPACE;
 END_ADDRESS_MAP;
