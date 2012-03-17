@@ -1,6 +1,7 @@
 void start_rom();
 void wait_vbl();
 byte key_wait();
+byte key_read();
 
 void vdp_set_address(word address);
 void vdp_write(byte b);
@@ -41,6 +42,11 @@ void music_on_irq();
 void music_start();
 void music_stop();
 
+byte spi_write0(byte value);
+void spi_write1(byte value);
+byte spi_read0();
+byte spi_read1();
+
 
 void sort_directory(byte* buffer);
 
@@ -52,7 +58,7 @@ void irq_handler()
 {
 //	vdp_set_address(0xc000);
 //	vdp_write(0x1);
-	music_on_irq();
+//	music_on_irq();
 }
 
 void nmi_handler()
@@ -61,51 +67,51 @@ void nmi_handler()
 
 void main()
 {
+	byte key;
 	console_init();
 
 	// sega logo
-	init_sega_logo();
 	draw_sega_logo();
-
-	// arrow
-	vdp_set_address(0x1500);
-	video_copy(arrow_data, 0x40);
 	
+	vdp_set_address(0x3800);
+	repeat(20) {
+		repeat(0x20) {
+			vdp_write(0);
+			vdp_write(0);
+		}
+	}
+
+//	music_start();
+	music_stop();
+
+	vdp_set_address(0x8140);
 	console_move_to(0,0);
 	console_print("SMS Bootloader v0.91");
 	console_new_line();
 
-//	if (sd_init()) {
-//		console_print("sd card ok");
-//		console_new_line();
-//	} else {
-//		console_print("sd initialization error");
-//		return;
-//	}
 
-//	if (fat_init()) {
-//		console_print("fat init ok");
-//		console_new_line();
-//	} else {
-//		console_print("fat init error");
-//		return;
-//	}
+	if (sd_init()) {
+		console_print("sd card ok");
+		console_new_line();
+	} else {
+		console_print("sd initialization error");
+		return;
+	}
 
-	music_start();
-	vdp_set_address(0x8160);
+	if (fat_init()) {
+		console_print("fat init ok");
+		console_new_line();
+	} else {
+		console_print("fat init error");
+		return;
+	}
 
-//	if (!fat_open_root_directory()) {
-//		console_print("error while reading root directory");
-//		return;
-//	}
+	if (!fat_open_root_directory()) {
+		console_print("error while reading root directory");
+		return;
+	}
 
-//	main_loop();
-}
-
-void init_sega_logo()
-{
-	vdp_set_address(0x1000);
-	video_copy(sega_logo, 0x500);
+	main_loop();
 }
 
 void draw_sega_logo()
@@ -150,7 +156,7 @@ void main_loop()
 		while (true) {
 			print_dir(scroll_position,cursor_position);
 			key = key_wait();
-			if ((key&1)!=0) {
+			if ((key&4)!=0) {
 				if (cursor_position>directory_buffer) {
 					cursor_position = cursor_position-0x10;
 				}

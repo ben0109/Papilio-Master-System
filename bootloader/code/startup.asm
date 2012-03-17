@@ -49,7 +49,7 @@ org $0066
 	retn
 
 start:
-	ei
+;	ei
 	call main
 
 end:
@@ -93,14 +93,18 @@ wait_vbl:
 	halt
 	ret
 	
+key_read:
+	in a,($dc)
+	ret
+
 key_wait:
-	call wait_vbl
+;	call wait_vbl
 	in a,($dc)
 	cpl
 	and $3f
 	jr nz,key_wait
 key_wait_loop:
-	call wait_vbl
+;	call wait_vbl
 	in a,($dc)
 	cpl
 	and $3f

@@ -16,7 +16,7 @@ void console_init()
 
 	vdp_set_address(0x8004);	// mode 4
 	vdp_set_address(0x8100);	// display off
-	vdp_set_address(0x820e);	// table address at $3700
+	vdp_set_address(0x820e);	// table address at $3800
 	vdp_set_address(0x8560);	// sprite table at $3000
 	vdp_set_address(0x8700);	// overscan color 0
 	vdp_set_address(0x8800);	// scroll x = 0
@@ -30,7 +30,7 @@ void console_init()
 	}
 
 	vdp_set_address(0x0000);
-	video_load_tiles_1bpp(font_data, 96);
+//	video_load_tiles_1bpp(font_data, 96);
 
 	console_move_to(0,0);
 }

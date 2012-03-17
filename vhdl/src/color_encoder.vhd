@@ -6,7 +6,7 @@ use IEEE.NUMERIC_STD.ALL;
 -- sync is the sync signal (0 for 0V, 1 for 0.3V)
 -- line_visible is 1 for lines that are displayed (only sync when 0)
 -- line_even should be toggled every line
--- color: 222 RGB (r1r0g1g0b1b0)
+-- color: 222 RGB (b1b0g1g0r1r0)
 -- output: 6 bit linear output, "000000" is 0v, "111111" is 1.3V (step is 0.02V)
 entity color_encoder is
     Port ( clk				: in  STD_LOGIC;
@@ -21,8 +21,6 @@ end color_encoder;
 architecture Behavioral of color_encoder is
 
 	component yuv_table
---	port (a	: in  std_logic_vector(5 downto 0);
---			spo: out std_logic_vector(17 downto 0));
 	port (color	: in  std_logic_vector(5 downto 0);
 			y		: out std_logic_vector(5 downto 0);
 			u		: out std_logic_vector(5 downto 0);

@@ -27,54 +27,65 @@ void int32_add_int32(byte* a, byte* b);
 void int32_print(byte* a);
 void int32_debug(byte* a);
 
+byte key_wait();
+
 bool sd_init()
 {
 	byte timeout;
 
-	spi_set_speed(0x40); // 378kHz
+	console_print("sd: set speed");console_new_line();
+	spi_set_speed(0x7f); // 378kHz
 
 	// wait a bit
 	spi_assert_cs();
-	repeat(0xff) {
+	repeat(0x10) {
 		spi_send_byte(0xff);
 	}
 	spi_deassert_cs();
 	spi_send_byte(0xff);
 	spi_send_byte(0xff);
+	spi_assert_cs();
 
-	if (sd_cmd0() != 0x01) {	// GO_IDLE_STATE
-		return false;
+	timeout = 0xff;
+	while (sd_cmd0() != 0x01) {	// GO_IDLE_STATE
+		if (timeout==0) {
+			spi_deassert_cs();
+			return false;
+		}
+		timeout = timeout-1;
 	}
 
 	if (sd_cmd8() != 0x01) {
+		spi_deassert_cs();
 		return false;
 	}
 
 	timeout = 0xff;
-	while (true) {
+	while ((sd_acmd41()&1)!=0) {
 		if (timeout==0) {
+			spi_deassert_cs();
 			return false;
-		}
-		if ((sd_acmd41()&1)==0) {
-			break;
 		}
 		timeout = timeout-1;
 	}
 
 	if (sd_cmd58()!=0) {
+		spi_deassert_cs();
 		return false;
 	}
 	if (sd_cmd16()!=0) {
+		spi_deassert_cs();
 		return false;
 	}
 
+	spi_deassert_cs();
 	return true;
 }
 
 byte sd_wait_r1()
 {
 	byte r;
-	repeat (8) {
+	repeat (32) {
 		r = spi_receive_byte();
 		if ((r&0x80)==0) {
 			return r;
@@ -86,7 +97,6 @@ byte sd_wait_r1()
 byte sd_cmd0()
 {
 	byte r;
-	spi_assert_cs();
 
 	spi_send_byte(0x40);
 	spi_send_byte(0x00);
@@ -97,8 +107,6 @@ byte sd_cmd0()
 
 	r = sd_wait_r1();
 
-	spi_delay();
-	spi_deassert_cs();
 //	console_print("cmd0:");
 //	console_print_byte(r);
 //	console_new_line();
@@ -108,7 +116,6 @@ byte sd_cmd0()
 byte sd_cmd8()
 {
 	byte r;
-	spi_assert_cs();
 
 	spi_send_byte(0x48);
 	spi_send_byte(0x00);
@@ -124,8 +131,6 @@ byte sd_cmd8()
 	spi_delay();
 	spi_delay();
 
-	spi_delay();
-	spi_deassert_cs();
 //	console_print("cmd8:");
 //	console_print_byte(r);
 //	console_new_line();
@@ -135,9 +140,8 @@ byte sd_cmd8()
 byte sd_acmd41()
 {
 	byte r;
-	spi_assert_cs();
 
-	spi_send_byte(0x77);
+	spi_send_byte(0x77); // CMD55
 	spi_send_byte(0x00);
 	spi_send_byte(0x00);
 	spi_send_byte(0x00);
@@ -146,11 +150,7 @@ byte sd_acmd41()
 
 	r = sd_wait_r1();
 
-	spi_delay();
-	spi_deassert_cs();
-	spi_assert_cs();
-
-	spi_send_byte(0x69);
+	spi_send_byte(0x69); // CMD41
 	spi_send_byte(0x40);
 	spi_send_byte(0x00);
 	spi_send_byte(0x00);
@@ -159,8 +159,6 @@ byte sd_acmd41()
 
 	r = sd_wait_r1();
 
-	spi_delay();
-	spi_deassert_cs();
 //	console_print("cmd41:");
 //	console_print_byte(r);
 //	console_new_line();
@@ -170,7 +168,6 @@ byte sd_acmd41()
 byte sd_cmd58()
 {
 	byte r;
-	spi_assert_cs();
 
 	spi_send_byte(0x7a);
 	spi_send_byte(0x00);
@@ -180,14 +177,11 @@ byte sd_cmd58()
 	spi_send_byte(0xff);
 
 	r = sd_wait_r1();
-	spi_delay();
-	spi_delay();
+	spi_delay(); // if &0xc0==0xc0 => SDHC
 	spi_delay();
 	spi_delay();
 	spi_delay();
 
-	spi_delay();
-	spi_deassert_cs();
 //	console_print("cmd58:");
 //	console_print_byte(r);
 //	console_new_line();
@@ -197,7 +191,6 @@ byte sd_cmd58()
 byte sd_cmd16()
 {
 	byte r;
-	spi_assert_cs();
 
 	spi_send_byte(0x50);
 	spi_send_byte(0x00);
@@ -208,31 +201,7 @@ byte sd_cmd16()
 
 	r = sd_wait_r1();
 
-	spi_delay();
-	spi_deassert_cs();
 //	console_print("cmd16:");
-//	console_print_byte(r);
-//	console_new_line();
-	return r;
-}
-
-byte sd_cmd17(byte* address)
-{
-	byte r;
-	spi_assert_cs();
-
-	spi_send_byte(0x51);
-	spi_send_byte(address[3]);
-	spi_send_byte(address[2]);
-	spi_send_byte(address[1]);
-	spi_send_byte(address[0]);
-	spi_send_byte(0xff);
-
-	r = sd_wait_r1();
-
-	spi_delay();
-	spi_deassert_cs();
-//	console_print("cmd17:");
 //	console_print_byte(r);
 //	console_new_line();
 	return r;
@@ -241,6 +210,8 @@ byte sd_cmd17(byte* address)
 bool sd_load_sector(byte* target, byte* sector)
 {
 	byte[4] address;
+	byte r;
+	byte timeout;
 
 	address[0] = 0;
 	address[1] = sector[0];
@@ -249,31 +220,39 @@ bool sd_load_sector(byte* target, byte* sector)
 
 	int32_add_int32(address,address);
 
-//	console_print("loading address ");
-//	int32_print(address);
-//	console_new_line();
+	console_print("loading address ");
+	int32_print(address);
+	console_new_line();
 
-	if ((sd_cmd17(address)&0x80)!=0) {
+	// SEND CMD17
+	spi_assert_cs();
+	spi_send_byte(0x51);		// CMD17
+	spi_send_byte(address[3]);
+	spi_send_byte(address[2]);
+	spi_send_byte(address[1]);
+	spi_send_byte(address[0]);
+	spi_send_byte(0xff);
+
+	r = sd_wait_r1();
+//	console_print("cmd17:");
+//	console_print_byte(r);
+//	console_new_line();
+	if ((r&0x80)!=0) {
+		spi_deassert_cs();
 		return false;
 	}
 
-	return sd_receive_block(target);
-}
-
-bool sd_receive_block(byte* target)
-{
-	byte r = 0;
-	spi_assert_cs();
-	while (true) {
-		if (spi_receive_byte()==0xfe) {
-			break;
-		}
-		r = r+1;
-		if (r>=8) {
+	// wait for 0xfe (start of block)
+	timeout = 0xff;
+	while (spi_receive_byte()!=0xfe) {
+		if (timeout==0) {
+			spi_deassert_cs();
 			return false;
 		}
+		timeout = timeout-1;
 	}
 
+	// read block
 	repeat (0x200) {
 		*target = spi_receive_byte();
 		target = target + 1;
@@ -283,6 +262,7 @@ bool sd_receive_block(byte* target)
 	spi_delay();
 	spi_delay();
 
+	// shutdown
 	spi_delay();
 	spi_deassert_cs();
 	return true;

@@ -1,6 +1,6 @@
 void psg_write(byte b);
 
-extern byte[] music_data;
+//extern byte[] music_data;
 
 byte* music_pointer;
 bool music_on;
@@ -28,13 +28,13 @@ void music_on_irq()
 
 void music_start()
 {
-	music_pointer = music_data;
-	music_on = true;
+//	music_pointer = music_data;
+//	music_on = true;
 }
 
 void music_stop()
 {
-	music_on = false;
+//	music_on = false;
 }
 
 byte music_read_byte()

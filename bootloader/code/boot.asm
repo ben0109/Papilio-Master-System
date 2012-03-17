@@ -79,7 +79,7 @@ org $0066
 	retn
 
 start:
-	ei
+;	ei
 	call main
 
 end:
@@ -123,14 +123,18 @@ wait_vbl:
 	halt
 	ret
 	
+key_read:
+	in a,($dc)
+	ret
+
 key_wait:
-	call wait_vbl
+;	call wait_vbl
 	in a,($dc)
 	cpl
 	and $3f
 	jr nz,key_wait
 key_wait_loop:
-	call wait_vbl
+;	call wait_vbl
 	in a,($dc)
 	cpl
 	and $3f
@@ -322,7 +326,7 @@ int32_is_equal:
 	add ix,sp
 	push bc
 	ld b,$04
-_int32_is_equal_56:
+_int32_is_equal_71:
 	ld l,(ix+$06)
 	ld h,(ix+$07)
 	ld a,(hl)
@@ -330,12 +334,12 @@ _int32_is_equal_56:
 	ld h,(ix+$05)
 	ld h,(hl)
 	sub h
-	jr z,_int32_is_equal_58
+	jr z,_int32_is_equal_73
 	pop bc
 	xor a
 	jp _int32_is_equal_end
-_int32_is_equal_58:
-_int32_is_equal_59:
+_int32_is_equal_73:
+_int32_is_equal_74:
 	ld l,(ix+$06)
 	ld h,(ix+$07)
 	inc hl
@@ -346,9 +350,9 @@ _int32_is_equal_59:
 	inc hl
 	ld (ix+$04),l
 	ld (ix+$05),h
-	djnz _int32_is_equal_56
+	djnz _int32_is_equal_71
 	pop bc
-_int32_is_equal_57:
+_int32_is_equal_72:
 	ld a,$01
 _int32_is_equal_end:
 	pop ix
@@ -462,18 +466,18 @@ print_dir_entry:
 	ld (ix+$00),a
 	cpl
 	and $01
-	jr z,_print_dir_entry_44
-	ld hl,_print_dir_entry_46
+	jr z,_print_dir_entry_59
+	ld hl,_print_dir_entry_61
 	push hl
 	call console_print
 	pop de
-	jr _print_dir_entry_45
-_print_dir_entry_44:
-	ld hl,_print_dir_entry_47
+	jr _print_dir_entry_60
+_print_dir_entry_59:
+	ld hl,_print_dir_entry_62
 	push hl
 	call console_print
 	pop de
-_print_dir_entry_45:
+_print_dir_entry_60:
 	ld l,(ix+$07)
 	ld h,(ix+$08)
 	inc hl
@@ -481,7 +485,7 @@ _print_dir_entry_45:
 	ld (ix+$08),h
 	push bc
 	ld b,$08
-_print_dir_entry_48:
+_print_dir_entry_63:
 	ld l,(ix+$07)
 	ld h,(ix+$08)
 	ld a,(hl)
@@ -493,16 +497,16 @@ _print_dir_entry_48:
 	inc hl
 	ld (ix+$07),l
 	ld (ix+$08),h
-	djnz _print_dir_entry_48
+	djnz _print_dir_entry_63
 	pop bc
-_print_dir_entry_49:
+_print_dir_entry_64:
 	ld a,$2e
 	push af
 	call console_print_char
 	pop de
 	push bc
 	ld b,$03
-_print_dir_entry_50:
+_print_dir_entry_65:
 	ld l,(ix+$07)
 	ld h,(ix+$08)
 	ld a,(hl)
@@ -514,24 +518,24 @@ _print_dir_entry_50:
 	inc hl
 	ld (ix+$07),l
 	ld (ix+$08),h
-	djnz _print_dir_entry_50
+	djnz _print_dir_entry_65
 	pop bc
-_print_dir_entry_51:
+_print_dir_entry_66:
 	ld a,(ix+$00)
 	cpl
 	and $01
-	jr z,_print_dir_entry_52
-	ld hl,_print_dir_entry_54
+	jr z,_print_dir_entry_67
+	ld hl,_print_dir_entry_69
 	push hl
 	call console_print
 	pop de
-	jr _print_dir_entry_53
-_print_dir_entry_52:
-	ld hl,_print_dir_entry_55
+	jr _print_dir_entry_68
+_print_dir_entry_67:
+	ld hl,_print_dir_entry_70
 	push hl
 	call console_print
 	pop de
-_print_dir_entry_53:
+_print_dir_entry_68:
 _print_dir_entry_end:
 	ld sp,iy
 	pop iy
@@ -554,7 +558,7 @@ print_dir:
 	ld (ix+$00),a
 	push bc
 	ld b,$14
-_print_dir_36:
+_print_dir_51:
 	ld a,$06
 	push af
 	ld a,$04
@@ -571,7 +575,7 @@ _print_dir_36:
 	scf
 	ccf
 	sbc hl,de
-	jr nz,_print_dir_38
+	jr nz,_print_dir_53
 	ld a,$c8
 	push af
 	call console_print_char
@@ -584,30 +588,30 @@ _print_dir_36:
 	push af
 	call console_print_char
 	pop de
-	jr _print_dir_39
-_print_dir_38:
-	ld hl,_print_dir_40
+	jr _print_dir_54
+_print_dir_53:
+	ld hl,_print_dir_55
 	push hl
 	call console_print
 	pop de
-_print_dir_39:
+_print_dir_54:
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld a,(hl)
 	and a
-	jr z,_print_dir_41
+	jr z,_print_dir_56
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	push hl
 	call print_dir_entry
 	pop de
-	jr _print_dir_42
-_print_dir_41:
-	ld hl,_print_dir_43
+	jr _print_dir_57
+_print_dir_56:
+	ld hl,_print_dir_58
 	push hl
 	call console_print
 	pop de
-_print_dir_42:
+_print_dir_57:
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0010
@@ -615,9 +619,9 @@ _print_dir_42:
 	ld (ix+$01),l
 	ld (ix+$02),h
 	inc (ix+$00)
-	djnz _print_dir_36
+	djnz _print_dir_51
 	pop bc
-_print_dir_37:
+_print_dir_52:
 _print_dir_end:
 	ld sp,iy
 	pop iy
@@ -632,7 +636,7 @@ main_loop:
 	ld ix,$fffb
 	add ix,sp
 	ld sp,ix
-_main_loop_10:
+_main_loop_25:
 	ld hl,directory_buffer
 	push hl
 	call sort_directory
@@ -643,7 +647,7 @@ _main_loop_10:
 	ld hl,directory_buffer
 	ld (ix+$01),l
 	ld (ix+$02),h
-_main_loop_12:
+_main_loop_27:
 	ld l,(ix+$03)
 	ld h,(ix+$04)
 	push hl
@@ -655,15 +659,15 @@ _main_loop_12:
 	pop de
 	call key_wait
 	ld (ix+$00),a
-	and $01
-	jr z,_main_loop_14
+	and $04
+	jr z,_main_loop_29
 	ld hl,directory_buffer
 	ld e,(ix+$01)
 	ld d,(ix+$02)
 	scf
 	ccf
 	sbc hl,de
-	jr nc,_main_loop_16
+	jr nc,_main_loop_31
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0010
@@ -672,8 +676,8 @@ _main_loop_12:
 	sbc hl,de
 	ld (ix+$01),l
 	ld (ix+$02),h
-_main_loop_16:
-_main_loop_17:
+_main_loop_31:
+_main_loop_32:
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld e,(ix+$03)
@@ -681,33 +685,33 @@ _main_loop_17:
 	scf
 	ccf
 	sbc hl,de
-	jr nc,_main_loop_18
+	jr nc,_main_loop_33
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld (ix+$03),l
 	ld (ix+$04),h
-_main_loop_18:
-_main_loop_19:
-_main_loop_14:
-_main_loop_15:
+_main_loop_33:
+_main_loop_34:
+_main_loop_29:
+_main_loop_30:
 	ld a,(ix+$00)
 	and $02
-	jr z,_main_loop_20
+	jr z,_main_loop_35
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0010
 	add hl,de
 	ld a,(hl)
 	and a
-	jr z,_main_loop_22
+	jr z,_main_loop_37
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0010
 	add hl,de
 	ld (ix+$01),l
 	ld (ix+$02),h
-_main_loop_22:
-_main_loop_23:
+_main_loop_37:
+_main_loop_38:
 	ld l,(ix+$03)
 	ld h,(ix+$04)
 	push hl
@@ -722,7 +726,7 @@ _main_loop_23:
 	scf
 	ccf
 	sbc hl,de
-	jr nc,_main_loop_24
+	jr nc,_main_loop_39
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0130
@@ -731,20 +735,20 @@ _main_loop_23:
 	sbc hl,de
 	ld (ix+$03),l
 	ld (ix+$04),h
-_main_loop_24:
-_main_loop_25:
-_main_loop_20:
-_main_loop_21:
+_main_loop_39:
+_main_loop_40:
+_main_loop_35:
+_main_loop_36:
 	ld a,(ix+$00)
 	and $10
-	jr z,_main_loop_26
+	jr z,_main_loop_41
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$0000
 	add hl,de
 	ld a,(hl)
 	and $10
-	jr z,_main_loop_28
+	jr z,_main_loop_43
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$000c
@@ -754,16 +758,16 @@ _main_loop_21:
 	pop de
 	cpl
 	and $01
-	jr z,_main_loop_30
-	ld hl,_main_loop_32
+	jr z,_main_loop_45
+	ld hl,_main_loop_47
 	push hl
 	call console_print
 	pop de
-_main_loop_30:
-_main_loop_31:
+_main_loop_45:
+_main_loop_46:
 	call start_rom
-	jr _main_loop_29
-_main_loop_28:
+	jr _main_loop_44
+_main_loop_43:
 	ld l,(ix+$01)
 	ld h,(ix+$02)
 	ld de,$000c
@@ -773,22 +777,22 @@ _main_loop_28:
 	pop de
 	cpl
 	and $01
-	jr z,_main_loop_33
-	ld hl,_main_loop_35
+	jr z,_main_loop_48
+	ld hl,_main_loop_50
 	push hl
 	call console_print
 	pop de
 	jp _main_loop_end
-_main_loop_33:
-_main_loop_34:
-	jr _main_loop_13
-_main_loop_29:
+_main_loop_48:
+_main_loop_49:
+	jr _main_loop_28
+_main_loop_44:
+_main_loop_41:
+_main_loop_42:
+	jp _main_loop_27
+_main_loop_28:
+	jp _main_loop_25
 _main_loop_26:
-_main_loop_27:
-	jp _main_loop_12
-_main_loop_13:
-	jp _main_loop_10
-_main_loop_11:
 _main_loop_end:
 	ld sp,iy
 	pop iy
@@ -814,7 +818,7 @@ draw_sega_logo:
 	pop de
 	push bc
 	ld b,$0a
-_draw_sega_logo_2:
+_draw_sega_logo_17:
 	ld a,(ix+$00)
 	push af
 	call vdp_write
@@ -824,9 +828,9 @@ _draw_sega_logo_2:
 	call vdp_write
 	pop de
 	inc (ix+$00)
-	djnz _draw_sega_logo_2
+	djnz _draw_sega_logo_17
 	pop bc
-_draw_sega_logo_3:
+_draw_sega_logo_18:
 	ld a,$16
 	push af
 	ld a,$01
@@ -836,7 +840,7 @@ _draw_sega_logo_3:
 	pop de
 	push bc
 	ld b,$0a
-_draw_sega_logo_4:
+_draw_sega_logo_19:
 	ld a,(ix+$00)
 	push af
 	call vdp_write
@@ -846,9 +850,9 @@ _draw_sega_logo_4:
 	call vdp_write
 	pop de
 	inc (ix+$00)
-	djnz _draw_sega_logo_4
+	djnz _draw_sega_logo_19
 	pop bc
-_draw_sega_logo_5:
+_draw_sega_logo_20:
 	ld a,$16
 	push af
 	ld a,$02
@@ -858,7 +862,7 @@ _draw_sega_logo_5:
 	pop de
 	push bc
 	ld b,$0a
-_draw_sega_logo_6:
+_draw_sega_logo_21:
 	ld a,(ix+$00)
 	push af
 	call vdp_write
@@ -868,9 +872,9 @@ _draw_sega_logo_6:
 	call vdp_write
 	pop de
 	inc (ix+$00)
-	djnz _draw_sega_logo_6
+	djnz _draw_sega_logo_21
 	pop bc
-_draw_sega_logo_7:
+_draw_sega_logo_22:
 	ld a,$16
 	push af
 	ld a,$03
@@ -880,7 +884,7 @@ _draw_sega_logo_7:
 	pop de
 	push bc
 	ld b,$0a
-_draw_sega_logo_8:
+_draw_sega_logo_23:
 	ld a,(ix+$00)
 	push af
 	call vdp_write
@@ -890,51 +894,53 @@ _draw_sega_logo_8:
 	call vdp_write
 	pop de
 	inc (ix+$00)
-	djnz _draw_sega_logo_8
+	djnz _draw_sega_logo_23
 	pop bc
-_draw_sega_logo_9:
+_draw_sega_logo_24:
 _draw_sega_logo_end:
 	ld sp,iy
 	pop iy
 	pop ix
 	ret
-;; void init_sega_logo()
-init_sega_logo:
-	push ix
-	ld ix,$0000
-	add ix,sp
-	ld hl,$1000
-	push hl
-	call vdp_set_address
-	pop de
-	ld hl,sega_logo
-	push hl
-	ld hl,$0500
-	push hl
-	call video_copy
-	pop de
-	pop de
-_init_sega_logo_end:
-	pop ix
-	ret
 ;; void main()
 main:
 	push ix
-	ld ix,$0000
+	push iy
+	ld iy,$0000
+	add iy,sp
+	ld ix,$ffff
 	add ix,sp
+	ld sp,ix
 	call console_init
-	call init_sega_logo
 	call draw_sega_logo
-	ld hl,$1500
+	ld hl,$3800
 	push hl
 	call vdp_set_address
 	pop de
-	ld hl,arrow_data
-	push hl
-	ld hl,$0040
-	push hl
-	call video_copy
+	push bc
+	ld b,$14
+_main_1:
+	push bc
+	ld b,$20
+_main_3:
+	ld a,$00
+	push af
+	call vdp_write
 	pop de
+	ld a,$00
+	push af
+	call vdp_write
+	pop de
+	djnz _main_3
+	pop bc
+_main_4:
+	djnz _main_1
+	pop bc
+_main_2:
+	call music_stop
+	ld hl,$8140
+	push hl
+	call vdp_set_address
 	pop de
 	ld a,$00
 	push af
@@ -943,17 +949,58 @@ main:
 	call console_move_to
 	pop de
 	pop de
-	ld hl,_main_1
+	ld hl,_main_5
 	push hl
 	call console_print
 	pop de
 	call console_new_line
-	call music_start
-	ld hl,$8160
+	call sd_init
+	and $01
+	jr z,_main_6
+	ld hl,_main_8
 	push hl
-	call vdp_set_address
+	call console_print
 	pop de
+	call console_new_line
+	jr _main_7
+_main_6:
+	ld hl,_main_9
+	push hl
+	call console_print
+	pop de
+	jp _main_end
+_main_7:
+	call fat_init
+	and $01
+	jr z,_main_10
+	ld hl,_main_12
+	push hl
+	call console_print
+	pop de
+	call console_new_line
+	jr _main_11
+_main_10:
+	ld hl,_main_13
+	push hl
+	call console_print
+	pop de
+	jp _main_end
+_main_11:
+	call fat_open_root_directory
+	cpl
+	and $01
+	jr z,_main_14
+	ld hl,_main_16
+	push hl
+	call console_print
+	pop de
+	jp _main_end
+_main_14:
+_main_15:
+	call main_loop
 _main_end:
+	ld sp,iy
+	pop iy
 	pop ix
 	ret
 ;; void nmi_handler()
@@ -969,7 +1016,6 @@ irq_handler:
 	push ix
 	ld ix,$0000
 	add ix,sp
-	call music_on_irq
 _irq_handler_end:
 	pop ix
 	ret
@@ -1265,13 +1311,6 @@ _console_init_2:
 	push hl
 	call vdp_set_address
 	pop de
-	ld hl,font_data
-	push hl
-	ld a,$60
-	push af
-	call video_load_tiles_1bpp
-	pop de
-	pop de
 	ld a,$00
 	push af
 	ld a,$00
@@ -1284,68 +1323,13 @@ _console_init_end:
 	pop iy
 	pop ix
 	ret
-;; bool sd_receive_block(byte* target)
-sd_receive_block:
-	push ix
-	push iy
-	ld iy,$0000
-	add iy,sp
-	ld ix,$ffff
-	add ix,sp
-	ld sp,ix
-	ld a,$00
-	ld (ix+$00),a
-	call spi_assert_cs
-_sd_receive_block_23:
-	call spi_receive_byte
-	sub $fe
-	jr z,_sd_receive_block_24
-_sd_receive_block_26:
-	inc (ix+$00)
-	ld a,(ix+$00)
-	sub $08
-	jr c,_sd_receive_block_27
-	xor a
-	jp _sd_receive_block_end
-_sd_receive_block_27:
-_sd_receive_block_28:
-	jp _sd_receive_block_23
-_sd_receive_block_24:
-	push bc
-	ld bc,$0200
-_sd_receive_block_29:
-	call spi_receive_byte
-	ld l,(ix+$07)
-	ld h,(ix+$08)
-	ld (hl),a
-	ld l,(ix+$07)
-	ld h,(ix+$08)
-	inc hl
-	ld (ix+$07),l
-	ld (ix+$08),h
-	dec bc
-	ld a,b
-	or  c
-	jr nz,_sd_receive_block_29
-	pop bc
-_sd_receive_block_30:
-	call spi_delay
-	call spi_delay
-	call spi_delay
-	call spi_deassert_cs
-	ld a,$01
-_sd_receive_block_end:
-	ld sp,iy
-	pop iy
-	pop ix
-	ret
 ;; bool sd_load_sector(byte* target, byte* sector)
 sd_load_sector:
 	push ix
 	push iy
 	ld iy,$0000
 	add iy,sp
-	ld ix,$fffc
+	ld ix,$fffa
 	add ix,sp
 	ld sp,ix
 	ld a,$00
@@ -1354,15 +1338,15 @@ sd_load_sector:
 	push hl
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	ex de,hl
 	pop hl
 	pop af
 	add hl,de
 	ld (hl),a
-	ld l,(ix+$0a)
-	ld h,(ix+$0b)
+	ld l,(ix+$0c)
+	ld h,(ix+$0d)
 	ld de,$0000
 	add hl,de
 	ld a,(hl)
@@ -1371,15 +1355,15 @@ sd_load_sector:
 	push hl
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	ex de,hl
 	pop hl
 	pop af
 	add hl,de
 	ld (hl),a
-	ld l,(ix+$0a)
-	ld h,(ix+$0b)
+	ld l,(ix+$0c)
+	ld h,(ix+$0d)
 	inc hl
 	ld a,(hl)
 	push af
@@ -1387,15 +1371,15 @@ sd_load_sector:
 	push hl
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	ex de,hl
 	pop hl
 	pop af
 	add hl,de
 	ld (hl),a
-	ld l,(ix+$0a)
-	ld h,(ix+$0b)
+	ld l,(ix+$0c)
+	ld h,(ix+$0d)
 	ld de,$0002
 	add hl,de
 	ld a,(hl)
@@ -1404,7 +1388,7 @@ sd_load_sector:
 	push hl
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	ex de,hl
 	pop hl
@@ -1413,79 +1397,67 @@ sd_load_sector:
 	ld (hl),a
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	push hl
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	push hl
 	call int32_add_int32
 	pop de
 	pop de
+	ld hl,_sd_load_sector_22
+	push hl
+	call console_print
+	pop de
 	push ix
 	pop hl
-	ld de,$0000
+	ld de,$0002
 	add hl,de
 	push hl
-	call sd_cmd17
+	call int32_print
 	pop de
-	and $80
-	jr z,_sd_load_sector_21
-	xor a
-	jp _sd_load_sector_end
-_sd_load_sector_21:
-_sd_load_sector_22:
-	ld l,(ix+$0c)
-	ld h,(ix+$0d)
-	push hl
-	call sd_receive_block
-	pop de
-_sd_load_sector_end:
-	ld sp,iy
-	pop iy
-	pop ix
-	ret
-;; byte sd_cmd17(byte* address)
-sd_cmd17:
-	push ix
-	push iy
-	ld iy,$0000
-	add iy,sp
-	ld ix,$ffff
-	add ix,sp
-	ld sp,ix
+	call console_new_line
 	call spi_assert_cs
 	ld a,$51
 	push af
 	call spi_send_byte
 	pop de
-	ld l,(ix+$07)
-	ld h,(ix+$08)
+	push ix
+	pop hl
+	ld de,$0002
+	add hl,de
 	ld de,$0003
 	add hl,de
 	ld a,(hl)
 	push af
 	call spi_send_byte
 	pop de
-	ld l,(ix+$07)
-	ld h,(ix+$08)
+	push ix
+	pop hl
+	ld de,$0002
+	add hl,de
 	ld de,$0002
 	add hl,de
 	ld a,(hl)
 	push af
 	call spi_send_byte
 	pop de
-	ld l,(ix+$07)
-	ld h,(ix+$08)
+	push ix
+	pop hl
+	ld de,$0002
+	add hl,de
 	inc hl
 	ld a,(hl)
 	push af
 	call spi_send_byte
 	pop de
-	ld l,(ix+$07)
-	ld h,(ix+$08)
+	push ix
+	pop hl
+	ld de,$0002
+	add hl,de
 	ld de,$0000
 	add hl,de
 	ld a,(hl)
@@ -1497,11 +1469,55 @@ sd_cmd17:
 	call spi_send_byte
 	pop de
 	call sd_wait_r1
+	ld (ix+$01),a
+	and $80
+	jr z,_sd_load_sector_23
+	call spi_deassert_cs
+	xor a
+	jp _sd_load_sector_end
+_sd_load_sector_23:
+_sd_load_sector_24:
+	ld a,$ff
 	ld (ix+$00),a
+_sd_load_sector_25:
+	call spi_receive_byte
+	sub $fe
+	jp z,_sd_load_sector_26
+	ld a,(ix+$00)
+	and a
+	jr nz,_sd_load_sector_27
+	call spi_deassert_cs
+	xor a
+	jp _sd_load_sector_end
+_sd_load_sector_27:
+_sd_load_sector_28:
+	dec (ix+$00)
+	jp _sd_load_sector_25
+_sd_load_sector_26:
+	push bc
+	ld bc,$0200
+_sd_load_sector_29:
+	call spi_receive_byte
+	ld l,(ix+$0e)
+	ld h,(ix+$0f)
+	ld (hl),a
+	ld l,(ix+$0e)
+	ld h,(ix+$0f)
+	inc hl
+	ld (ix+$0e),l
+	ld (ix+$0f),h
+	dec bc
+	ld a,b
+	or  c
+	jr nz,_sd_load_sector_29
+	pop bc
+_sd_load_sector_30:
+	call spi_delay
+	call spi_delay
 	call spi_delay
 	call spi_deassert_cs
-	ld a,(ix+$00)
-_sd_cmd17_end:
+	ld a,$01
+_sd_load_sector_end:
 	ld sp,iy
 	pop iy
 	pop ix
@@ -1515,7 +1531,6 @@ sd_cmd16:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	call spi_assert_cs
 	ld a,$50
 	push af
 	call spi_send_byte
@@ -1542,9 +1557,6 @@ sd_cmd16:
 	pop de
 	call sd_wait_r1
 	ld (ix+$00),a
-	call spi_delay
-	call spi_deassert_cs
-	ld a,(ix+$00)
 _sd_cmd16_end:
 	ld sp,iy
 	pop iy
@@ -1559,7 +1571,6 @@ sd_cmd58:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	call spi_assert_cs
 	ld a,$7a
 	push af
 	call spi_send_byte
@@ -1590,9 +1601,6 @@ sd_cmd58:
 	call spi_delay
 	call spi_delay
 	call spi_delay
-	call spi_delay
-	call spi_delay
-	call spi_deassert_cs
 	ld a,(ix+$00)
 _sd_cmd58_end:
 	ld sp,iy
@@ -1608,7 +1616,6 @@ sd_acmd41:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	call spi_assert_cs
 	ld a,$77
 	push af
 	call spi_send_byte
@@ -1635,9 +1642,6 @@ sd_acmd41:
 	pop de
 	call sd_wait_r1
 	ld (ix+$00),a
-	call spi_delay
-	call spi_deassert_cs
-	call spi_assert_cs
 	ld a,$69
 	push af
 	call spi_send_byte
@@ -1664,9 +1668,6 @@ sd_acmd41:
 	pop de
 	call sd_wait_r1
 	ld (ix+$00),a
-	call spi_delay
-	call spi_deassert_cs
-	ld a,(ix+$00)
 _sd_acmd41_end:
 	ld sp,iy
 	pop iy
@@ -1681,7 +1682,6 @@ sd_cmd8:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	call spi_assert_cs
 	ld a,$48
 	push af
 	call spi_send_byte
@@ -1713,8 +1713,6 @@ sd_cmd8:
 	call spi_delay
 	call spi_delay
 	call spi_delay
-	call spi_delay
-	call spi_deassert_cs
 	ld a,(ix+$00)
 _sd_cmd8_end:
 	ld sp,iy
@@ -1730,7 +1728,6 @@ sd_cmd0:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	call spi_assert_cs
 	ld a,$40
 	push af
 	call spi_send_byte
@@ -1757,9 +1754,6 @@ sd_cmd0:
 	pop de
 	call sd_wait_r1
 	ld (ix+$00),a
-	call spi_delay
-	call spi_deassert_cs
-	ld a,(ix+$00)
 _sd_cmd0_end:
 	ld sp,iy
 	pop iy
@@ -1775,20 +1769,20 @@ sd_wait_r1:
 	add ix,sp
 	ld sp,ix
 	push bc
-	ld b,$08
-_sd_wait_r1_17:
+	ld b,$20
+_sd_wait_r1_18:
 	call spi_receive_byte
 	ld (ix+$00),a
 	and $80
-	jr nz,_sd_wait_r1_19
+	jr nz,_sd_wait_r1_20
 	pop bc
 	ld a,(ix+$00)
 	jp _sd_wait_r1_end
-_sd_wait_r1_19:
 _sd_wait_r1_20:
-	djnz _sd_wait_r1_17
+_sd_wait_r1_21:
+	djnz _sd_wait_r1_18
 	pop bc
-_sd_wait_r1_18:
+_sd_wait_r1_19:
 	ld a,(ix+$00)
 _sd_wait_r1_end:
 	ld sp,iy
@@ -1804,21 +1798,26 @@ sd_init:
 	ld ix,$ffff
 	add ix,sp
 	ld sp,ix
-	ld a,$40
+	ld hl,_sd_init_1
+	push hl
+	call console_print
+	pop de
+	call console_new_line
+	ld a,$7f
 	push af
 	call spi_set_speed
 	pop de
 	call spi_assert_cs
 	push bc
-	ld b,$ff
-_sd_init_1:
+	ld b,$10
+_sd_init_2:
 	ld a,$ff
 	push af
 	call spi_send_byte
 	pop de
-	djnz _sd_init_1
+	djnz _sd_init_2
 	pop bc
-_sd_init_2:
+_sd_init_3:
 	call spi_deassert_cs
 	ld a,$ff
 	push af
@@ -1828,51 +1827,66 @@ _sd_init_2:
 	push af
 	call spi_send_byte
 	pop de
-	call sd_cmd0
-	dec a
-	jr z,_sd_init_3
-	xor a
-	jp _sd_init_end
-_sd_init_3:
-_sd_init_4:
-	call sd_cmd8
-	dec a
-	jr z,_sd_init_5
-	xor a
-	jp _sd_init_end
-_sd_init_5:
-_sd_init_6:
+	call spi_assert_cs
 	ld a,$ff
 	ld (ix+$00),a
-_sd_init_7:
+_sd_init_4:
+	call sd_cmd0
+	dec a
+	jp z,_sd_init_5
 	ld a,(ix+$00)
 	and a
-	jr nz,_sd_init_9
+	jr nz,_sd_init_6
+	call spi_deassert_cs
 	xor a
 	jp _sd_init_end
+_sd_init_6:
+_sd_init_7:
+	dec (ix+$00)
+	jp _sd_init_4
+_sd_init_5:
+	call sd_cmd8
+	dec a
+	jr z,_sd_init_8
+	call spi_deassert_cs
+	xor a
+	jp _sd_init_end
+_sd_init_8:
 _sd_init_9:
+	ld a,$ff
+	ld (ix+$00),a
 _sd_init_10:
 	call sd_acmd41
 	and $01
-	jr z,_sd_init_8
+	jp z,_sd_init_11
+	ld a,(ix+$00)
+	and a
+	jr nz,_sd_init_12
+	call spi_deassert_cs
+	xor a
+	jp _sd_init_end
 _sd_init_12:
+_sd_init_13:
 	dec (ix+$00)
-	jp _sd_init_7
-_sd_init_8:
+	jp _sd_init_10
+_sd_init_11:
 	call sd_cmd58
 	and a
-	jr z,_sd_init_13
+	jr z,_sd_init_14
+	call spi_deassert_cs
 	xor a
 	jp _sd_init_end
-_sd_init_13:
 _sd_init_14:
+_sd_init_15:
 	call sd_cmd16
 	and a
-	jr z,_sd_init_15
+	jr z,_sd_init_16
+	call spi_deassert_cs
 	xor a
 	jp _sd_init_end
-_sd_init_15:
 _sd_init_16:
+_sd_init_17:
+	call spi_deassert_cs
 	ld a,$01
 _sd_init_end:
 	ld sp,iy
@@ -3418,8 +3432,6 @@ music_stop:
 	push ix
 	ld ix,$0000
 	add ix,sp
-	xor a
-	ld (music_on),a
 _music_stop_end:
 	pop ix
 	ret
@@ -3428,10 +3440,6 @@ music_start:
 	push ix
 	ld ix,$0000
 	add ix,sp
-	ld de,music_data
-	ld (music_pointer),de
-	ld a,$01
-	ld (music_on),a
 _music_start_end:
 	pop ix
 	ret
@@ -3789,6 +3797,32 @@ console_print_word:
 	pop ix
 	ret
 	
+spi_write0:
+	push ix
+	ld ix,$0000
+	add ix,sp
+	ld a,(ix+$05)
+	out ($c0),a
+	pop ix
+	ret
+
+spi_write1:
+	push ix
+	ld ix,$0000
+	add ix,sp
+	ld a,(ix+$05)
+	out ($c1),a
+	pop ix
+	ret
+
+spi_read0:
+	in a,($00)
+	ret
+
+spi_read1:
+	in a,($01)
+	ret
+
 spi_set_speed:
 	push ix
 	ld ix,$0000
@@ -3833,7 +3867,9 @@ spi_receive_byte:
 	ld a,$ff
 	call spi_send_byte
 	in a,($01)
+;	push af
 ;	call console_print_byte
+;	pop af
 	pop ix
 	ret
 
@@ -3841,7 +3877,9 @@ spi_send_byte:
 	push ix
 	ld ix,$0000
 	add ix,sp
+;	push af
 ;	call console_print_byte
+;	pop af
 spi_send_byte0:
 	push af
 	out ($c1),a
@@ -3852,619 +3890,45 @@ spi_send_byte0_loop:
 	pop af
 	pop ix
 	ret
-
 palette_data:
-db $10,$33,$30,$3f,$00,$33,$33,$33,$03,$33,$33,$33,$1b,$33,$33,$3f
-db $10,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$0f
-
-; 8x8 ascii font (32-127)
-; taken from TONC : http://www.coranac.com/tonc/text/text.htm
-font_data:
-db $00,$00,$00,$00,$00,$00,$00,$00 ;  
-db $18,$18,$18,$18,$18,$00,$18,$00 ; !
-db $6c,$6c,$00,$00,$00,$00,$00,$00 ; "
-db $6c,$6c,$fe,$6c,$fe,$6c,$6c,$00 ; #
-db $18,$3e,$60,$3c,$06,$7c,$18,$00 ; $
-db $00,$66,$ac,$d8,$36,$6a,$cc,$00 ; %
-db $38,$6c,$68,$76,$dc,$ce,$7b,$00 ; &
-db $18,$18,$30,$00,$00,$00,$00,$00 ; '
-db $0c,$18,$30,$30,$30,$18,$0c,$00 ; (
-db $30,$18,$0c,$0c,$0c,$18,$30,$00 ; )
-db $00,$66,$3c,$ff,$3c,$66,$00,$00 ; *
-db $00,$18,$18,$7e,$18,$18,$00,$00 ; +
-db $00,$00,$00,$00,$00,$18,$18,$30 ; ,
-db $00,$00,$00,$7e,$00,$00,$00,$00 ; -
-db $00,$00,$00,$00,$00,$18,$18,$00 ; .
-db $03,$06,$0c,$18,$30,$60,$c0,$00 ; /
-db $3c,$66,$6e,$7e,$76,$66,$3c,$00 ; 0
-db $18,$38,$78,$18,$18,$18,$18,$00 ; 1
-db $3c,$66,$06,$0c,$18,$30,$7e,$00 ; 2
-db $3c,$66,$06,$1c,$06,$66,$3c,$00 ; 3
-db $1c,$3c,$6c,$cc,$fe,$0c,$0c,$00 ; 4
-db $7e,$60,$7c,$06,$06,$66,$3c,$00 ; 5
-db $1c,$30,$60,$7c,$66,$66,$3c,$00 ; 6
-db $7e,$06,$06,$0c,$18,$18,$18,$00 ; 7
-db $3c,$66,$66,$3c,$66,$66,$3c,$00 ; 8
-db $3c,$66,$66,$3e,$06,$0c,$38,$00 ; 9
-db $00,$18,$18,$00,$00,$18,$18,$00 ; :
-db $00,$18,$18,$00,$00,$18,$18,$30 ; ;
-db $00,$06,$18,$60,$18,$06,$00,$00 ; <
-db $00,$00,$7e,$00,$7e,$00,$00,$00 ; =
-db $00,$60,$18,$06,$18,$60,$00,$00 ; >
-db $3c,$66,$06,$0c,$18,$00,$18,$00 ; ?
-db $3c,$66,$5a,$5a,$5e,$60,$3c,$00 ; @
-db $3c,$66,$66,$7e,$66,$66,$66,$00 ; A
-db $7c,$66,$66,$7c,$66,$66,$7c,$00 ; B
-db $1e,$30,$60,$60,$60,$30,$1e,$00 ; C
-db $78,$6c,$66,$66,$66,$6c,$78,$00 ; D
-db $7e,$60,$60,$78,$60,$60,$7e,$00 ; E
-db $7e,$60,$60,$78,$60,$60,$60,$00 ; F
-db $3c,$66,$60,$6e,$66,$66,$3e,$00 ; G
-db $66,$66,$66,$7e,$66,$66,$66,$00 ; H
-db $3c,$18,$18,$18,$18,$18,$3c,$00 ; I
-db $06,$06,$06,$06,$06,$66,$3c,$00 ; J
-db $c6,$cc,$d8,$f0,$d8,$cc,$c6,$00 ; K
-db $60,$60,$60,$60,$60,$60,$7e,$00 ; L
-db $c6,$ee,$fe,$d6,$c6,$c6,$c6,$00 ; M
-db $c6,$e6,$f6,$de,$ce,$c6,$c6,$00 ; N
-db $3c,$66,$66,$66,$66,$66,$3c,$00 ; O
-db $7c,$66,$66,$7c,$60,$60,$60,$00 ; P
-db $78,$cc,$cc,$cc,$cc,$dc,$7e,$00 ; Q
-db $7c,$66,$66,$7c,$6c,$66,$66,$00 ; R
-db $3c,$66,$70,$3c,$0e,$66,$3c,$00 ; S
-db $7e,$18,$18,$18,$18,$18,$18,$00 ; T
-db $66,$66,$66,$66,$66,$66,$3c,$00 ; U
-db $66,$66,$66,$66,$3c,$3c,$18,$00 ; V
-db $c6,$c6,$c6,$d6,$fe,$ee,$c6,$00 ; W
-db $c3,$66,$3c,$18,$3c,$66,$c3,$00 ; X
-db $c3,$66,$3c,$18,$18,$18,$18,$00 ; Y
-db $fe,$0c,$18,$30,$60,$c0,$fe,$00 ; Z
-db $3c,$30,$30,$30,$30,$30,$3c,$00 ; [
-db $c0,$60,$30,$18,$0c,$06,$03,$00 ; \
-db $3c,$0c,$0c,$0c,$0c,$0c,$3c,$00 ; ]
-db $18,$3c,$66,$00,$00,$00,$00,$00 ; ^
-db $00,$00,$00,$00,$00,$00,$fc,$00 ; _
-db $18,$18,$0c,$00,$00,$00,$00,$00 ; `
-db $00,$00,$3c,$06,$3e,$66,$3e,$00 ; a
-db $60,$60,$7c,$66,$66,$66,$7c,$00 ; b
-db $00,$00,$3c,$60,$60,$60,$3c,$00 ; c
-db $06,$06,$3e,$66,$66,$66,$3e,$00 ; d
-db $00,$00,$3c,$66,$7e,$60,$3c,$00 ; e
-db $1c,$30,$7c,$30,$30,$30,$30,$00 ; f
-db $00,$00,$3e,$66,$66,$3e,$06,$3c ; g
-db $60,$60,$7c,$66,$66,$66,$66,$00 ; h
-db $18,$00,$18,$18,$18,$18,$0c,$00 ; i
-db $0c,$00,$0c,$0c,$0c,$0c,$0c,$78 ; j
-db $60,$60,$66,$6c,$78,$6c,$66,$00 ; k
-db $18,$18,$18,$18,$18,$18,$0c,$00 ; l
-db $00,$00,$ec,$fe,$d6,$c6,$c6,$00 ; m
-db $00,$00,$7c,$66,$66,$66,$66,$00 ; n
-db $00,$00,$3c,$66,$66,$66,$3c,$00 ; o
-db $00,$00,$7c,$66,$66,$7c,$60,$60 ; p
-db $00,$00,$3e,$66,$66,$3e,$06,$06 ; q
-db $00,$00,$7c,$66,$60,$60,$60,$00 ; r
-db $00,$00,$3c,$60,$3c,$06,$7c,$00 ; s
-db $30,$30,$7c,$30,$30,$30,$1c,$00 ; t
-db $00,$00,$66,$66,$66,$66,$3e,$00 ; u
-db $00,$00,$66,$66,$66,$3c,$18,$00 ; v
-db $00,$00,$c6,$c6,$d6,$fe,$6c,$00 ; w
-db $00,$00,$c6,$6c,$38,$6c,$c6,$00 ; x
-db $00,$00,$66,$66,$66,$3c,$18,$30 ; y
-db $00,$00,$7e,$0c,$18,$30,$7e,$00 ; z
-db $0c,$18,$18,$30,$18,$18,$0c,$00 ; {
-db $18,$18,$18,$18,$18,$18,$18,$00 ; |
-db $30,$18,$18,$0c,$18,$18,$30,$00 ; }
-db $00,$76,$dc,$00,$00,$00,$00,$00 ; ~
-db $00,$00,$00,$00,$00,$00,$00,$00
-
-arrow_data:
-	db $00,$00,$00,$00
-	db $00,$00,$00,$00
-	db $00,$00,$7f,$00
-	db $00,$00,$7f,$3f
-	db $00,$00,$40,$3f
-	db $00,$00,$7f,$00
-	db $00,$00,$00,$00
-	db $00,$00,$00,$00
-
-	db $00,$00,$30,$00
-	db $00,$00,$38,$10
-	db $00,$00,$fc,$18
-	db $00,$00,$fa,$fc
-	db $00,$00,$02,$fc
-	db $00,$00,$e4,$18
-	db $00,$00,$28,$10
-	db $00,$00,$30,$00
-
-sega_logo:
-db $07,$07,$00,$00,$1c,$1f,$00,$00,$30,$3f,$00,$00,$60,$7f,$00,$00
-db $41,$7f,$00,$00,$c6,$ff,$00,$00,$84,$ff,$00,$00,$88,$ff,$00,$00
-db $ff,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $ff,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $e1,$e1,$00,$00,$26,$e7,$00,$00,$2c,$ef,$00,$00,$30,$ff,$00,$00
-db $f0,$ff,$00,$00,$21,$ff,$00,$00,$21,$ff,$00,$00,$22,$ff,$00,$00
-db $ff,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $7f,$ff,$00,$00,$80,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $f8,$f8,$00,$00,$09,$f9,$00,$00,$0b,$fb,$00,$00,$0e,$ff,$00,$00
-db $f8,$ff,$00,$00,$08,$ff,$00,$00,$08,$ff,$00,$00,$08,$ff,$00,$00
-db $7f,$7f,$00,$00,$c0,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $1f,$ff,$00,$00,$60,$ff,$00,$00,$40,$ff,$00,$00,$80,$ff,$00,$00
-db $fe,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00
-db $fe,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00
-db $03,$03,$00,$00,$0e,$0f,$00,$00,$08,$0f,$00,$00,$18,$1f,$00,$00
-db $11,$1f,$00,$00,$31,$3f,$00,$00,$22,$3f,$00,$00,$22,$3f,$00,$00
-db $f0,$f0,$00,$00,$3d,$fd,$00,$00,$0f,$ff,$00,$00,$0e,$ff,$00,$00
-db $c6,$ff,$00,$00,$46,$ff,$00,$00,$22,$ff,$00,$00,$23,$ff,$00,$00
-db $78,$78,$00,$00,$86,$fe,$00,$00,$7b,$ff,$00,$00,$8d,$ff,$00,$00
-db $b5,$ff,$00,$00,$8d,$ff,$00,$00,$b5,$ff,$00,$00,$7a,$fe,$00,$00
-db $88,$ff,$00,$00,$88,$ff,$00,$00,$84,$ff,$00,$00,$c6,$ff,$00,$00
-db $41,$7f,$00,$00,$60,$7f,$00,$00,$30,$3f,$00,$00,$0c,$0f,$00,$00
-db $ff,$ff,$00,$00,$07,$ff,$00,$00,$01,$ff,$00,$00,$00,$ff,$00,$00
-db $f0,$ff,$00,$00,$0c,$ff,$00,$00,$04,$ff,$00,$00,$02,$ff,$00,$00
-db $e2,$ff,$00,$00,$e2,$ff,$00,$00,$e2,$ff,$00,$00,$e2,$ff,$00,$00
-db $63,$ff,$00,$00,$62,$ff,$00,$00,$22,$ff,$00,$00,$22,$ff,$00,$00
-db $1f,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $ff,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $f8,$ff,$00,$00,$18,$ff,$00,$00,$18,$ff,$00,$00,$18,$ff,$00,$00
-db $f8,$ff,$00,$00,$18,$ff,$00,$00,$18,$ff,$00,$00,$18,$ff,$00,$00
-db $8f,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00
-db $8f,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00
-db $fe,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00,$02,$fe,$00,$00
-db $e2,$fe,$00,$00,$22,$fe,$00,$00,$23,$ff,$00,$00,$23,$ff,$00,$00
-db $62,$7f,$00,$00,$44,$7f,$00,$00,$44,$7f,$00,$00,$c4,$ff,$00,$00
-db $88,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00,$11,$ff,$00,$00
-db $23,$ff,$00,$00,$11,$ff,$00,$00,$11,$ff,$00,$00,$11,$ff,$00,$00
-db $88,$ff,$00,$00,$88,$ff,$00,$00,$88,$ff,$00,$00,$c4,$ff,$00,$00
-db $86,$fe,$00,$00,$78,$78,$00,$00,$00,$00,$00,$00,$80,$80,$00,$00
-db $80,$80,$00,$00,$80,$80,$00,$00,$c0,$c0,$00,$00,$40,$c0,$00,$00
-db $ff,$ff,$00,$00,$80,$ff,$00,$00,$80,$ff,$00,$00,$80,$ff,$00,$00
-db $ff,$ff,$00,$00,$80,$ff,$00,$00,$80,$ff,$00,$00,$80,$ff,$00,$00
-db $f2,$ff,$00,$00,$02,$ff,$00,$00,$04,$ff,$00,$00,$0c,$ff,$00,$00
-db $f0,$ff,$00,$00,$00,$ff,$00,$00,$01,$ff,$00,$00,$07,$ff,$00,$00
-db $22,$ff,$00,$00,$22,$ff,$00,$00,$21,$ff,$00,$00,$71,$ff,$00,$00
-db $70,$ff,$00,$00,$d8,$df,$00,$00,$8c,$8f,$00,$00,$07,$07,$00,$00
-db $1f,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$80,$ff,$00,$00
-db $7f,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $f8,$ff,$00,$00,$08,$ff,$00,$00,$08,$ff,$00,$00,$0c,$ff,$00,$00
-db $fc,$ff,$00,$00,$0e,$ff,$00,$00,$0b,$fb,$00,$00,$09,$f9,$00,$00
-db $8e,$ff,$00,$00,$80,$ff,$00,$00,$40,$ff,$00,$00,$60,$ff,$00,$00
-db $1f,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$c0,$ff,$00,$00
-db $23,$ff,$00,$00,$23,$ff,$00,$00,$22,$ff,$00,$00,$22,$ff,$00,$00
-db $e0,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $11,$ff,$00,$00,$10,$ff,$00,$00,$20,$ff,$00,$00,$20,$ff,$00,$00
-db $3f,$ff,$00,$00,$60,$ff,$00,$00,$60,$ff,$00,$00,$60,$ff,$00,$00
-db $c4,$ff,$00,$00,$04,$ff,$00,$00,$02,$ff,$00,$00,$02,$ff,$00,$00
-db $fe,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00,$00,$ff,$00,$00
-db $40,$c0,$00,$00,$40,$c0,$00,$00,$60,$e0,$00,$00,$20,$e0,$00,$00
-db $20,$e0,$00,$00,$20,$e0,$00,$00,$20,$e0,$00,$00,$20,$e0,$00,$00
-db $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $f8,$f8,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $01,$01,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $f8,$f8,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $7f,$7f,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $e0,$e0,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-music_data:
-db $13,$80,$00,$a0,$00,$c0,$00,$e5,$9f,$bf,$df,$ff,$80,$09,$a5,$0b
-db $e4,$95,$b5,$d5,$06,$80,$00,$e4,$9f,$bf,$df,$15,$80,$00,$a5,$0b
-db $c0,$00,$e4,$9f,$bf,$df,$ff,$81,$05,$a6,$19,$cd,$32,$e4,$95,$b5
-db $d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$03,$98,$b8,$d8
-db $03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a3,$14,$b5,$00
-db $03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$86
-db $06,$95,$03,$af,$10,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02
-db $98,$b8,$00,$03,$80,$00,$95,$03,$a0,$00,$b5,$02,$96,$b6,$00,$02
-db $97,$b7,$00,$00,$02,$98,$b8,$00,$03,$a3,$14,$b5,$00,$02,$99,$b6
-db $00,$02,$9a,$b7,$00,$00,$01,$b8,$00,$03,$88,$08,$95,$03,$ab,$0c
-db $b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80
-db $00,$95,$03,$a0,$00,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02
-db $98,$b8,$00,$03,$a3,$14,$b5,$00,$02,$99,$b6,$00,$02,$9a,$b7,$00
-db $00,$01,$b8,$00,$03,$af,$10,$b5,$03,$cd,$32,$d5,$02,$b6,$d6,$00
-db $02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a0,$00,$b5,$03,$c0,$00
-db $d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a3
-db $14,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$01
-db $95,$06,$a6,$19,$c1,$26,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$a0,$00,$b5,$03,$c0,$00,$d5
-db $03,$99,$b6,$d6,$00,$02,$9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$03
-db $88,$09,$95,$03,$a0,$13,$b5,$03,$96,$b6,$d9,$00,$03,$97,$b7,$da
-db $00,$00,$02,$98,$b8,$00,$03,$88,$08,$95,$03,$a2,$0f,$b5,$02,$96
-db $b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95,$03
-db $a0,$00,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00
-db $03,$89,$07,$95,$03,$a0,$13,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00
-db $00,$02,$98,$b8,$00,$03,$86,$06,$95,$03,$ab,$0c,$b5,$02,$96,$b6
-db $00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95,$03,$a0
-db $00,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03
-db $86,$06,$95,$03,$a0,$13,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00
-db $02,$98,$b8,$00,$03,$89,$07,$95,$03,$a2,$0f,$b5,$02,$96,$b6,$00
-db $02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95,$03,$a0,$00
-db $b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$86
-db $06,$95,$03,$a0,$13,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02
-db $98,$b8,$00,$03,$81,$05,$95,$06,$a6,$19,$cd,$32,$b5,$d5,$03,$96
-db $b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80
-db $00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97
-db $b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a3,$14,$b5,$00,$03,$99
-db $b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$86,$06,$95
-db $03,$af,$10,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8
-db $00,$03,$80,$00,$95,$03,$a0,$00,$b5,$02,$96,$b6,$00,$02,$97,$b7
-db $00,$00,$02,$98,$b8,$00,$03,$a3,$14,$b5,$00,$02,$99,$b6,$00,$02
-db $9a,$b7,$00,$00,$01,$b8,$00,$03,$88,$08,$95,$03,$ab,$0c,$b5,$02
-db $96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95
-db $03,$a0,$00,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8
-db $00,$03,$a3,$14,$b5,$00,$02,$99,$b6,$00,$02,$9a,$b7,$00,$00,$01
-db $b8,$00,$03,$af,$10,$b5,$03,$cd,$32,$d5,$02,$b6,$d6,$00,$02,$b7
-db $d7,$00,$00,$02,$b8,$d8,$00,$03,$a0,$00,$b5,$03,$c0,$00,$d5,$02
-db $b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a3,$14,$b5
-db $00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$01,$95,$06
-db $a6,$19,$c1,$26,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$a0,$00,$b5,$03,$c0,$00,$d5,$03,$99
-db $b6,$d6,$00,$02,$9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$03,$88,$09
-db $95,$03,$a0,$13,$b5,$03,$96,$b6,$d9,$00,$03,$97,$b7,$da,$00,$00
-db $02,$98,$b8,$00,$03,$88,$08,$95,$03,$a2,$0f,$b5,$02,$96,$b6,$00
-db $02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95,$03,$a0,$00
-db $b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$89
-db $07,$95,$03,$a0,$13,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02
-db $98,$b8,$00,$03,$86,$06,$95,$03,$ab,$0c,$b5,$02,$96,$b6,$00,$02
-db $97,$b7,$00,$00,$02,$98,$b8,$00,$03,$80,$00,$95,$03,$a0,$00,$b5
-db $02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$a0,$13
-db $b5,$00,$02,$99,$b6,$00,$02,$9a,$b7,$00,$00,$01,$b8,$00,$03,$89
-db $07,$95,$03,$a2,$0f,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02
-db $98,$b8,$00,$03,$80,$00,$95,$03,$a0,$00,$b5,$02,$96,$b6,$00,$02
-db $97,$b7,$00,$00,$02,$98,$b8,$00,$03,$86,$06,$95,$03,$a0,$13,$b5
-db $02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$8b,$05
-db $95,$06,$a5,$0b,$ce,$21,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0
-db $00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98
-db $b8,$d8,$00,$03,$a7,$0d,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7
-db $da,$00,$00,$01,$b8,$00,$03,$a5,$0b,$b5,$00,$01,$b6,$00,$01,$b7
-db $00,$00,$01,$b8,$00,$03,$a0,$00,$b5,$00,$01,$b6,$00,$01,$b7,$00
-db $00,$01,$b8,$00,$03,$a7,$0d,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00
-db $01,$b8,$00,$03,$8c,$06,$95,$06,$a5,$0b,$ce,$21,$b5,$d5,$03,$96
-db $b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80
-db $00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97
-db $b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a7,$0d,$b5,$00,$03,$99
-db $b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$a5,$0b,$b5
-db $00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a0,$00,$b5,$00
-db $01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a7,$0d,$b5,$00,$01
-db $b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$8b,$05,$95,$06,$af,$10
-db $ce,$21,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02
-db $98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03
-db $96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03
-db $a7,$0d,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01
-db $b8,$00,$03,$8c,$06,$95,$06,$a5,$0b,$c4,$2d,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$80,$00
-db $95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$a7,$0d,$b5,$00,$03,$99,$b6
-db $d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$84,$04,$95,$06
-db $af,$10,$ce,$21,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5
-db $d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8
-db $00,$00,$00,$03,$99,$b9,$d9,$00,$03,$9a,$ba,$da,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$03,$81,$05,$95,$06
-db $a1,$0a,$c3,$1e,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5
-db $d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8
-db $00,$03,$a0,$0c,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00
-db $00,$01,$b8,$00,$03,$a1,$0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00
-db $01,$b8,$00,$03,$a0,$00,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01
-db $b8,$00,$03,$a0,$0c,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8
-db $00,$03,$80,$06,$95,$06,$a1,$0a,$c3,$1e,$b5,$d5,$03,$96,$b6,$d6
-db $00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95
-db $06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01
-db $d7,$00,$03,$98,$b8,$d8,$00,$03,$a0,$0c,$b5,$00,$03,$99,$b6,$d9
-db $00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$a1,$0a,$b5,$00,$01
-db $b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a0,$00,$b5,$00,$01,$b6
-db $00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a0,$0c,$b5,$00,$01,$b6,$00
-db $01,$b7,$00,$00,$01,$b8,$00,$03,$81,$05,$95,$06,$a2,$0f,$c3,$1e
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a0,$0c
-db $b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$80,$06,$95,$06,$a1,$0a,$c5,$28,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$80,$00,$95,$06
-db $a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$a0,$0c,$b5,$00,$03,$99,$b6,$d9,$00
-db $02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$8c,$03,$95,$06,$a2,$0f
-db $c3,$1e,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02
-db $98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03
-db $96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$00
-db $00,$03,$99,$b9,$d9,$00,$03,$9a,$ba,$da,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$03,$88,$04,$95,$06,$a0,$09
-db $cf,$1a,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02
-db $98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03
-db $96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03
-db $ab,$0a,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01
-db $b8,$00,$03,$a0,$09,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8
-db $00,$03,$a0,$00,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00
-db $03,$ab,$0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03
-db $85,$05,$95,$06,$a0,$09,$cf,$1a,$b5,$d5,$03,$96,$b6,$d6,$00,$03
-db $97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0
-db $00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00
-db $03,$98,$b8,$d8,$00,$03,$ab,$0a,$b5,$00,$03,$99,$b6,$d9,$00,$03
-db $9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$a0,$09,$b5,$00,$01,$b6,$00
-db $01,$b7,$00,$00,$01,$b8,$00,$03,$a0,$00,$b5,$00,$01,$b6,$00,$01
-db $b7,$00,$00,$01,$b8,$00,$03,$ab,$0a,$b5,$00,$01,$b6,$00,$01,$b7
-db $00,$00,$01,$b8,$00,$03,$88,$04,$95,$06,$a7,$0d,$cf,$1a,$b5,$d5
-db $03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8
-db $03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$ab,$0a,$b5,$00
-db $03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$85
-db $05,$95,$06,$a0,$09,$cf,$23,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97
-db $b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$80,$00,$95,$06,$a0,$00
-db $c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02
-db $98,$b8,$01,$d8,$03,$ab,$0a,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a
-db $b7,$01,$da,$00,$01,$b8,$00,$03,$86,$03,$95,$06,$a7,$0d,$cf,$1a
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$00,$00,$03
-db $99,$b9,$d9,$00,$03,$9a,$ba,$da,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$03,$84,$04,$95,$06,$a8,$08,$c6,$19
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a1,$0a
-db $b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$a8,$08,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03
-db $a0,$00,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a1
-db $0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$81,$05
-db $95,$06,$a8,$08,$c6,$19,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80,$00,$95,$06,$a0,$00,$c0
-db $00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98
-db $b8,$d8,$00,$03,$a1,$0a,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7
-db $da,$00,$00,$01,$b8,$00,$03,$a8,$08,$b5,$00,$01,$b6,$00,$01,$b7
-db $00,$00,$01,$b8,$00,$03,$a0,$00,$b5,$00,$01,$b6,$00,$01,$b7,$00
-db $00,$01,$b8,$00,$03,$a1,$0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00
-db $01,$b8,$00,$03,$84,$04,$95,$06,$ab,$0c,$c6,$19,$b5,$d5,$03,$96
-db $b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$80
-db $00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97
-db $b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a1,$0a,$b5,$00,$03,$99
-db $b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$81,$05,$95
-db $06,$a8,$08,$ce,$21,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01
-db $d7,$00,$03,$98,$b8,$d8,$00,$03,$80,$00,$95,$06,$a0,$00,$c0,$00
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$a1,$0a,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01
-db $da,$00,$01,$b8,$00,$03,$83,$03,$95,$06,$ab,$0c,$c6,$19,$b5,$d5
-db $03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8
-db $03,$80,$00,$95,$06,$a0,$00,$c0,$00,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$00,$00,$03,$99,$b9
-db $d9,$00,$03,$9a,$ba,$da,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$03,$81,$05,$95,$06,$a6,$19,$cd,$32,$b5,$d5
-db $03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8
-db $03,$a3,$14,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00
-db $01,$b8,$00,$03,$af,$10,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01
-db $b8,$00,$03,$86,$06,$95,$03,$ab,$0c,$b5,$02,$96,$b6,$00,$02,$97
-db $b7,$00,$00,$02,$98,$b8,$00,$03,$af,$10,$b5,$03,$c0,$00,$d5,$03
-db $99,$b6,$d6,$00,$03,$9a,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$88
-db $08,$95,$06,$a3,$14,$cd,$32,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97
-db $b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a6,$19,$b5,$00,$03,$99
-db $b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$a3,$14,$b5
-db $03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8
-db $00,$03,$af,$10,$b5,$03,$cd,$32,$d5,$02,$b6,$d6,$00,$02,$b7,$d7
-db $00,$00,$02,$b8,$d8,$00,$03,$ab,$0c,$b5,$03,$c0,$00,$d5,$02,$b6
-db $d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$af,$10,$b5,$00
-db $02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$03,$a3,$14,$b5
-db $03,$cd,$32,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8
-db $00,$03,$80,$00,$95,$06,$a6,$19,$c1,$26,$b5,$d5,$03,$96,$b6,$d6
-db $00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$a0,$13,$b5
-db $00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03
-db $88,$09,$95,$03,$a2,$0f,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00
-db $02,$98,$b8,$00,$03,$88,$08,$95,$03,$ab,$0c,$b5,$02,$96,$b6,$00
-db $02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$a2,$0f,$b5,$03,$c0,$00
-db $d5,$03,$99,$b6,$d6,$00,$03,$9a,$b7,$d7,$00,$00,$02,$b8,$d8,$00
-db $03,$89,$07,$95,$06,$a0,$13,$c1,$26,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$86,$06,$95,$03
-db $a6,$19,$b5,$03,$96,$b6,$d9,$00,$03,$97,$b7,$da,$00,$00,$02,$98
-db $b8,$00,$03,$a0,$13,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$02
-db $9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$01,$95,$06,$a2,$0f,$c1,$26
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$89,$07,$95,$06,$ab,$0c,$cd,$32,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a2,$0f
-db $b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$86,$06,$95,$06,$a0,$13,$c1,$26,$b5,$d5,$03,$96,$b6,$d6,$00
-db $02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$81,$05,$95,$06
-db $a6,$19,$cd,$32,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$a3,$14,$b5,$00,$03,$99,$b6,$d9,$00
-db $02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$af,$10,$b5,$00,$01,$b6
-db $00,$01,$b7,$00,$00,$01,$b8,$00,$03,$86,$06,$95,$03,$ab,$0c,$b5
-db $02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$af,$10
-db $b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$03,$9a,$b7,$d7,$00,$00
-db $02,$b8,$d8,$00,$03,$88,$08,$95,$06,$a3,$14,$cd,$32,$b5,$d5,$03
-db $96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03
-db $a6,$19,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01
-db $b8,$00,$03,$a3,$14,$b5,$03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7
-db $d7,$00,$00,$02,$b8,$d8,$00,$03,$af,$10,$b5,$03,$cd,$32,$d5,$02
-db $b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$ab,$0c,$b5
-db $03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8
-db $00,$03,$af,$10,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01
-db $b8,$00,$03,$a3,$14,$b5,$03,$cd,$32,$d5,$02,$b6,$d6,$00,$02,$b7
-db $d7,$00,$00,$02,$b8,$d8,$00,$03,$80,$00,$95,$06,$a6,$19,$c1,$26
-db $b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8
-db $01,$d8,$03,$a0,$13,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01
-db $da,$00,$01,$b8,$00,$03,$88,$09,$95,$03,$a2,$0f,$b5,$02,$96,$b6
-db $00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$88,$08,$95,$03,$ab
-db $0c,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03
-db $a2,$0f,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$03,$9a,$b7,$d7
-db $00,$00,$02,$b8,$d8,$00,$03,$89,$07,$95,$06,$a0,$13,$c1,$26,$b5
-db $d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8
-db $00,$03,$86,$06,$95,$03,$a6,$19,$b5,$03,$96,$b6,$d9,$00,$03,$97
-db $b7,$da,$00,$00,$02,$98,$b8,$00,$03,$a0,$13,$b5,$03,$c0,$00,$d5
-db $03,$99,$b6,$d6,$00,$02,$9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$01
-db $95,$06,$a2,$0f,$c1,$26,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$89,$07,$95,$06,$ab,$0c,$cd
-db $32,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98
-db $b8,$d8,$00,$03,$a2,$0f,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7
-db $da,$00,$00,$01,$b8,$00,$03,$86,$06,$95,$06,$a0,$13,$c1,$26,$b5
-db $d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8
-db $00,$03,$8b,$05,$95,$06,$aa,$16,$ce,$21,$b5,$d5,$03,$96,$b6,$d6
-db $00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$af,$10,$b5
-db $00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03
-db $a7,$0d,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a5
-db $0b,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a7,$0d
-db $b5,$03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8
-db $d8,$00,$03,$af,$10,$b5,$03,$ce,$21,$d5,$02,$b6,$d6,$00,$02,$b7
-db $d7,$00,$00,$02,$b8,$d8,$00,$03,$8c,$06,$95,$03,$aa,$16,$b5,$03
-db $96,$b6,$d9,$00,$03,$97,$b7,$da,$00,$00,$02,$98,$b8,$00,$03,$af
-db $10,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$02,$9a,$b7,$01,$d7
-db $00,$02,$b8,$d8,$00,$03,$a7,$0d,$b5,$03,$ce,$21,$d5,$02,$b6,$d6
-db $00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a5,$0b,$b5,$03,$c4
-db $2d,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03
-db $a7,$0d,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$af,$10,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03
-db $8b,$05,$95,$06,$aa,$16,$ce,$21,$b5,$d5,$03,$96,$b6,$d6,$00,$03
-db $97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$af,$10,$b5,$00,$03
-db $99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$a7,$0d
-db $b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$8c,$06,$95
-db $03,$a5,$0b,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8
-db $00,$03,$a7,$0d,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$03,$9a
-db $b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$84,$04,$95,$06,$af,$10,$ce
-db $21,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98
-db $b8,$d8,$00,$03,$aa,$16,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7
-db $da,$00,$00,$01,$b8,$00,$03,$af,$10,$b5,$03,$c0,$00,$d5,$02,$b6
-db $d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a7,$0d,$b5,$03
-db $ce,$21,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00
-db $03,$af,$10,$b5,$03,$c4,$2d,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00
-db $00,$02,$b8,$d8,$00,$03,$a7,$0d,$b5,$00,$02,$b6,$d9,$00,$02,$b7
-db $da,$00,$00,$01,$b8,$00,$03,$a5,$0b,$b5,$03,$ce,$21,$d5,$02,$b6
-db $d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$81,$05,$95,$06
-db $a3,$14,$c3,$1e,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00
-db $00,$02,$98,$b8,$01,$d8,$03,$a2,$0f,$b5,$00,$03,$99,$b6,$d9,$00
-db $02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$a0,$0c,$b5,$00,$01,$b6
-db $00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a1,$0a,$b5,$00,$01,$b6,$00
-db $01,$b7,$00,$00,$01,$b8,$00,$03,$a0,$0c,$b5,$03,$c0,$00,$d5,$02
-db $b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a2,$0f,$b5
-db $03,$c3,$1e,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8
-db $00,$03,$80,$06,$95,$03,$a3,$14,$b5,$03,$96,$b6,$d9,$00,$03,$97
-db $b7,$da,$00,$00,$02,$98,$b8,$00,$03,$a2,$0f,$b5,$03,$c0,$00,$d5
-db $03,$99,$b6,$d6,$00,$02,$9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$03
-db $a0,$0c,$b5,$03,$c3,$1e,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00
-db $02,$b8,$d8,$00,$03,$a1,$0a,$b5,$03,$c5,$28,$d5,$02,$b6,$d6,$00
-db $02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a0,$0c,$b5,$00,$02,$b6
-db $d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$03,$a2,$0f,$b5,$00,$01
-db $b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$81,$05,$95,$06,$a3,$14
-db $c3,$1e,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02
-db $98,$b8,$01,$d8,$03,$a2,$0f,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a
-db $b7,$01,$da,$00,$01,$b8,$00,$03,$a0,$0c,$b5,$00,$01,$b6,$00,$01
-db $b7,$00,$00,$01,$b8,$00,$03,$80,$06,$95,$03,$a1,$0a,$b5,$02,$96
-db $b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03,$a0,$0c,$b5,$03
-db $c0,$00,$d5,$03,$99,$b6,$d6,$00,$03,$9a,$b7,$d7,$00,$00,$02,$b8
-db $d8,$00,$03,$8c,$03,$95,$06,$a2,$0f,$c3,$1e,$b5,$d5,$03,$96,$b6
-db $d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8,$00,$03,$a3,$14
-db $b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$a2,$0f,$b5,$03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00
-db $00,$02,$b8,$d8,$00,$03,$a0,$0c,$b5,$03,$c3,$1e,$d5,$02,$b6,$d6
-db $00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a2,$0f,$b5,$03,$c5
-db $28,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03
-db $a0,$0c,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00
-db $03,$a1,$0a,$b5,$03,$c3,$1e,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00
-db $00,$02,$b8,$d8,$00,$03,$88,$04,$95,$06,$af,$11,$cf,$1a,$b5,$d5
-db $03,$96,$b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8
-db $03,$a7,$0d,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00
-db $01,$b8,$00,$03,$ab,$0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01
-db $b8,$00,$03,$a0,$09,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8
-db $00,$03,$ab,$0a,$b5,$03,$c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7
-db $00,$00,$02,$b8,$d8,$00,$03,$a7,$0d,$b5,$03,$cf,$1a,$d5,$02,$b6
-db $d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$85,$05,$95,$03
-db $af,$11,$b5,$03,$96,$b6,$d9,$00,$03,$97,$b7,$da,$00,$00,$02,$98
-db $b8,$00,$03,$a7,$0d,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$02
-db $9a,$b7,$01,$d7,$00,$02,$b8,$d8,$00,$03,$ab,$0a,$b5,$03,$cf,$1a
-db $d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a0
-db $09,$b5,$03,$cf,$23,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02
-db $b8,$d8,$00,$03,$ab,$0a,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00
-db $00,$01,$b8,$00,$03,$a7,$0d,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00
-db $01,$b8,$00,$03,$88,$04,$95,$06,$af,$11,$cf,$1a,$b5,$d5,$03,$96
-db $b6,$d6,$00,$03,$97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$a7
-db $0d,$b5,$00,$03,$99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8
-db $00,$03,$ab,$0a,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00
-db $03,$85,$05,$95,$03,$a0,$09,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00
-db $00,$02,$98,$b8,$00,$03,$ab,$0a,$b5,$03,$c0,$00,$d5,$03,$99,$b6
-db $d6,$00,$03,$9a,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$86,$03,$95
-db $06,$a7,$0d,$cf,$1a,$b5,$d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01
-db $d7,$00,$03,$98,$b8,$d8,$00,$03,$af,$11,$b5,$00,$03,$99,$b6,$d9
-db $00,$03,$9a,$b7,$da,$00,$00,$01,$b8,$00,$03,$a7,$0d,$b5,$03,$c0
-db $00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03
-db $ab,$0a,$b5,$03,$cf,$1a,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00
-db $02,$b8,$d8,$00,$03,$a7,$0d,$b5,$03,$cf,$23,$d5,$02,$b6,$d6,$00
-db $02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$ab,$0a,$b5,$00,$02,$b6
-db $d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$03,$a0,$09,$b5,$03,$cf
-db $1a,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03
-db $84,$04,$95,$06,$af,$10,$c6,$19,$b5,$d5,$03,$96,$b6,$d6,$00,$03
-db $97,$b7,$d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$ab,$0c,$b5,$00,$03
-db $99,$b6,$d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$a1,$0a
-db $b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a8,$08,$b5
-db $00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$a1,$0a,$b5,$03
-db $c0,$00,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00
-db $03,$ab,$0c,$b5,$03,$c6,$19,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00
-db $00,$02,$b8,$d8,$00,$03,$81,$05,$95,$03,$af,$10,$b5,$03,$96,$b6
-db $d9,$00,$03,$97,$b7,$da,$00,$00,$02,$98,$b8,$00,$03,$ab,$0c,$b5
-db $03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$02,$9a,$b7,$01,$d7,$00,$02
-db $b8,$d8,$00,$03,$a1,$0a,$b5,$03,$c6,$19,$d5,$02,$b6,$d6,$00,$02
-db $b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a8,$08,$b5,$03,$ce,$21,$d5
-db $02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a1,$0a
-db $b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00,$00,$01,$b8,$00,$03,$ab
-db $0c,$b5,$00,$01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$84,$04
-db $95,$06,$af,$10,$c6,$19,$b5,$d5,$03,$96,$b6,$d6,$00,$03,$97,$b7
-db $d7,$00,$00,$02,$98,$b8,$01,$d8,$03,$ab,$0c,$b5,$00,$03,$99,$b6
-db $d9,$00,$02,$9a,$b7,$01,$da,$00,$01,$b8,$00,$03,$a1,$0a,$b5,$00
-db $01,$b6,$00,$01,$b7,$00,$00,$01,$b8,$00,$03,$81,$05,$95,$03,$a8
-db $08,$b5,$02,$96,$b6,$00,$02,$97,$b7,$00,$00,$02,$98,$b8,$00,$03
-db $a1,$0a,$b5,$03,$c0,$00,$d5,$03,$99,$b6,$d6,$00,$03,$9a,$b7,$d7
-db $00,$00,$02,$b8,$d8,$00,$03,$83,$03,$95,$06,$ab,$0c,$c6,$19,$b5
-db $d5,$03,$96,$b6,$d6,$00,$02,$97,$b7,$01,$d7,$00,$03,$98,$b8,$d8
-db $00,$03,$af,$10,$b5,$00,$03,$99,$b6,$d9,$00,$03,$9a,$b7,$da,$00
-db $00,$01,$b8,$00,$03,$ab,$0c,$b5,$03,$c0,$00,$d5,$02,$b6,$d6,$00
-db $02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$a1,$0a,$b5,$03,$c6,$19
-db $d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$ab
-db $0c,$b5,$03,$ce,$21,$d5,$02,$b6,$d6,$00,$02,$b7,$d7,$00,$00,$02
-db $b8,$d8,$00,$03,$a1,$0a,$b5,$00,$02,$b6,$d9,$00,$02,$b7,$da,$00
-db $00,$01,$b8,$00,$03,$a8,$08,$b5,$03,$c6,$19,$d5,$02,$b6,$d6,$00
-db $02,$b7,$d7,$00,$00,$02,$b8,$d8,$00,$03,$81,$05,$95,$01,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+db $20,$33,$30,$3f,$00,$33,$03,$33,$03,$08,$33,$33,$1b,$33,$33,$3f
+db $20,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$33,$0f
 
 
 
 
 
 
-_print_dir_entry_47:
+
+_print_dir_entry_62:
 	db "[",0
-_print_dir_entry_46:
+_print_dir_entry_61:
 	db " ",0
-_print_dir_entry_55:
+_print_dir_entry_70:
 	db "]",0
-_print_dir_entry_54:
+_print_dir_entry_69:
 	db " ",0
-_print_dir_40:
+_print_dir_55:
 	db "   ",0
-_print_dir_43:
+_print_dir_58:
 	db "              ",0
-_main_loop_35:
+_main_loop_50:
 	db "error while reading file",0
-_main_loop_32:
+_main_loop_47:
 	db "error while reading rom",0
 
-
-_main_1:
+_main_5:
 	db "SMS Bootloader v0.91",0
+_main_9:
+	db "sd initialization error",0
+_main_8:
+	db "sd card ok",0
+_main_13:
+	db "fat init error",0
+_main_12:
+	db "fat init ok",0
+_main_16:
+	db "error while reading root directory",0
 
 
 
@@ -4478,16 +3942,16 @@ _main_1:
 
 
 
+_sd_load_sector_22:
+	db "loading address ",0
 
 
 
 
 
 
-
-
-
-
+_sd_init_1:
+	db "sd: set speed",0
 
 
 

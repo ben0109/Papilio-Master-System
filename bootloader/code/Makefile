@@ -12,6 +12,12 @@ boot.o: boot.asm
 boot.mem: boot.o
 	srec_cat boot.o -binary -line_length 59 -o boot.mem -vmem 8
 
+vram.mem: vram.bin
+	srec_cat vram.bin -binary -offset 0x8000 -line_length 59 -o vram.mem -vmem 8
+
+all.mem: vram.mem boot.mem
+	cat boot.mem vram.mem > all.mem
+
 boot.sms: boot.o
 	srec_cat boot.o -binary -fill 0 0 0x8000 -o boot.sms -binary
 
@@ -24,7 +30,7 @@ clean:
 
 OBJECTS := main.mco console.mco sd.mco fat.mco sort.mco debug.mco music.mco
 OBJECTS := $(OBJECTS) int32.mco video.mco spi.mco
-OBJECTS := $(OBJECTS) palette.mco font.mco arrow.mco sega.mco tune.mco
+OBJECTS := $(OBJECTS) palette.mco #font.mco arrow.mco sega.mco tune.mco
 
 boot.asm: startup.asm end.asm $(OBJECTS)
 	$(LINK) $(OBJECTS) > $@
