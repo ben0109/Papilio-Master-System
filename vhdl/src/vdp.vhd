@@ -10,11 +10,11 @@ entity vdp is
 			A					: in  STD_LOGIC_VECTOR (7 downto 0);
 			D_in				: in  STD_LOGIC_VECTOR (7 downto 0);
 			D_out				: out STD_LOGIC_VECTOR (7 downto 0);
-			sync				: out STD_LOGIC;
-			color				: out STD_LOGIC_VECTOR (5 downto 0);
-			line_visible	: out STD_lOGIC;
-			line_even		: out STD_lOGIC;
-			pal				: in  STD_LOGIC);
+			x					: unsigned(8 downto 0);
+			y					: unsigned(7 downto 0);
+			line_reset		: std_logic;
+			frame_reset		: std_logic;
+			color				: out std_logic_vector (5 downto 0));
 end vdp;
 
 architecture Behavioral of vdp is
@@ -50,34 +50,36 @@ architecture Behavioral of vdp is
 	end component;
 	
 	component vdp_main is
-		port (clk				: in  std_logic;			
-				vram_A			: out std_logic_vector(13 downto 0);
-				vram_D			: in  std_logic_vector(7 downto 0);
-				cram_A			: out std_logic_vector(4 downto 0);
-				cram_D			: in  std_logic_vector(5 downto 0);
-				sync				: out std_logic;
-				color				: out std_logic_vector (5 downto 0);
-				line_visible	: out STD_lOGIC;
-				line_even		: out STD_lOGIC;
-				irq_n				: out std_logic;
-						
-				pal				: in  std_logic;
-				display_on		: in  std_logic;
-				mask_column0	: in  std_logic;
-				overscan			: in  std_logic_vector (3 downto 0);
+	port (clk				: in  std_logic;			
+			vram_A			: out std_logic_vector(13 downto 0);
+			vram_D			: in  std_logic_vector(7 downto 0);
+			cram_A			: out std_logic_vector(4 downto 0);
+			cram_D			: in  std_logic_vector(5 downto 0);
+			
+			x					: unsigned(8 downto 0);
+			y					: unsigned(7 downto 0);
+			line_reset		: std_logic;
+			frame_reset		: std_logic;
+			
+			color				: out std_logic_vector (5 downto 0);
+			irq_n				: out std_logic;
+					
+			display_on		: in  std_logic;
+			mask_column0	: in  std_logic;
+			overscan			: in  std_logic_vector (3 downto 0);
 
-				bg_address		: in  std_logic_vector (2 downto 0);
-				bg_scroll_x		: in  unsigned(7 downto 0);
-				bg_scroll_y		: in  unsigned(7 downto 0);
-				
-				irq_frame_en	: in  std_logic;
-				irq_line_en		: in  std_logic;
-				irq_line_count	: in  unsigned(7 downto 0);
-				
-				spr_address		: in  std_logic_vector (5 downto 0);
-				spr_high_bit	: in  std_logic;
-				spr_shift		: in  std_logic;	
-				spr_tall			: in  std_logic);	
+			bg_address		: in  std_logic_vector (2 downto 0);
+			bg_scroll_x		: in  unsigned(7 downto 0);
+			bg_scroll_y		: in  unsigned(7 downto 0);
+			
+			irq_frame_en	: in  std_logic;
+			irq_line_en		: in  std_logic;
+			irq_line_count	: in  unsigned(7 downto 0);
+			
+			spr_address		: in  std_logic_vector (5 downto 0);
+			spr_high_bit	: in  std_logic;
+			spr_shift		: in  std_logic;	
+			spr_tall			: in  std_logic);	
 	end component;
 
 	component vdp_vram is
@@ -108,28 +110,24 @@ architecture Behavioral of vdp is
 	signal cram_vdp_A		: std_logic_vector(4 downto 0);
 	signal cram_vdp_D		: std_logic_vector(5 downto 0);
 			
-	signal display_on		: std_logic;
-	signal mask_column0	: std_logic;
-	signal overscan		: std_logic_vector (3 downto 0);
+	signal display_on		: std_logic := '1';
+	signal mask_column0	: std_logic := '0';
+	signal overscan		: std_logic_vector (3 downto 0) := "0000";
 	
-	signal irq_frame_en	: std_logic;
-	signal irq_line_en	: std_logic;
-	signal irq_line_count: unsigned(7 downto 0);
+	signal irq_frame_en	: std_logic := '0';
+	signal irq_line_en	: std_logic := '0';
+	signal irq_line_count: unsigned(7 downto 0) := (others=>'1');
 	
-	signal bg_address		: std_logic_vector (2 downto 0);
-	signal bg_scroll_x	: unsigned(7 downto 0);
-	signal bg_scroll_y	: unsigned(7 downto 0);
-	signal spr_address	: std_logic_vector (5 downto 0);
-	signal spr_shift		: std_logic;
-	signal spr_tall		: std_logic;
-	signal spr_high_bit	: std_logic;
+	signal bg_address		: std_logic_vector (2 downto 0) := (others=>'0');
+	signal bg_scroll_x	: unsigned(7 downto 0) := (others=>'0');
+	signal bg_scroll_y	: unsigned(7 downto 0) := (others=>'0');
+	signal spr_address	: std_logic_vector (5 downto 0) := (others=>'0');
+	signal spr_shift		: std_logic := '0';
+	signal spr_tall		: std_logic := '0';
+	signal spr_high_bit	: std_logic := '0';
 
-	signal hcount			: unsigned(8 downto 0) := (others => '0');
+	signal hcount			: unsigned(8 downto 0) := (others=>'0');
 	signal vcount			: unsigned(8 downto 0) := "000101000";
-
-	signal x					: unsigned(8 downto 0);
-	signal y					: unsigned(7 downto 0);
-	signal line_reset		: std_logic;
 
 	signal bg_vram_A		: std_logic_vector(13 downto 0);
 	signal bg_color		: std_logic_vector(4 downto 0);
@@ -179,14 +177,15 @@ begin
 				vram_D			=> vram_vdp_D,
 				cram_A			=> cram_vdp_A,
 				cram_D			=> cram_vdp_D,
-				sync				=> sync,
+				
+				x					=> x,
+				y					=> y,
+				line_reset		=> line_reset,
+				frame_reset		=> frame_reset,
 				color				=> color,
-				line_visible	=> line_visible,
-				line_even		=> line_even,
 				irq_n				=> irq_n,
 						
-				pal				=> pal,
-				display_on		=> display_on,
+				display_on		=> '1',--display_on,
 				mask_column0	=> mask_column0,
 				overscan			=> overscan,
 				

@@ -62,10 +62,10 @@ begin
 			case x(2 downto 0) is
 			when "000" => vram_A <= table_address & "0";
 			when "001" => vram_A <= table_address & "1";
-			when "010" => vram_A <= char_address & "00";
-			when "011" => vram_A <= char_address & "01";
-			when "100" => vram_A <= char_address & "10";
-			when "101" => vram_A <= char_address & "11";
+			when "011" => vram_A <= char_address & "00";
+			when "100" => vram_A <= char_address & "01";
+			when "101" => vram_A <= char_address & "10";
+			when "110" => vram_A <= char_address & "11";
 			when others =>
 			end case;
 		end if;
@@ -74,9 +74,9 @@ begin
 	process (clk) begin
 		if (rising_edge(clk)) then
 			case x(2 downto 0) is
-			when "010" =>
+			when "001" =>
 				tile_index(7 downto 0) <= vram_D;
-			when "011" =>
+			when "010" =>
 				tile_index(8) <= vram_D(0);
 				flip_x <= vram_D(1);
 				tile_y(0) <= y(0) xor vram_D(2);
@@ -91,7 +91,7 @@ begin
 			when "110" =>
 				data2 <= vram_D;
 			when "111" =>
-				data3 <= vram_D;
+--				data3 <= vram_D;
 			when others =>
 			end case;
 		end if;
@@ -99,16 +99,12 @@ begin
 	
 	process (clk) begin
 		if (rising_edge(clk)) then
-			color(0) <= shift0(7);
-			color(1) <= shift1(7);
-			color(2) <= shift2(7);
-			color(3) <= shift3(7);
 			case x(2 downto 0) is
 			when "111" =>
 				shift0 <= data0;
 				shift1 <= data1;
 				shift2 <= data2;
-				shift3 <= data3;
+				shift3 <= vram_D;
 				color(4) <= palette;
 				priority <= priority_latch;
 			when others =>
@@ -119,5 +115,10 @@ begin
 			end case;
 		end if;
 	end process;
+	
+	color(0) <= shift0(7);
+	color(1) <= shift1(7);
+	color(2) <= shift2(7);
+	color(3) <= shift3(7);
 end architecture;
 

@@ -38,6 +38,9 @@ architecture Behavioral of vdp_control is
 	signal address		: unsigned(15 downto 0);
 	
 	signal vram_write	: std_logic := '0';
+	
+	signal irq_frame_en_in : std_logic := '0';
+	signal irq_line_en_in : std_logic := '0';
 
 begin
 
@@ -67,11 +70,11 @@ begin
 							case cpu_D_in(5 downto 0) is
 							when "000000" =>
 								mask_column0 <= address(5);
-								irq_line_en <= address(4);
+								irq_line_en_in <= address(4);
 								spr_shift <= address(3);
 							when "000001" =>
 								display_on <= address(6);
-								irq_frame_en <= address(5);
+								irq_frame_en_in <= address(5);
 								spr_tall <= address(1);
 							when "000010" =>
 								bg_address <= std_logic_vector(address(3 downto 1));
@@ -97,6 +100,8 @@ begin
 		end if;
 	end process;
 
+	irq_frame_en <= irq_frame_en_in;
+	irq_line_en <= irq_line_en_in;
 
 end Behavioral;
 

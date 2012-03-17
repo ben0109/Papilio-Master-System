@@ -92,7 +92,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(0 downto 0),
@@ -177,7 +177,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(1 downto 1),
@@ -262,7 +262,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(2 downto 2),
@@ -347,7 +347,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(3 downto 3),
@@ -432,7 +432,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(4 downto 4),
@@ -517,7 +517,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(5 downto 5),
@@ -602,7 +602,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(6 downto 6),
@@ -687,7 +687,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => clk,
+		CLKB => not clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(7 downto 7),

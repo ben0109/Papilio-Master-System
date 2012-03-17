@@ -8,13 +8,15 @@ entity vdp_main is
 			vram_D			: in  std_logic_vector(7 downto 0);
 			cram_A			: out std_logic_vector(4 downto 0);
 			cram_D			: in  std_logic_vector(5 downto 0);
-			sync				: out std_logic;
+			
+			x					: unsigned(8 downto 0);
+			y					: unsigned(7 downto 0);
+			line_reset		: std_logic;
+			frame_reset		: std_logic;
+			
 			color				: out std_logic_vector (5 downto 0);
-			line_visible	: out STD_lOGIC;
-			line_even		: out STD_lOGIC;
 			irq_n				: out std_logic;
 					
-			pal				: in  std_logic;
 			display_on		: in  std_logic;
 			mask_column0	: in  std_logic;
 			overscan			: in  std_logic_vector (3 downto 0);
@@ -59,13 +61,6 @@ architecture Behavioral of vdp_main is
 			color				: out std_logic_vector(3 downto 0));
 	end component;
 
-	signal hcount			: unsigned(8 downto 0) := (others => '0');
-	signal vcount			: unsigned(8 downto 0) := "000101000";
-
-	signal x					: unsigned(8 downto 0);
-	signal y					: unsigned(7 downto 0);
-	signal line_reset		: std_logic;
-	
 	signal bg_vram_A		: std_logic_vector(13 downto 0);
 	signal bg_color		: std_logic_vector(4 downto 0);
 	signal bg_priority	: std_logic;
@@ -73,7 +68,7 @@ architecture Behavioral of vdp_main is
 	signal spr_vram_A		: std_logic_vector(13 downto 0);
 	signal spr_color		: std_logic_vector(3 downto 0);
 
-	signal irq_counter	: unsigned(3 downto 0) := (others=>'0');
+	signal irq_counter	: unsigned(5 downto 0) := (others=>'0');
 	signal vbl_irq			: std_logic;
 	signal hbl_irq			: std_logic;
 
@@ -108,88 +103,13 @@ begin
 
 	process (clk)
 	begin
-		if rising_edge(clk) then
-			if (pal='1' and hcount=511) or (pal='0' and hcount=509) then
-				hcount <= (others => '0');
-				if (pal='1' and vcount=311) or (pal='0' and vcount=261)  then
-					vcount <= (others=>'0');
-					if irq_frame_en='1' then
-						vbl_irq <= '1';
-					end if;
-				else
-					vcount <= vcount + 1;
-				end if;
-			else
-				hcount <= hcount + 1;
-				vbl_irq <= '0';
-				hbl_irq <= '0';
-			end if;
-
-			if hcount=156 then
-				line_reset <= '1';
-				x <= "111110000";
-				if pal='1' then
-					y <= (vcount(7 downto 0)-64);
-				else
-					y <= (vcount(7 downto 0)-48);
-				end if;
-			else
-				line_reset <= '0';
-				x <= x+1;
-			end if;
+		if frame_reset='1' and irq_frame_en='1' then
+			vbl_irq <= '1';
 		end if;
 	end process;
+	hbl_irq <= '0';
 	
-	process (clk)
-	begin
-		if rising_edge(clk) then
-			if vcount<7 then
-				if vcount<3 then
-					if hcount<19 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount<5 then
-					if hcount<219 or (hcount>=256 and hcount<475) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount=5 then
-					if hcount<219 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				elsif vcount<7 then
-					if hcount<19 or (hcount>=256 and hcount<275) then
-						sync <= '0';
-					else
-						sync <= '1';
-					end if;
-				end if;
-				line_visible <= '0';
-				color <= "000000";
-				
-			else
-				if hcount<37 then
-					sync <= '0';
-				else
-					sync <= '1';
-				end if;
-				line_visible <= '1';
-				
-				if vcount<25 or hcount<84 or hcount>=500 then
-					color <= "000000";
-				else
-					color <= cram_D;
-				end if;
-			end if;
-		end if;
-	end process;
-	
-	line_even <= vcount(0);
+	color <= cram_D;
 
 	process (x, y)
 		variable spr_active : std_logic;
@@ -198,37 +118,29 @@ begin
 		if x<256 and y<192 then
 			spr_active := spr_color(0) or spr_color(1) or spr_color(2) or spr_color(3);
 			bg_active := bg_color(0) or bg_color(1) or bg_color(2) or bg_color(3);
-			if (bg_priority='0' and spr_active='1') or (bg_priority='1' and bg_active='0') then
-				cram_A <= "1"&spr_color;
-			else
+--			if (bg_priority='0' and spr_active='1') or (bg_priority='1' and bg_active='0') then
+--				cram_A <= "1"&spr_color;
+--			else
 				cram_A <= bg_color;
-			end if;
+--			end if;
 		else
 			cram_A <= "1"&overscan;
 		end if;
-		
-		if x>=256 and x<384 then
-			vram_A <= spr_vram_A; -- sprite data
-		else
-			vram_A <= bg_vram_A; -- background data
-		end if;
 	end process;
+	
+	vram_A <= spr_vram_A when x>=256 and x<384 else bg_vram_A;
 	
 	process (clk)
 	begin
 		if rising_edge(clk) then
 			if vbl_irq='1' or hbl_irq='1' then
-				irq_counter <= to_unsigned(15,4);
-				IRQ_n <= '0';
-			elsif irq_counter=0 then
-				IRQ_n <= '1';
-			else
+				irq_counter <= (others=>'1');
+			elsif irq_counter>0 then
 				irq_counter <= irq_counter-1;
-				IRQ_n <= '0';
 			end if;
 		end if;
 	end process;
-
+	IRQ_n <= '0' when irq_counter>0 else '1';
 
 end Behavioral;
 
