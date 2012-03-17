@@ -31,20 +31,22 @@ entity glue is
 		boot_rom_D_out:	in  STD_LOGIC_VECTOR(7 downto 0);
 		spi_RD_n:			out STD_LOGIC;
 		spi_WR_n:			out STD_LOGIC;
-		spi_D_out:			in  STD_LOGIC_VECTOR(7 downto 0));
+		spi_D_out:			in  STD_LOGIC_VECTOR(7 downto 0);
+		uart_WR_n:			out STD_LOGIC;
+		uart_D_out:			in  STD_LOGIC_VECTOR(7 downto 0));
 end glue;
 
 architecture Behavioral of glue is
 
-	signal reset_counter : unsigned(3 downto 0) := "1111";
-	signal bootloader : std_logic := '0';
-	signal internal_D_out : std_logic_vector(7 downto 0);
-	signal irom_RD_n : std_logic := '1';
+	signal reset_counter:	unsigned(3 downto 0) := "1111";
+	signal bootloader:		std_logic := '0';
+	signal irom_D_out:		std_logic_vector(7 downto 0);
+	signal irom_RD_n:			std_logic := '1';
 	
-	signal RD_n_reg	: std_logic := '1';
-	signal WR_n_reg	: std_logic := '1';
-	signal RD_n_clk	: std_logic := '1';
-	signal WR_n_clk	: std_logic := '1';
+	signal RD_n_reg:			std_logic := '1';
+	signal WR_n_reg:			std_logic := '1';
+	signal RD_n_clk:			std_logic := '1';
+	signal WR_n_clk:			std_logic := '1';
 	
 begin
 
@@ -59,7 +61,7 @@ begin
 		end if;
 	end process;
 	
-	process (clk,RD_n_clk,WR_n_clk)
+	process (clk)
 	begin
 		if rising_edge(clk) then
 			RD_n_clk <= RD_n or not RD_n_reg;
@@ -101,32 +103,18 @@ begin
 		end if;
 	end process;
 	
-	process (bootloader,io_n,A,vdp_D_out,io_D_out,ram_D_out,rom_D_out,boot_rom_D_out,spi_D_out)
-	begin
-		if io_n='0' then
-			case A(7 downto 6) is
-			when "00" =>
-				if bootloader='0' then
-					D_out <= spi_D_out;
-				end if;
-			when "01" => D_out <= vdp_D_out;
-			when "10" => D_out <= vdp_D_out;
-			when "11" => D_out <= io_D_out;
-			when others =>
-			end case;
-			
-		else
-			case A(15 downto 14) is
-			when "11" => D_out <= ram_D_out;
-			when others =>
-				if bootloader='0' then
-					D_out <= boot_rom_D_out;
-				else
-					D_out <= rom_D_out;
-				end if;
-			end case;
-		end if;
-	end process;
+	irom_D_out <= boot_rom_D_out when bootloader='0' else rom_D_out;
+	
+	with io_n&A select
+	D_out <= spi_D_out		when "0--------00------",
+				vdp_D_out		when "0--------01------",
+				vdp_D_out		when "0--------10------",
+				io_D_out			when "0--------11------",
+				irom_D_out		when "100--------------",
+				irom_D_out		when "101--------------",
+				irom_D_out		when "110--------------",
+				ram_D_out		when "111--------------",
+				(others=>'-')	when others;
 
 end Behavioral;
 

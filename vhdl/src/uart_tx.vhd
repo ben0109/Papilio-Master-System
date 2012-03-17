@@ -13,9 +13,10 @@ end uart_tx;
 
 architecture Behavioral of uart_tx is
 
-	signal clk_counter:	unsigned(11 downto 0);
-	signal bit_counter:	unsigned(3 downto 0) := (others=>'0');
-	signal shift:			std_logic_vector(7 downto 0);
+	constant clk_divider:	unsigned(9 downto 0) := "1101000000"; -- 832 = (8000000/9600)-1
+	signal clk_counter:		unsigned(9 downto 0);
+	signal bit_counter:		unsigned(3 downto 0) := (others=>'0');
+	signal shift:				std_logic_vector(7 downto 0);
 
 begin
 
@@ -35,7 +36,7 @@ begin
 					serial_out <= shift(0);
 					shift(7 downto 0) <= "1"&shift(7 downto 1);
 					bit_counter <= bit_counter-1;
-					clk_counter <= "110100000100"; -- 3332 = (32000000/9600)-1
+					clk_counter <= clk_divider;
 				else
 					clk_counter <= clk_counter-1;
 				end if;

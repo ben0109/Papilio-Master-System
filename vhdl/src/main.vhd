@@ -64,7 +64,9 @@ architecture Behavioral of main is
 			boot_rom_D_out	: in  STD_LOGIC_VECTOR(7 downto 0);
 			spi_RD_n			: out STD_LOGIC;
 			spi_WR_n			: out STD_LOGIC;
-			spi_D_out		: in  STD_LOGIC_VECTOR(7 downto 0));
+			spi_D_out		: in  STD_LOGIC_VECTOR(7 downto 0);
+			uart_WR_n		: out STD_LOGIC;
+			uart_D_out		: in  STD_LOGIC_VECTOR(7 downto 0));
 	end component;
 	
 --	component dummy_z80 is
@@ -75,55 +77,55 @@ architecture Behavioral of main is
 		IOWait : integer := 1	-- 0 => Single cycle I/O, 1 => Std I/O cycle
 	);
 	port(
-		RESET_n	: in std_logic;
-		CLK_n		: in std_logic;
-		WAIT_n	: in std_logic;
-		INT_n		: in std_logic;
-		NMI_n		: in std_logic;
-		BUSRQ_n	: in std_logic;
-		M1_n		: out std_logic;
-		MREQ_n	: out std_logic;
-		IORQ_n	: out std_logic;
-		RD_n		: out std_logic;
-		WR_n		: out std_logic;
-		RFSH_n	: out std_logic;
-		HALT_n	: out std_logic;
-		BUSAK_n	: out std_logic;
-		A			: out std_logic_vector(15 downto 0);
-		DI			: in std_logic_vector(7 downto 0);
-		DO			: out std_logic_vector(7 downto 0)
+		RESET_n:		in std_logic;
+		CLK_n:		in std_logic;
+		WAIT_n:		in std_logic;
+		INT_n	:		in std_logic;
+		NMI_n:		in std_logic;
+		BUSRQ_n:		in std_logic;
+		M1_n:			out std_logic;
+		MREQ_n:		out std_logic;
+		IORQ_n:		out std_logic;
+		RD_n:			out std_logic;
+		WR_n:			out std_logic;
+		RFSH_n:		out std_logic;
+		HALT_n:		out std_logic;
+		BUSAK_n:		out std_logic;
+		A:				out std_logic_vector(15 downto 0);
+		DI:			in std_logic_vector(7 downto 0);
+		DO:			out std_logic_vector(7 downto 0)
 	);
 	end component;
 		
 	component vdp_vga_timing is
 	port (
-		clk_16:			in  std_logic;
-		x: 				out unsigned(8 downto 0);
-		y:					out unsigned(7 downto 0);
-		line_reset:		out std_logic;
-		frame_reset:	out std_logic;
-		color:			in std_logic_vector(5 downto 0);
-		hsync:			out std_logic;
-		vsync:			out std_logic;
-		red:				out std_logic_vector(1 downto 0);
-		green:			out std_logic_vector(1 downto 0);
-		blue:				out std_logic_vector(1 downto 0));
+		clk_16:		in  std_logic;
+		x: 			out unsigned(8 downto 0);
+		y:				out unsigned(7 downto 0);
+		line_reset:	out std_logic;
+		frame_reset:out std_logic;
+		color:		in std_logic_vector(5 downto 0);
+		hsync:		out std_logic;
+		vsync:		out std_logic;
+		red:			out std_logic_vector(1 downto 0);
+		green:		out std_logic_vector(1 downto 0);
+		blue:			out std_logic_vector(1 downto 0));
 	end component;
 
 	component vdp is
 	port (
-		clk:				in  STD_LOGIC;
-		RD_n:				in  STD_LOGIC;
-		WR_n:				in  STD_LOGIC;
-		IRQ_n:			out STD_LOGIC;
-		A:					in  STD_LOGIC_VECTOR(7 downto 0);
-		D_in:				in  STD_LOGIC_VECTOR(7 downto 0);
-		D_out:			out STD_LOGIC_VECTOR(7 downto 0);			
-		x:					in  unsigned(8 downto 0);
-		y:					in  unsigned(7 downto 0);
-		line_reset:		in  std_logic;
-		frame_reset:	in  std_logic;			
-		color: out std_logic_vector (5 downto 0));
+		clk:			in  STD_LOGIC;
+		RD_n:			in  STD_LOGIC;
+		WR_n:			in  STD_LOGIC;
+		IRQ_n:		out STD_LOGIC;
+		A:				in  STD_LOGIC_VECTOR(7 downto 0);
+		D_in:			in  STD_LOGIC_VECTOR(7 downto 0);
+		D_out:		out STD_LOGIC_VECTOR(7 downto 0);			
+		x:				in  unsigned(8 downto 0);
+		y:				in  unsigned(7 downto 0);
+		line_reset:	in  std_logic;
+		frame_reset:in  std_logic;			
+		color: 		out std_logic_vector (5 downto 0));
 	end component;
 	
 	component psg is
@@ -244,6 +246,9 @@ architecture Behavioral of main is
 	signal boot_rom_RD_n	: std_logic;
 	signal boot_rom_D_out: std_logic_vector(7 downto 0);
 	
+	signal uart_WR_n		: std_logic;
+	signal uart_D_out		: std_logic_vector(7 downto 0);
+	
 	signal pal				: std_logic := '0';
 
 	signal x: unsigned(8 downto 0);
@@ -295,29 +300,31 @@ begin
 		boot_rom_D_out	=> boot_rom_D_out,
 		spi_RD_n			=> spi_RD_n,
 		spi_WR_n			=> spi_WR_n,
-		spi_D_out		=> spi_D_out);
+		spi_D_out		=> spi_D_out,
+		uart_WR_n		=> uart_WR_n,
+		uart_D_out		=> uart_D_out);
 	
 	
 --	z80_inst: dummy_z80
 	z80_inst: T80s
 	port map(
-		RESET_n	=> RESET_n,
-		CLK_n		=> clk8_n,
-		WAIT_n	=> '1',
-		INT_n		=> '1',--IRQ_n,
-		NMI_n		=> '1',
-		BUSRQ_n	=> '1',
-		M1_n		=> open,
-		MREQ_n	=> open,
-		IORQ_n	=> IO_n,
-		RD_n		=> RD_n,
-		WR_n		=> WR_n,
-		RFSH_n	=> open,
-		HALT_n	=> open,
-		BUSAK_n	=> open,
-		A			=> A,
-		DI			=> D_out,
-		DO			=> D_in
+		RESET_n		=> RESET_n,
+		CLK_n			=> clk8_n,
+		WAIT_n		=> '1',
+		INT_n			=> '1',--IRQ_n,
+		NMI_n			=> '1',
+		BUSRQ_n		=> '1',
+		M1_n			=> open,
+		MREQ_n		=> open,
+		IORQ_n		=> IO_n,
+		RD_n			=> RD_n,
+		WR_n			=> WR_n,
+		RFSH_n		=> open,
+		HALT_n		=> open,
+		BUSAK_n		=> open,
+		A				=> A,
+		DI				=> D_out,
+		DO				=> D_in
 	);
 	
 	vdp_timing_inst: vdp_vga_timing
@@ -337,81 +344,91 @@ begin
 
 	vdp_inst: vdp
 	port map (
-		clk				=> clk16,
-		RD_n				=> vdp_RD_n,
-		WR_n				=> vdp_WR_n,
-		IRQ_n				=> IRQ_n,
-		A					=> A(7 downto 0),
-		D_in				=> D_in,
-		D_out				=> vdp_D_out,
-		x					=> x,
-		y					=> y,
-		color				=> color,
-		frame_reset		=> frame_reset,
-		line_reset		=> line_reset);
+		clk			=> clk16,
+		RD_n			=> vdp_RD_n,
+		WR_n			=> vdp_WR_n,
+		IRQ_n			=> IRQ_n,
+		A				=> A(7 downto 0),
+		D_in			=> D_in,
+		D_out			=> vdp_D_out,
+		x				=> x,
+		y				=> y,
+		color			=> color,
+		frame_reset	=> frame_reset,
+		line_reset	=> line_reset);
 		
 --	psg_inst: psg
 --	port map (
---		clk	=> clk8,
---		WR_n	=> psg_WR_n,
---		D_in	=> D_in,
---		output=> audio_out);
+--		clk			=> clk8,
+--		WR_n			=> psg_WR_n,
+--		D_in			=> D_in,
+--		output		=> audio_out);
 	
 	io_inst: io
    port map (
-		clk		=> clk8,
-		WR_n		=> io_WR_n,
-		RD_n		=> io_RD_n,
-		A			=> A(7 downto 0),
-		D_in		=> D_in,
-		D_out		=> io_D_out,
-		J1_up		=> joy_1(0),
-		J1_down	=> joy_1(1),
-		J1_left	=> joy_1(2),
-		J1_right	=> joy_1(3),
-		RESET		=> '1',
-		J1_tl		=> joy_1(4),
-		J1_tr		=> joy_1(5),
-		J2_up		=> '1',
-		J2_down	=> '1',
-		J2_left	=> '1',
-		J2_right	=> '1',
-		J2_tl		=> '1',
-		J2_tr		=> '1');
+		clk			=> clk8,
+		WR_n			=> io_WR_n,
+		RD_n			=> io_RD_n,
+		A				=> A(7 downto 0),
+		D_in			=> D_in,
+		D_out			=> io_D_out,
+		J1_up			=> joy_1(0),
+		J1_down		=> joy_1(1),
+		J1_left		=> joy_1(2),
+		J1_right		=> joy_1(3),
+		RESET			=> '1',
+		J1_tl			=> joy_1(4),
+		J1_tr			=> joy_1(5),
+		J2_up			=> '1',
+		J2_down		=> '1',
+		J2_left		=> '1',
+		J2_right		=> '1',
+		J2_tl			=> '1',
+		J2_tr			=> '1');
 		
 	joy_1_gnd <= '0';
+		
+	ram_inst: ram
+	port map(
+		clk			=> clk8,
+		RD_n			=> ram_RD_n,
+		WR_n			=> ram_WR_n,
+		A				=> A(12 downto 0),
+		D_in			=> D_in,
+		D_out			=> ram_D_out);
 
 	boot_rom_inst: boot_rom
 	port map(
-		clk	=> clk8,
-		RD_n	=> boot_rom_RD_n,
-		A		=> A(12 downto 0),
-		D_in	=> D_in,
-		D_out	=> boot_rom_D_out);
+		clk			=> clk8,
+		RD_n			=> boot_rom_RD_n,
+		A				=> A(12 downto 0),
+		D_in			=> D_in,
+		D_out			=> boot_rom_D_out);
 	
 --	spi_inst: dummy_spi
 	spi_inst: spi
 	port map (
-		clk	=> clk16,
-		RD_n	=> spi_RD_n,
-		WR_n	=> spi_WR_n,
-		A		=> A(7 downto 0),
-		D_in	=> D_in,
-		D_out	=> spi_D_out,
+		clk			=> clk16,
+		RD_n			=> spi_RD_n,
+		WR_n			=> spi_WR_n,
+		A				=> A(7 downto 0),
+		D_in			=> D_in,
+		D_out			=> spi_D_out,
 			
-		cs_n	=> spi_cs_n,
-		sclk	=> spi_sclk,
-		miso	=> spi_do,
-		mosi	=> spi_di);
-		
-	ram_inst: ram
-	port map(
-		clk	=> clk8,
-		RD_n	=> ram_RD_n,
-		WR_n	=> ram_WR_n,
-		A		=> A(12 downto 0),
-		D_in	=> D_in,
-		D_out	=> ram_D_out);
+		cs_n			=> spi_cs_n,
+		sclk			=> spi_sclk,
+		miso			=> spi_do,
+		mosi			=> spi_di);
+
+	uart_tx_inst: uart_tx
+	port map (
+		clk			=> clk8,
+		WR_n			=> uart_WR_n,
+		D_in			=> D_in,
+		serial_out	=> tx,
+		ready			=> uart_D_out(0));
+	
+	uart_D_out(7 downto 1) <= (others=>'0');
 
 end Behavioral;
 
