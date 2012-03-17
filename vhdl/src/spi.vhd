@@ -11,81 +11,67 @@ entity spi is
 		D_in	: in  STD_LOGIC_VECTOR (7 downto 0);
 		D_out	: out STD_LOGIC_VECTOR (7 downto 0);
 		
-		ss		: out STD_LOGIC;
-		sck	: out STD_LOGIC;
+		cs_n	: out STD_LOGIC;
+		sclk	: out STD_LOGIC;
 		miso	: in  STD_LOGIC;
 		mosi	: out STD_LOGIC);
 end spi;
 
 architecture Behavioral of spi is
 	signal ready	: std_logic := '1';
-	signal div_rst	: std_logic_vector(6 downto 0) := "0000000";
-	signal clk_div	: std_logic_vector(6 downto 0) := "0000000";
-	signal in_ss	: std_logic := '1';
-	signal in_sck	: std_logic := '0';
-	signal in_mosi	: std_logic := '0';
+	signal clk_div	: unsigned(6 downto 0) := "0000000";
+	signal clk_cnt	: unsigned(6 downto 0) := "0000000";
+	signal bit_cnt	: unsigned(3 downto 0) := "0000";
 	signal shift	: std_logic_vector(7 downto 0);
-	signal count	: integer := 0;
-	signal ff		: std_logic := '0';
+	signal in_sclk	: std_logic := '1';
 begin
+	ready <= '1' when bit_cnt=0 else '0';
+	
 	process (clk,A,WR_n,RD_n,D_in,miso)
 	begin
 		if rising_edge(clk) then
-			if count>0 then
-				case clk_div is
+			if ready='0' then
+				case clk_cnt is
 				when "0000000" =>
-					in_sck <= ff;
-					if ff='1' then
-						in_mosi <= shift(7);
-					else
+					if in_sclk='1' then
+						mosi <= shift(7);
+					elsif in_sclk='0' then
 						shift <= shift(6 downto 0)&miso;
-					end if;
-					ff <= not ff;
-					count <= count-1;
-					clk_div <= div_rst;
+						bit_cnt <= bit_cnt-1;
+					end if;					
+					clk_cnt <= clk_div;
+					in_sclk <= not in_sclk;
 				when others =>
-					clk_div <= std_logic_vector(unsigned(clk_div)-1);
+					clk_cnt <= clk_cnt-1;
 				end case;
 				
 			elsif WR_n='0' then
 				if A(0)='0' then
-					in_ss <= D_in(7);
-					div_rst <= D_in(6 downto 0);
+					cs_n <= D_in(7);
+					clk_div <= unsigned(D_in(6 downto 0));
 				elsif ready='1' then
 					shift <= D_in;
-					in_mosi <= D_in(7);
-					count <= 16;
-					ff <= '0';
-					clk_div <= div_rst;
+					bit_cnt <= "1000";
+					clk_cnt <= "0000001";
 				end if;
 			end if;
 		end if;
 	end process;
 	
-	process (count)
-	begin
-		if count=0 then
-			ready <= '1';
-		else
-			ready <= '0';
-		end if;
-	end process;
 	
 	
 	process (clk,A,WR_n,RD_n,D_in,miso)
 	begin
 		if rising_edge(clk) and RD_n='0' then
 			if A(0)='0' then
-				D_out <= ready&div_rst;
+				D_out <= ready&std_logic_vector(clk_div);
 			else
 				D_out <= shift;
 			end if;
 		end if;
 	end process;
 	
-	ss <= in_ss;
-	sck <= ff;
-	mosi <= in_mosi;
+	sclk <= in_sclk;
 
 end Behavioral;
 

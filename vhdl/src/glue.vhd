@@ -1,38 +1,42 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity glue is
-	port (clk				: in  STD_LOGIC;
-			IO_n				: in  STD_LOGIC;
-			RD_n				: in  STD_LOGIC;
-			WR_n				: in  STD_LOGIC;
-			A					: in  STD_LOGIC_VECTOR(15 downto 0);
-			D_in				: in  STD_LOGIC_VECTOR(7 downto 0);
-			D_out				: out STD_LOGIC_VECTOR(7 downto 0);
+	port (
+		clk:					in  STD_LOGIC;
+		IO_n:					in  STD_LOGIC;
+		RD_n:					in  STD_LOGIC;
+		WR_n:					in  STD_LOGIC;
+		A:						in  STD_LOGIC_VECTOR(15 downto 0);
+		D_in:					in  STD_LOGIC_VECTOR(7 downto 0);
+		D_out:				out STD_LOGIC_VECTOR(7 downto 0);
+		RESET_n:				out STD_LOGIC;
 			
-			vdp_RD_n			: out STD_LOGIC;
-			vdp_WR_n			: out STD_LOGIC;
-			vdp_D_out		: in  STD_LOGIC_VECTOR(7 downto 0);
-			psg_WR_n			: out STD_LOGIC;
-			io_RD_n			: out STD_LOGIC;
-			io_WR_n			: out STD_LOGIC;
-			io_D_out			: in  STD_LOGIC_VECTOR(7 downto 0);
-			ram_RD_n			: out STD_LOGIC;
-			ram_WR_n			: out STD_LOGIC;
-			ram_D_out		: in  STD_LOGIC_VECTOR(7 downto 0);
-			rom_RD_n			: out STD_LOGIC;
-			rom_WR_n			: out STD_LOGIC;
-			rom_D_out		: in  STD_LOGIC_VECTOR(7 downto 0);
+		vdp_RD_n:			out STD_LOGIC;
+		vdp_WR_n:			out STD_LOGIC;
+		vdp_D_out:			in  STD_LOGIC_VECTOR(7 downto 0);
+		psg_WR_n:			out STD_LOGIC;
+		io_RD_n:				out STD_LOGIC;
+		io_WR_n:				out STD_LOGIC;
+		io_D_out:			in  STD_LOGIC_VECTOR(7 downto 0);
+		ram_RD_n:			out STD_LOGIC;
+		ram_WR_n:			out STD_LOGIC;
+		ram_D_out:			in  STD_LOGIC_VECTOR(7 downto 0);
+		rom_RD_n:			out STD_LOGIC;
+		rom_WR_n:			out STD_LOGIC;
+		rom_D_out:			in  STD_LOGIC_VECTOR(7 downto 0);
 			
-			boot_rom_RD_n	: out STD_LOGIC;
-			boot_rom_D_out	: in  STD_LOGIC_VECTOR(7 downto 0);
-			spi_RD_n			: out STD_LOGIC;
-			spi_WR_n			: out STD_LOGIC;
-			spi_D_out		: in  STD_LOGIC_VECTOR(7 downto 0));
+		boot_rom_RD_n:		out STD_LOGIC;
+		boot_rom_D_out:	in  STD_LOGIC_VECTOR(7 downto 0);
+		spi_RD_n:			out STD_LOGIC;
+		spi_WR_n:			out STD_LOGIC;
+		spi_D_out:			in  STD_LOGIC_VECTOR(7 downto 0));
 end glue;
 
 architecture Behavioral of glue is
 
+	signal reset_counter : unsigned(3 downto 0) := "1111";
 	signal bootloader : std_logic := '0';
 	signal internal_D_out : std_logic_vector(7 downto 0);
 	signal irom_RD_n : std_logic := '1';
@@ -44,6 +48,17 @@ architecture Behavioral of glue is
 	
 begin
 
+	reset_n <= '0' when reset_counter>0 else '1';
+
+	process (clk)
+	begin
+		if rising_edge(clk) then
+			if reset_counter>0 then
+				reset_counter <= reset_counter - 1;
+			end if;
+		end if;
+	end process;
+	
 	process (clk,RD_n_clk,WR_n_clk)
 	begin
 		if rising_edge(clk) then
