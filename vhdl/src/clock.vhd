@@ -28,10 +28,10 @@ library UNISIM;
 use UNISIM.Vcomponents.ALL;
 
 entity clock is
-   port ( CLKIN_IN        : in    std_logic; 
-          CLKFX_OUT       : out   std_logic; 
-          CLKFX180_OUT    : out   std_logic; 
-          CLKIN_IBUFG_OUT : out   std_logic; 
+   port ( CLKIN_IN        : in    std_logic;
+          CLKFX_OUT       : out   std_logic;
+          CLKFX180_OUT    : out   std_logic;
+          CLKIN_IBUFG_OUT : out   std_logic;
           CLK2X_OUT       : out   std_logic);
 end clock;
 
