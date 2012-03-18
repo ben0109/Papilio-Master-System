@@ -5,6 +5,13 @@ use IEEE.NUMERIC_STD.ALL;
 entity main is
 	port (
 		clk:			in  STD_LOGIC;
+		
+		ram_ce:		out STD_LOGIC;
+		ram_be:		out STD_LOGIC;
+		ram_oe:		out STD_LOGIC;
+		ram_we:		out STD_LOGIC;
+		ram_a:		out STD_LOGIC_VECTOR(18 downto 0);
+		ram_d:		inout STD_LOGIC_VECTOR(15 downto 0);
 
 		joy_1_gnd:	out STD_LOGIC;
 		joy_1:		in	STD_LOGIC_VECTOR(5 downto 0);
@@ -207,6 +214,7 @@ architecture Behavioral of main is
 	signal ram_D_out:			std_logic_vector(7 downto 0);
 	
 	signal rom_RD_n:			std_logic;
+	signal rom_WR_n:			std_logic;
 	signal rom_D_out:			std_logic_vector(7 downto 0);
 	
 	signal spi_RD_n:			std_logic;
@@ -233,6 +241,9 @@ architecture Behavioral of main is
 	signal irom_D_out:		std_logic_vector(7 downto 0);
 	signal irom_RD_n:			std_logic := '1';
 
+	signal bank0:				std_logic_vector(4 downto 0);
+	signal bank1:				std_logic_vector(4 downto 0);
+	signal bank2:				std_logic_vector(4 downto 0);
 begin
 
 	clock_inst: clock
@@ -434,6 +445,10 @@ begin
 	uart_WR_n<= bootloader or WR_n when "0--------111-----",
 					'1' when others;
 	
+	with io_n&A select
+	rom_WR_n <= bootloader or WR_n when "110--------------",
+					'1' when others;
+	
 	process (clk8_n)
 	begin
 		if rising_edge(clk8_n) then
@@ -446,7 +461,9 @@ begin
 		end if;
 	end process;
 	
-	irom_D_out <= boot_rom_D_out when bootloader='0' else rom_D_out;
+	with bootloader select
+	irom_D_out <=	boot_rom_D_out when '0',
+						rom_D_out when others;
 	
 	with io_n&A select
 	D_out <= spi_D_out		when "0--------000-----",
@@ -459,6 +476,53 @@ begin
 				irom_D_out		when "110--------------",
 				ram_D_out		when "111--------------",
 				(others=>'-')	when others;
+				
+				
+	-- external ram control
+	
+	process (clk8_n)
+	begin
+		if rising_edge(clk8_n) then
+			if WR_n='0' and A(15 downto 2)="11111111111111" then
+				case A(1 downto 0) is
+				when "01" => bank0 <= D_in(4 downto 0);
+				when "10" => bank1 <= D_in(4 downto 0);
+				when "11" => bank2 <= D_in(4 downto 0);
+				when others =>
+				end case;
+			end if;
+		end if;
+	end process;
+	
+	ram_ce <= '1';
+	ram_be <= '0';
+	ram_oe <= RD_n;
+	ram_we <= rom_WR_n;
+	ram_a(13 downto 0) <= A(13 downto 0);
+	process (A)
+	begin
+		case A(15 downto 14) is
+		when "00" =>
+			-- first kilobyte is always from bank 0
+			if A(13 downto 10)="0000" then
+				ram_a(18 downto 14) <= (others=>'0');
+			else
+				ram_a(18 downto 14) <= bank0;
+			end if;
+		when "01" =>
+			ram_a(18 downto 14) <= bank1;
+			
+		when others =>
+			ram_a(18 downto 14) <= bank2;
+		end case;
+	end process;
+	
+	with RD_n select
+	ram_d(7 downto 0) <= (others=>'Z') when '0',
+								D_in when others;
+	ram_d(15 downto 8) <= (others=>'Z');
+				
+	rom_D_out <= ram_d(7 downto 0);
 
 end Behavioral;
 
