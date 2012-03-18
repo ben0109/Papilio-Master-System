@@ -16,46 +16,46 @@ architecture Behavioral of boot_rom is
 begin
    RAMB16_S2_inst0 : RAMB16_S2
    port map (
-      DO => D_out(1 downto 0),
-      ADDR => a,
-      CLK => not clk,
-      DI => "00",
-      EN => '1',
-      SSR => '0',
-      WE => '0'
+      CLK	=> not clk,
+      EN		=> '1',
+      SSR	=> '0',
+      WE		=> '0',
+      ADDR	=> a,
+      DI		=> "00",
+      DO		=> D_out(1 downto 0)
    );
 
    RAMB16_S2_inst1 : RAMB16_S2
    port map (
-      DO => D_out(3 downto 2),
-      ADDR => a,
-      CLK => not clk,
-      DI => "00",
-      EN => '1',
-      SSR => '0',
-      WE => '0'
+      CLK	=> not clk,
+      EN		=> '1',
+      SSR	=> '0',
+      WE		=> '0',
+      ADDR	=> a,
+      DI		=> "00",
+      DO		=> D_out(3 downto 2)
    );
 
    RAMB16_S2_inst2 : RAMB16_S2
    port map (
-      DO => D_out(5 downto 4),
-      ADDR => a,
-      CLK => not clk,
-      DI => "00",
-      EN => '1',
-      SSR => '0',
-      WE => '0'
+      CLK	=> not clk,
+      EN		=> '1',
+      SSR	=> '0',
+      WE		=> '0',
+      ADDR	=> a,
+      DI		=> "00",
+      DO		=> D_out(5 downto 4)
    );
 
    RAMB16_S2_inst3 : RAMB16_S2
    port map (
-      DO => D_out(7 downto 6),
-      ADDR => a,
-      CLK => not clk,
-      DI => "00",
-      EN => '1',
-      SSR => '0',
-      WE => '0'
+      CLK	=> not clk,
+      EN		=> '1',
+      SSR	=> '0',
+      WE		=> '0',
+      ADDR	=> a,
+      DI		=> "00",
+      DO		=> D_out(7 downto 6)
    );
 
 end Behavioral;

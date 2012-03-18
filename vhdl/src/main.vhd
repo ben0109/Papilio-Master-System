@@ -381,7 +381,7 @@ begin
 	
 	
 	
-	-- glue logic	
+	-- glue logic
 
 	reset_n <= '0' when reset_counter>0 else '1';
 
