@@ -232,11 +232,6 @@ architecture Behavioral of main is
 	signal bootloader:		std_logic := '0';
 	signal irom_D_out:		std_logic_vector(7 downto 0);
 	signal irom_RD_n:			std_logic := '1';
-	
-	signal RD_n_reg:			std_logic := '1';
-	signal WR_n_reg:			std_logic := '1';
-	signal RD_n_clk:			std_logic := '1';
-	signal WR_n_clk:			std_logic := '1';
 
 begin
 
@@ -398,55 +393,45 @@ begin
 		end if;
 	end process;
 	
-	process (clk8_n)
-	begin
-		if falling_edge(clk8_n) then
-			RD_n_clk <= RD_n or not RD_n_reg;
-			WR_n_clk <= WR_n or not WR_n_reg;
-			RD_n_reg <= RD_n;
-			WR_n_reg <= WR_n;
-		end if;
-	end process;
-	
 	with io_n&A select
-	vdp_WR_n <= WR_n_clk when "0--------10------",
+	vdp_WR_n <= WR_n when "0--------10------",
 					'1' when others;
 					
 	with io_n&A select
-	vdp_RD_n <= RD_n_clk when "0--------01------",
-					RD_n_clk when "0--------10------",
+	vdp_RD_n <= RD_n when "0--------01------",
+					RD_n when "0--------10------",
 					'1' when others;
 	
 	with io_n&A select
-	psg_WR_n <= WR_n_clk when "0--------01------",
+	psg_WR_n <= WR_n when "0--------01------",
 					'1' when others;
 
 	with io_n&A select
-	ctl_WR_n <=	WR_n_clk when "0--------00-----0",
+	ctl_WR_n <=	WR_n when "0--------00-----0",
 					'1' when others;
 
 	with io_n&A select
-	io_WR_n <=	WR_n_clk when "0--------00-----1",
+	io_WR_n <=	WR_n when "0--------00-----1",
 					'1' when others;
 					
 	with io_n&A select
-	io_RD_n <=	RD_n_clk when "0--------11------",
+	io_RD_n <=	RD_n when "0--------11------",
 					'1' when others;
 	
 	with io_n&A select
-	ram_WR_n <= WR_n_clk when "111--------------",
+	ram_WR_n <= WR_n when "111--------------",
 					'1' when others;
 					
 	with io_n&A select
-	spi_RD_n <= bootloader or RD_n_clk when "0--------00------",
+	spi_RD_n <= bootloader or RD_n when "0--------00------",
 					'1' when others;
 
 	with io_n&A select
-	spi_WR_n <= bootloader or WR_n_clk when "0--------110-----",
+	spi_WR_n <= bootloader or WR_n when "0--------110-----",
 					'1' when others;
 
 	with io_n&A select
-	uart_WR_n<= bootloader or WR_n_clk when "0--------111-----",
+	uart_WR_n<= bootloader or WR_n when "0--------111-----",
 					'1' when others;
 	
 	process (clk8_n)
