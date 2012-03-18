@@ -3,8 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_control is
-	port (clk			: in  STD_LOGIC;
-	
+	port (cpu_clk			: in  STD_LOGIC;
 			cpu_RD_n		: in  STD_LOGIC;
 			cpu_WR_n		: in  STD_LOGIC;
 			cpu_A			: in  STD_LOGIC_VECTOR (7 downto 0);
@@ -48,9 +47,9 @@ begin
 	cram_WE <= not cpu_WR_n and not cpu_A(0) and address(15) and address(14);
 	vram_WE <= not cpu_WR_n and not cpu_A(0) and not (address(15) and address(14));
 
-	process (clk)
+	process (cpu_clk)
 	begin
-		if rising_edge(clk) then
+		if rising_edge(cpu_clk) then
 			if cpu_WR_n='1' then
 				if vram_write='1' then
 					vram_write <= '0';

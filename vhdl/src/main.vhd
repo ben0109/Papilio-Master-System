@@ -30,11 +30,11 @@ architecture Behavioral of main is
 
 	component clock is
    port (
-		CLKIN_IN			: in  std_logic; 
-		CLKIN_IBUFG_OUT: out std_logic;         
-		CLKFX_OUT 		: out std_logic;
-		CLKFX180_OUT	: out std_logic;
-		CLK2X_OUT		: out std_logic);
+		CLKIN_IN:			in  std_logic; 
+		CLKIN_IBUFG_OUT:	out std_logic;         
+		CLKFX_OUT:			out std_logic;
+		CLKFX180_OUT:		out std_logic;
+		CLK2X_OUT:			out std_logic);
 	end component;
 	
 --	component dummy_z80 is
@@ -45,181 +45,184 @@ architecture Behavioral of main is
 		IOWait : integer := 1	-- 0 => Single cycle I/O, 1 => Std I/O cycle
 	);
 	port(
-		RESET_n:		in std_logic;
-		CLK_n:		in std_logic;
-		WAIT_n:		in std_logic;
-		INT_n	:		in std_logic;
-		NMI_n:		in std_logic;
-		BUSRQ_n:		in std_logic;
-		M1_n:			out std_logic;
-		MREQ_n:		out std_logic;
-		IORQ_n:		out std_logic;
-		RD_n:			out std_logic;
-		WR_n:			out std_logic;
-		RFSH_n:		out std_logic;
-		HALT_n:		out std_logic;
-		BUSAK_n:		out std_logic;
-		A:				out std_logic_vector(15 downto 0);
-		DI:			in std_logic_vector(7 downto 0);
-		DO:			out std_logic_vector(7 downto 0)
+		RESET_n:			in std_logic;
+		CLK_n:			in std_logic;
+		WAIT_n:			in std_logic;
+		INT_n:				in std_logic;
+		NMI_n:			in std_logic;
+		BUSRQ_n:			in std_logic;
+		M1_n:				out std_logic;
+		MREQ_n:			out std_logic;
+		IORQ_n:			out std_logic;
+		RD_n:				out std_logic;
+		WR_n:				out std_logic;
+		RFSH_n:			out std_logic;
+		HALT_n:			out std_logic;
+		BUSAK_n:			out std_logic;
+		A:					out std_logic_vector(15 downto 0);
+		DI:				in std_logic_vector(7 downto 0);
+		DO:				out std_logic_vector(7 downto 0)
 	);
 	end component;
 		
 	component vdp_vga_timing is
 	port (
-		clk_16:		in  std_logic;
-		x: 			out unsigned(8 downto 0);
-		y:				out unsigned(7 downto 0);
-		line_reset:	out std_logic;
-		frame_reset:out std_logic;
-		color:		in std_logic_vector(5 downto 0);
-		hsync:		out std_logic;
-		vsync:		out std_logic;
-		red:			out std_logic_vector(1 downto 0);
-		green:		out std_logic_vector(1 downto 0);
-		blue:			out std_logic_vector(1 downto 0));
+		clk_16:			in  std_logic;
+		x: 				out unsigned(8 downto 0);
+		y:					out unsigned(7 downto 0);
+		line_reset:		out std_logic;
+		frame_reset:	out std_logic;
+		color:			in std_logic_vector(5 downto 0);
+		hsync:			out std_logic;
+		vsync:			out std_logic;
+		red:				out std_logic_vector(1 downto 0);
+		green:			out std_logic_vector(1 downto 0);
+		blue:				out std_logic_vector(1 downto 0));
 	end component;
 
 	component vdp is
 	port (
-		clk:			in  STD_LOGIC;
-		RD_n:			in  STD_LOGIC;
-		WR_n:			in  STD_LOGIC;
-		IRQ_n:		out STD_LOGIC;
-		A:				in  STD_LOGIC_VECTOR(7 downto 0);
-		D_in:			in  STD_LOGIC_VECTOR(7 downto 0);
-		D_out:		out STD_LOGIC_VECTOR(7 downto 0);			
-		x:				in  unsigned(8 downto 0);
-		y:				in  unsigned(7 downto 0);
-		line_reset:	in  std_logic;
-		frame_reset:in  std_logic;			
-		color: 		out std_logic_vector (5 downto 0));
+		cpu_clk:			in  STD_LOGIC;
+		vdp_clk:			in  STD_LOGIC;
+		RD_n:				in  STD_LOGIC;
+		WR_n:				in  STD_LOGIC;
+		IRQ_n:			out STD_LOGIC;
+		A:					in  STD_LOGIC_VECTOR(7 downto 0);
+		D_in:				in  STD_LOGIC_VECTOR(7 downto 0);
+		D_out:			out STD_LOGIC_VECTOR(7 downto 0);			
+		x:					in  unsigned(8 downto 0);
+		y:					in  unsigned(7 downto 0);
+		line_reset:		in  std_logic;
+		frame_reset:	in  std_logic;			
+		color: 			out std_logic_vector (5 downto 0));
 	end component;
 	
 	component psg is
    port (
-		clk:			in  STD_LOGIC;
-		WR_n:			in  STD_LOGIC;
-		D_in:			in  STD_LOGIC_VECTOR (7 downto 0);
-		output:		out STD_LOGIC);
+		clk:				in  STD_LOGIC;
+		WR_n:				in  STD_LOGIC;
+		D_in:				in  STD_LOGIC_VECTOR (7 downto 0);
+		output:			out STD_LOGIC);
 	end component;
 	
 	component io is
    port (
-		clk:			in  STD_LOGIC;
-		WR_n:			in  STD_LOGIC;
-		RD_n:			in  STD_LOGIC;
-		A:				in  STD_LOGIC_VECTOR (7 downto 0);
-		D_in:			in  STD_LOGIC_VECTOR (7 downto 0);
-		D_out:		out STD_LOGIC_VECTOR (7 downto 0);
-		J1_up:		in  STD_LOGIC;
-		J1_down:		in  STD_LOGIC;
-		J1_left:		in  STD_LOGIC;
-		J1_right:	in  STD_LOGIC;
-		J1_tl:		in  STD_LOGIC;
-		J1_tr:		in  STD_LOGIC;
-		J2_up:		in  STD_LOGIC;
-		J2_down:		in  STD_LOGIC;
-		J2_left:		in  STD_LOGIC;
-		J2_right:	in  STD_LOGIC;
-		J2_tl:		in  STD_LOGIC;
-		J2_tr:		in  STD_LOGIC;
-		RESET:		in  STD_LOGIC);
+		clk:				in  STD_LOGIC;
+		WR_n:				in  STD_LOGIC;
+		RD_n:				in  STD_LOGIC;
+		A:					in  STD_LOGIC_VECTOR (7 downto 0);
+		D_in:				in  STD_LOGIC_VECTOR (7 downto 0);
+		D_out:			out STD_LOGIC_VECTOR (7 downto 0);
+		J1_up:			in  STD_LOGIC;
+		J1_down:			in  STD_LOGIC;
+		J1_left:			in  STD_LOGIC;
+		J1_right:		in  STD_LOGIC;
+		J1_tl:			in  STD_LOGIC;
+		J1_tr:			in  STD_LOGIC;
+		J2_up:			in  STD_LOGIC;
+		J2_down:			in  STD_LOGIC;
+		J2_left:			in  STD_LOGIC;
+		J2_right:		in  STD_LOGIC;
+		J2_tl:			in  STD_LOGIC;
+		J2_tr:			in  STD_LOGIC;
+		RESET:			in  STD_LOGIC);
 	end component;
 
 	component ram is
 	port (
-		clk:			in  STD_LOGIC;
-		RD_n:			in  STD_LOGIC;
-		WR_n:			in  STD_LOGIC;
-		A:				in  STD_LOGIC_VECTOR(12 downto 0);
-		D_in:			in  STD_LOGIC_VECTOR(7 downto 0);
-		D_out:		out STD_LOGIC_VECTOR(7 downto 0));
+		clk:				in  STD_LOGIC;
+		RD_n:				in  STD_LOGIC;
+		WR_n:				in  STD_LOGIC;
+		A:					in  STD_LOGIC_VECTOR(12 downto 0);
+		D_in:				in  STD_LOGIC_VECTOR(7 downto 0);
+		D_out:			out STD_LOGIC_VECTOR(7 downto 0));
 	end component;
 
 	component boot_rom is
 	port (
-		clk:			in  STD_LOGIC;
-		RD_n:			in  STD_LOGIC;
-		A:				in  STD_LOGIC_VECTOR(12 downto 0);
-		D_out:		out STD_LOGIC_VECTOR(7 downto 0));
+		clk:				in  STD_LOGIC;
+		RD_n:				in  STD_LOGIC;
+		A:					in  STD_LOGIC_VECTOR(12 downto 0);
+		D_out:			out STD_LOGIC_VECTOR(7 downto 0));
 	end component;
 
 	
 --	component dummy_spi is
 	component spi is
 	port (
-		clk:			in  STD_LOGIC;
-		RD_n:			in  STD_LOGIC;
-		WR_n:			in  STD_LOGIC;
-		A:				in  STD_LOGIC_VECTOR (7 downto 0);
-		D_in:			in  STD_LOGIC_VECTOR (7 downto 0);
-		D_out:		out STD_LOGIC_VECTOR (7 downto 0);
+		clk:				in  STD_LOGIC;
+		RD_n:				in  STD_LOGIC;
+		WR_n:				in  STD_LOGIC;
+		A:					in  STD_LOGIC_VECTOR (7 downto 0);
+		D_in:				in  STD_LOGIC_VECTOR (7 downto 0);
+		D_out:			out STD_LOGIC_VECTOR (7 downto 0);
 			
-		cs_n:			out STD_LOGIC;
-		sclk:			out STD_LOGIC;
-		miso:			in  STD_LOGIC;
-		mosi:			out STD_LOGIC);
+		cs_n:				out STD_LOGIC;
+		sclk:				out STD_LOGIC;
+		miso:				in  STD_LOGIC;
+		mosi:				out STD_LOGIC);
 	end component;
 
 	component uart_tx is
 	port (
-		clk:  		in  std_logic;
-		WR_n:			in  std_logic;
-		D_in: 		in  std_logic_vector(7 downto 0);
-		serial_out:	out std_logic;
-		ready:		out std_logic);
+		clk:  			in  std_logic;
+		WR_n:				in  std_logic;
+		D_in: 			in  std_logic_vector(7 downto 0);
+		serial_out:		out std_logic;
+		ready:			out std_logic);
 	end component;
 	
-	signal clk32			: std_logic;
-	signal clk8				: std_logic;
-	signal clk8_n			: std_logic;
-	signal clk16			: std_logic := '0';
-	signal clk64			: std_logic;
+	signal clk32:				std_logic;
+	signal clk8:				std_logic;
+	signal clk8_n:				std_logic;
+	signal clk16:				std_logic := '0';
+	signal clk64:				std_logic;
 	
-	signal RESET_n			: std_logic;
-	signal RD_n				: std_logic;
-	signal WR_n				: std_logic;
-	signal IRQ_n			: std_logic;
-	signal IO_n				: std_logic;
-	signal A					: std_logic_vector(15 downto 0);
-	signal D_in				: std_logic_vector(7 downto 0);
-	signal D_out			: std_logic_vector(7 downto 0);
+	signal RESET_n:			std_logic;
+	signal RD_n:				std_logic;
+	signal WR_n:				std_logic;
+	signal IRQ_n:				std_logic;
+	signal IO_n:				std_logic;
+	signal A:					std_logic_vector(15 downto 0);
+	signal D_in:				std_logic_vector(7 downto 0);
+	signal D_out:				std_logic_vector(7 downto 0);
 	
-	signal vdp_RD_n		: std_logic;
-	signal vdp_WR_n		: std_logic;
-	signal vdp_D_out		: std_logic_vector(7 downto 0);
-	signal frame_reset	: std_logic;
-	signal line_reset		: std_logic;
-	signal color			: std_logic_vector(5 downto 0);
+	signal vdp_RD_n:			std_logic;
+	signal vdp_WR_n:			std_logic;
+	signal vdp_D_out:			std_logic_vector(7 downto 0);
+	signal frame_reset:		std_logic;
+	signal line_reset:		std_logic;
+	signal color:				std_logic_vector(5 downto 0);
 	
-	signal psg_WR_n		: std_logic;
+	signal psg_WR_n:			std_logic;
 	
-	signal io_RD_n			: std_logic;
-	signal io_WR_n			: std_logic;
-	signal io_D_out		: std_logic_vector(7 downto 0);
+	signal ctl_WR_n:			std_logic;
 	
-	signal ram_RD_n		: std_logic;
-	signal ram_WR_n		: std_logic;
-	signal ram_D_out		: std_logic_vector(7 downto 0);
+	signal io_RD_n:			std_logic;
+	signal io_WR_n:			std_logic;
+	signal io_D_out:			std_logic_vector(7 downto 0);
 	
-	signal rom_RD_n		: std_logic;
-	signal rom_D_out		: std_logic_vector(7 downto 0);
+	signal ram_RD_n:			std_logic;
+	signal ram_WR_n:			std_logic;
+	signal ram_D_out:			std_logic_vector(7 downto 0);
 	
-	signal spi_RD_n		: std_logic;
-	signal spi_WR_n		: std_logic;
-	signal spi_D_out		: std_logic_vector(7 downto 0);
+	signal rom_RD_n:			std_logic;
+	signal rom_D_out:			std_logic_vector(7 downto 0);
 	
-	signal boot_rom_RD_n	: std_logic;
-	signal boot_rom_D_out: std_logic_vector(7 downto 0);
+	signal spi_RD_n:			std_logic;
+	signal spi_WR_n:			std_logic;
+	signal spi_D_out:			std_logic_vector(7 downto 0);
 	
-	signal uart_WR_n		: std_logic;
-	signal uart_D_out		: std_logic_vector(7 downto 0);
+	signal boot_rom_RD_n:	std_logic;
+	signal boot_rom_D_out:	std_logic_vector(7 downto 0);
 	
-	signal pal				: std_logic := '0';
+	signal uart_WR_n:			std_logic;
+	signal uart_D_out:		std_logic_vector(7 downto 0);
+	
+	signal pal:					std_logic := '0';
 
-	signal x: unsigned(8 downto 0);
-	signal y: unsigned(7 downto 0);
+	signal x:					unsigned(8 downto 0);
+	signal y:					unsigned(7 downto 0);
 	
 	
 	
@@ -292,7 +295,8 @@ begin
 
 	vdp_inst: vdp
 	port map (
-		clk			=> clk16,
+		cpu_clk		=> clk16,
+		vdp_clk		=> clk16,
 		RD_n			=> vdp_RD_n,
 		WR_n			=> vdp_WR_n,
 		IRQ_n			=> IRQ_n,
@@ -404,28 +408,54 @@ begin
 		end if;
 	end process;
 	
-	vdp_WR_n <= io_n or WR_n_clk or not A(7) or A(6);
-	vdp_RD_n <= io_n or RD_n_clk or not (A(7) xor A(6));
+	with io_n&A select
+	vdp_WR_n <= WR_n_clk when "0--------10------",
+					'1' when others;
+					
+	with io_n&A select
+	vdp_RD_n <= RD_n_clk when "0--------01------",
+					RD_n_clk when "0--------10------",
+					'1' when others;
 	
-	psg_WR_n <= io_n or WR_n_clk or A(7) or not A(6);
+	with io_n&A select
+	psg_WR_n <= WR_n_clk when "0--------01------",
+					'1' when others;
 
-	io_WR_n <= io_n or WR_n_clk or A(7) or A(6) or not A(0);
-	io_RD_n <= io_n or RD_n_clk or not (A(7) and A(6));
+	with io_n&A select
+	ctl_WR_n <=	WR_n_clk when "0--------00-----0",
+					'1' when others;
 
-	spi_WR_n <= bootloader or io_n or WR_n_clk or not (A(7) and A(6));
-	spi_RD_n <= bootloader or io_n or RD_n_clk or A(7) or A(6);
+	with io_n&A select
+	io_WR_n <=	WR_n_clk when "0--------00-----1",
+					'1' when others;
+					
+	with io_n&A select
+	io_RD_n <=	RD_n_clk when "0--------11------",
+					'1' when others;
 	
-	ram_WR_n <= not io_n or WR_n_clk or not (A(15) and A(14));
+	with io_n&A select
+	ram_WR_n <= WR_n_clk when "111--------------",
+					'1' when others;
+					
+	with io_n&A select
+	spi_RD_n <= bootloader or RD_n_clk when "0--------00------",
+					'1' when others;
+
+	with io_n&A select
+	spi_WR_n <= bootloader or WR_n_clk when "0--------110-----",
+					'1' when others;
+
+	with io_n&A select
+	uart_WR_n<= bootloader or WR_n_clk when "0--------111-----",
+					'1' when others;
 	
 	process (clk8_n)
 	begin
 		if rising_edge(clk8_n) then
-			if WR_n_clk='0' then
-				if io_n='0' and A(7)='0' and A(6)='0' and A(0)='0' then
-					-- memory control
-					if bootloader='0' then
-						bootloader <= D_in(7);
-					end if;
+			if ctl_WR_n='0' then
+				-- memory control
+				if bootloader='0' then
+					bootloader <= D_in(7);
 				end if;
 			end if;
 		end if;
@@ -434,7 +464,8 @@ begin
 	irom_D_out <= boot_rom_D_out when bootloader='0' else rom_D_out;
 	
 	with io_n&A select
-	D_out <= spi_D_out		when "0--------00------",
+	D_out <= spi_D_out		when "0--------000-----",
+				uart_D_out		when "0--------001-----",
 				vdp_D_out		when "0--------01------",
 				vdp_D_out		when "0--------10------",
 				io_D_out			when "0--------11------",

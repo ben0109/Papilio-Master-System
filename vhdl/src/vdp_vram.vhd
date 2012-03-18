@@ -5,13 +5,15 @@ library UNISIM;
 use UNISIM.vcomponents.all;
 
 entity vdp_vram is
-	Port (clk		: in  STD_LOGIC;
-		cpu_WE		: in  STD_LOGIC;
-			cpu_A		: in  STD_LOGIC_VECTOR (13 downto 0);
-			cpu_D_in	: in  STD_LOGIC_VECTOR (7 downto 0);
-			cpu_D_out: out STD_LOGIC_VECTOR (7 downto 0);
-			vdp_A		: in  STD_LOGIC_VECTOR (13 downto 0);
-			vdp_D_out: out STD_LOGIC_VECTOR (7 downto 0));
+	port (
+		cpu_clk	: in  STD_LOGIC;
+		cpu_WE	: in  STD_LOGIC;
+		cpu_A		: in  STD_LOGIC_VECTOR (13 downto 0);
+		cpu_D_in	: in  STD_LOGIC_VECTOR (7 downto 0);
+		cpu_D_out: out STD_LOGIC_VECTOR (7 downto 0);
+		vdp_clk	: in  STD_LOGIC;
+		vdp_A		: in  STD_LOGIC_VECTOR (13 downto 0);
+		vdp_D_out: out STD_LOGIC_VECTOR (7 downto 0));
 end vdp_vram;
 
 architecture Behavioral of vdp_vram is
@@ -84,7 +86,7 @@ begin
 		INIT_3F => X"0550005000000055005500000000000000000000000000000ffc3f3fff0f00ff"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(0 downto 0),
 		DOA => cpu_D_out(0 downto 0),
@@ -92,7 +94,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(0 downto 0),
@@ -169,7 +171,7 @@ begin
 		INIT_3F => X"d88d88d8dd8888d888dd888d8888dddd0000000000000000ffc00ff0ffcfffff"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(1 downto 1),
 		DOA => cpu_D_out(1 downto 1),
@@ -177,7 +179,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(1 downto 1),
@@ -254,7 +256,7 @@ begin
 		INIT_3F => X"a5a505a0f505a0f005a5f000f5f5f5f5000000000000000033c33c3fcfccffff"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(2 downto 2),
 		DOA => cpu_D_out(2 downto 2),
@@ -262,7 +264,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(2 downto 2),
@@ -339,7 +341,7 @@ begin
 		INIT_3F => X"4ee4411be4444ee4444eb441ee44bb1100000000000000000ff00fc0cf0cffff"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(3 downto 3),
 		DOA => cpu_D_out(3 downto 3),
@@ -347,7 +349,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(3 downto 3),
@@ -424,7 +426,7 @@ begin
 		INIT_3F => X"500f04145f05505a05054f04ffaa1144000000000000000030cc3ccff3cf3cc3"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(4 downto 4),
 		DOA => cpu_D_out(4 downto 4),
@@ -432,7 +434,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(4 downto 4),
@@ -509,7 +511,7 @@ begin
 		INIT_3F => X"aaffaaeaffaffaaaafffaaaa5500110000000000000000000f3f03f000f03c00"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(5 downto 5),
 		DOA => cpu_D_out(5 downto 5),
@@ -517,7 +519,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(5 downto 5),
@@ -594,7 +596,7 @@ begin
 		INIT_3F => X"00500055000550050500550000554455000000000000000000ffcf00ffcf3cff"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(6 downto 6),
 		DOA => cpu_D_out(6 downto 6),
@@ -602,7 +604,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(6 downto 6),
@@ -679,7 +681,7 @@ begin
 		INIT_3F => X"550005000000055500555505555500000000000000000000ffc00c00c03cc300"
 	)
 	port map (
-		CLKA => clk,
+		CLKA => cpu_clk,
 		ADDRA => cpu_A,
 		DIA => cpu_D_in(7 downto 7),
 		DOA => cpu_D_out(7 downto 7),
@@ -687,7 +689,7 @@ begin
 		SSRA => '0',
 		WEA => cpu_WE,
 
-		CLKB => not clk,
+		CLKB => not vdp_clk,
 		ADDRB => vdp_A,
 		DIB => "0",
 		DOB => vdp_D_out(7 downto 7),
