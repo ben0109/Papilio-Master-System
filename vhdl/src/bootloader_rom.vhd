@@ -16,7 +16,7 @@ architecture Behavioral of boot_rom is
 begin
    RAMB16_S2_inst0 : RAMB16_S2
    port map (
-      CLK	=> not clk,
+      CLK	=> clk,
       EN		=> '1',
       SSR	=> '0',
       WE		=> '0',
@@ -27,7 +27,7 @@ begin
 
    RAMB16_S2_inst1 : RAMB16_S2
    port map (
-      CLK	=> not clk,
+      CLK	=> clk,
       EN		=> '1',
       SSR	=> '0',
       WE		=> '0',
@@ -38,7 +38,7 @@ begin
 
    RAMB16_S2_inst2 : RAMB16_S2
    port map (
-      CLK	=> not clk,
+      CLK	=> clk,
       EN		=> '1',
       SSR	=> '0',
       WE		=> '0',
@@ -49,7 +49,7 @@ begin
 
    RAMB16_S2_inst3 : RAMB16_S2
    port map (
-      CLK	=> not clk,
+      CLK	=> clk,
       EN		=> '1',
       SSR	=> '0',
       WE		=> '0',

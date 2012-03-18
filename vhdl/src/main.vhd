@@ -338,7 +338,7 @@ begin
 		
 	ram_inst: ram
 	port map(
-		clk			=> clk8,
+		clk			=> clk8_n,
 		RD_n			=> ram_RD_n,
 		WR_n			=> ram_WR_n,
 		A				=> A(12 downto 0),
@@ -347,7 +347,7 @@ begin
 
 	boot_rom_inst: boot_rom
 	port map(
-		clk			=> clk8,
+		clk			=> clk8_n,
 		RD_n			=> boot_rom_RD_n,
 		A				=> A(12 downto 0),
 		D_out			=> boot_rom_D_out);
@@ -369,7 +369,7 @@ begin
 
 	uart_tx_inst: uart_tx
 	port map (
-		clk			=> clk8,
+		clk			=> clk8_n,
 		WR_n			=> uart_WR_n,
 		D_in			=> D_in,
 		serial_out	=> tx,
@@ -385,18 +385,18 @@ begin
 
 	reset_n <= '0' when reset_counter>0 else '1';
 
-	process (clk8)
+	process (clk8_n)
 	begin
-		if rising_edge(clk8) then
+		if rising_edge(clk8_n) then
 			if reset_counter>0 then
 				reset_counter <= reset_counter - 1;
 			end if;
 		end if;
 	end process;
 	
-	process (clk8)
+	process (clk8_n)
 	begin
-		if rising_edge(clk8) then
+		if falling_edge(clk8_n) then
 			RD_n_clk <= RD_n or not RD_n_reg;
 			WR_n_clk <= WR_n or not WR_n_reg;
 			RD_n_reg <= RD_n;
@@ -417,9 +417,9 @@ begin
 	
 	ram_WR_n <= not io_n or WR_n_clk or not (A(15) and A(14));
 	
-	process (clk8)
+	process (clk8_n)
 	begin
-		if rising_edge(clk8) then
+		if rising_edge(clk8_n) then
 			if WR_n_clk='0' then
 				if io_n='0' and A(7)='0' and A(6)='0' and A(0)='0' then
 					-- memory control

@@ -106,50 +106,9 @@
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputAdded"/>
       <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="InputRemoved"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="cram_controller.vhd"/>
-      <outfile xil_pn:name="cram_controller_tb.vhd"/>
-      <outfile xil_pn:name="src/bootloader_rom.vhd"/>
-      <outfile xil_pn:name="src/clock.vhd"/>
-      <outfile xil_pn:name="src/color_encoder.vhd"/>
-      <outfile xil_pn:name="src/dac.vhd"/>
-      <outfile xil_pn:name="src/dummy_spi.vhd"/>
-      <outfile xil_pn:name="src/dummy_z80.vhd"/>
-      <outfile xil_pn:name="src/glue.vhd"/>
-      <outfile xil_pn:name="src/io.vhd"/>
-      <outfile xil_pn:name="src/main.vhd"/>
-      <outfile xil_pn:name="src/psg.vhd"/>
-      <outfile xil_pn:name="src/psg_noise.vhd"/>
-      <outfile xil_pn:name="src/psg_tone.vhd"/>
-      <outfile xil_pn:name="src/ram.vhd"/>
-      <outfile xil_pn:name="src/spi.vhd"/>
-      <outfile xil_pn:name="src/vdp.vhd"/>
-      <outfile xil_pn:name="src/vdp_background.vhd"/>
-      <outfile xil_pn:name="src/vdp_control.vhd"/>
-      <outfile xil_pn:name="src/vdp_cram.vhd"/>
-      <outfile xil_pn:name="src/vdp_main.vhd"/>
-      <outfile xil_pn:name="src/vdp_shifter.vhd"/>
-      <outfile xil_pn:name="src/vdp_sprite_shifter.vhd"/>
-      <outfile xil_pn:name="src/vdp_sprites.vhd"/>
-      <outfile xil_pn:name="src/vdp_vga_timing.vhd"/>
-      <outfile xil_pn:name="src/vdp_vram.vhd"/>
-      <outfile xil_pn:name="src/yuv_table.vhd"/>
-      <outfile xil_pn:name="t80/T80.vhd"/>
-      <outfile xil_pn:name="t80/T80_ALU.vhd"/>
-      <outfile xil_pn:name="t80/T80_MCode.vhd"/>
-      <outfile xil_pn:name="t80/T80_Pack.vhd"/>
-      <outfile xil_pn:name="t80/T80_Reg.vhd"/>
-      <outfile xil_pn:name="t80/T80s.vhd"/>
-      <outfile xil_pn:name="test/dummy_spi_tb.vhd"/>
-      <outfile xil_pn:name="test/dummy_z80_tb.vhd"/>
-      <outfile xil_pn:name="test/glue_tb.vhd"/>
-      <outfile xil_pn:name="test/main_tb.vhd"/>
-      <outfile xil_pn:name="test/spi_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_main_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_sprites_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_tb.vhd"/>
-      <outfile xil_pn:name="test/z80_tb.vhd"/>
-      <outfile xil_pn:name="vdp_timing.vhd"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1328647034" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="8015351383055812258" xil_pn:start_ts="1328647034">
       <status xil_pn:value="SuccessfullyRun"/>
@@ -170,50 +129,9 @@
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="InputRemoved"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="cram_controller.vhd"/>
-      <outfile xil_pn:name="cram_controller_tb.vhd"/>
-      <outfile xil_pn:name="src/bootloader_rom.vhd"/>
-      <outfile xil_pn:name="src/clock.vhd"/>
-      <outfile xil_pn:name="src/color_encoder.vhd"/>
-      <outfile xil_pn:name="src/dac.vhd"/>
-      <outfile xil_pn:name="src/dummy_spi.vhd"/>
-      <outfile xil_pn:name="src/dummy_z80.vhd"/>
-      <outfile xil_pn:name="src/glue.vhd"/>
-      <outfile xil_pn:name="src/io.vhd"/>
-      <outfile xil_pn:name="src/main.vhd"/>
-      <outfile xil_pn:name="src/psg.vhd"/>
-      <outfile xil_pn:name="src/psg_noise.vhd"/>
-      <outfile xil_pn:name="src/psg_tone.vhd"/>
-      <outfile xil_pn:name="src/ram.vhd"/>
-      <outfile xil_pn:name="src/spi.vhd"/>
-      <outfile xil_pn:name="src/vdp.vhd"/>
-      <outfile xil_pn:name="src/vdp_background.vhd"/>
-      <outfile xil_pn:name="src/vdp_control.vhd"/>
-      <outfile xil_pn:name="src/vdp_cram.vhd"/>
-      <outfile xil_pn:name="src/vdp_main.vhd"/>
-      <outfile xil_pn:name="src/vdp_shifter.vhd"/>
-      <outfile xil_pn:name="src/vdp_sprite_shifter.vhd"/>
-      <outfile xil_pn:name="src/vdp_sprites.vhd"/>
-      <outfile xil_pn:name="src/vdp_vga_timing.vhd"/>
-      <outfile xil_pn:name="src/vdp_vram.vhd"/>
-      <outfile xil_pn:name="src/yuv_table.vhd"/>
-      <outfile xil_pn:name="t80/T80.vhd"/>
-      <outfile xil_pn:name="t80/T80_ALU.vhd"/>
-      <outfile xil_pn:name="t80/T80_MCode.vhd"/>
-      <outfile xil_pn:name="t80/T80_Pack.vhd"/>
-      <outfile xil_pn:name="t80/T80_Reg.vhd"/>
-      <outfile xil_pn:name="t80/T80s.vhd"/>
-      <outfile xil_pn:name="test/dummy_spi_tb.vhd"/>
-      <outfile xil_pn:name="test/dummy_z80_tb.vhd"/>
-      <outfile xil_pn:name="test/glue_tb.vhd"/>
-      <outfile xil_pn:name="test/main_tb.vhd"/>
-      <outfile xil_pn:name="test/spi_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_main_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_sprites_tb.vhd"/>
-      <outfile xil_pn:name="test/vdp_tb.vhd"/>
-      <outfile xil_pn:name="test/z80_tb.vhd"/>
-      <outfile xil_pn:name="vdp_timing.vhd"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1328647228" xil_pn:in_ck="9095992487550199580" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-7164675021513329822" xil_pn:start_ts="1328647227">
       <status xil_pn:value="SuccessfullyRun"/>
@@ -222,23 +140,19 @@
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="InputRemoved"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="dummy_spi_tb_beh.prj"/>
-      <outfile xil_pn:name="dummy_spi_tb_isim_beh.exe"/>
-      <outfile xil_pn:name="fuse.log"/>
-      <outfile xil_pn:name="isim"/>
-      <outfile xil_pn:name="isim.log"/>
-      <outfile xil_pn:name="xilinxsim.ini"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1328647228" xil_pn:in_ck="6112070757911185443" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-600213292485867561" xil_pn:start_ts="1328647228">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="dummy_spi_tb_isim_beh.wdb"/>
-      <outfile xil_pn:name="isim.cmd"/>
-      <outfile xil_pn:name="isim.log"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1312041272" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1312041272">
       <status xil_pn:value="SuccessfullyRun"/>
@@ -268,7 +182,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1332019662" xil_pn:in_ck="-4316977577109607140" xil_pn:name="TRANEXT_xstsynthesize_spartan3e" xil_pn:prop_ck="5261139860602118901" xil_pn:start_ts="1332019559">
+    <transform xil_pn:end_ts="1332063639" xil_pn:in_ck="-8971689354521209080" xil_pn:name="TRANEXT_xstsynthesize_spartan3e" xil_pn:prop_ck="5261139860602118901" xil_pn:start_ts="1332063534">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
@@ -291,7 +205,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1332019674" xil_pn:in_ck="-2856017657762467074" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="1854741800036384593" xil_pn:start_ts="1332019662">
+    <transform xil_pn:end_ts="1332063651" xil_pn:in_ck="-2856017657762467074" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="1854741800036384593" xil_pn:start_ts="1332063639">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_ngo"/>
@@ -300,7 +214,7 @@
       <outfile xil_pn:name="main.ngd"/>
       <outfile xil_pn:name="main_ngdbuild.xrpt"/>
     </transform>
-    <transform xil_pn:end_ts="1332019689" xil_pn:in_ck="-1188128142809482113" xil_pn:name="TRANEXT_map_spartan3" xil_pn:prop_ck="4529310109966632409" xil_pn:start_ts="1332019674">
+    <transform xil_pn:end_ts="1332063664" xil_pn:in_ck="-1188128142809482113" xil_pn:name="TRANEXT_map_spartan3" xil_pn:prop_ck="4529310109966632409" xil_pn:start_ts="1332063651">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
@@ -314,7 +228,7 @@
       <outfile xil_pn:name="main_summary.xml"/>
       <outfile xil_pn:name="main_usage.xml"/>
     </transform>
-    <transform xil_pn:end_ts="1332019727" xil_pn:in_ck="4246531878179524376" xil_pn:name="TRANEXT_par_spartan3" xil_pn:prop_ck="7122883464624052383" xil_pn:start_ts="1332019689">
+    <transform xil_pn:end_ts="1332063702" xil_pn:in_ck="4246531878179524376" xil_pn:name="TRANEXT_par_spartan3" xil_pn:prop_ck="7122883464624052383" xil_pn:start_ts="1332063664">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
@@ -329,7 +243,7 @@
       <outfile xil_pn:name="main_pad.txt"/>
       <outfile xil_pn:name="main_par.xrpt"/>
     </transform>
-    <transform xil_pn:end_ts="1332019749" xil_pn:in_ck="4774924121320" xil_pn:name="TRANEXT_bitFile_spartan3a" xil_pn:prop_ck="-426368325978129584" xil_pn:start_ts="1332019727">
+    <transform xil_pn:end_ts="1332063723" xil_pn:in_ck="4774924121320" xil_pn:name="TRANEXT_bitFile_spartan3a" xil_pn:prop_ck="-426368325978129584" xil_pn:start_ts="1332063702">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
@@ -350,7 +264,7 @@
       <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="InputRemoved"/>
     </transform>
-    <transform xil_pn:end_ts="1332019727" xil_pn:in_ck="11384767911122427" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416186" xil_pn:start_ts="1332019720">
+    <transform xil_pn:end_ts="1332063702" xil_pn:in_ck="11384767911122427" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416186" xil_pn:start_ts="1332063695">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>
