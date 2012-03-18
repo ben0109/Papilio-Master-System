@@ -295,7 +295,7 @@ begin
 
 	vdp_inst: vdp
 	port map (
-		cpu_clk		=> clk16,
+		cpu_clk		=> clk8_n,
 		vdp_clk		=> clk16,
 		RD_n			=> vdp_RD_n,
 		WR_n			=> vdp_WR_n,
