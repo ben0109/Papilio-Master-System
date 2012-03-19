@@ -5,8 +5,8 @@ DATA2MEM:=$(ISE_PATH)/bin/lin/data2mem
 load: final.bit
 	sudo papilio-prog -v -f final.bit
 
-final.bit: main.bit boot.bmm $(MEM_PATH)/boot.mem
-	$(DATA2MEM) -bm boot.bmm -bd $(MEM_PATH)/all.mem -bt main.bit -o b final.bit
+final.bit: main.bit boot_bd.bmm $(MEM_PATH)/boot.mem
+	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt main.bit -o b final.bit
 
 
 #=================================================================

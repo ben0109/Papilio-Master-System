@@ -81,21 +81,21 @@ NET "ram_we" LOC = "M15";
 NET "ram_oe" LOC = "G13";
 NET "ram_be" LOC = "E14";
 
-INST "ram_inst\/RAMB16_S2_inst3" LOC = RAMB16_X1Y7;
-INST "ram_inst\/RAMB16_S2_inst2" LOC = RAMB16_X1Y6;
-INST "ram_inst\/RAMB16_S2_inst1" LOC = RAMB16_X1Y5;
-INST "ram_inst\/RAMB16_S2_inst0" LOC = RAMB16_X1Y4;
+#INST "ram_inst\/RAMB16_S2_inst3" LOC = RAMB16_X1Y7;
+#INST "ram_inst\/RAMB16_S2_inst2" LOC = RAMB16_X1Y6;
+#INST "ram_inst\/RAMB16_S2_inst1" LOC = RAMB16_X1Y5;
+#INST "ram_inst\/RAMB16_S2_inst0" LOC = RAMB16_X1Y4;
 
-INST "boot_rom_inst\/RAMB16_S2_inst3" LOC = RAMB16_X1Y3;
-INST "boot_rom_inst\/RAMB16_S2_inst2" LOC = RAMB16_X1Y2;
-INST "boot_rom_inst\/RAMB16_S2_inst1" LOC = RAMB16_X1Y1;
-INST "boot_rom_inst\/RAMB16_S2_inst0" LOC = RAMB16_X1Y0;
+#INST "boot_rom_inst\/RAMB16_S2_inst3" LOC = RAMB16_X1Y3;
+#INST "boot_rom_inst\/RAMB16_S2_inst2" LOC = RAMB16_X1Y2;
+#INST "boot_rom_inst\/RAMB16_S2_inst1" LOC = RAMB16_X1Y1;
+#INST "boot_rom_inst\/RAMB16_S2_inst0" LOC = RAMB16_X1Y0;
 
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst7" LOC = RAMB16_X0Y7;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst6" LOC = RAMB16_X0Y6;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst5" LOC = RAMB16_X0Y5;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst4" LOC = RAMB16_X0Y4;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst3" LOC = RAMB16_X0Y3;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst2" LOC = RAMB16_X0Y2;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst1" LOC = RAMB16_X0Y1;
-INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst0" LOC = RAMB16_X0Y0;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst7" LOC = RAMB16_X0Y7;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst6" LOC = RAMB16_X0Y6;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst5" LOC = RAMB16_X0Y5;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst4" LOC = RAMB16_X0Y4;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst3" LOC = RAMB16_X0Y3;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst2" LOC = RAMB16_X0Y2;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst1" LOC = RAMB16_X0Y1;
+#INST "vdp_inst\/vdp_vram_inst\/RAMB16_S1_inst0" LOC = RAMB16_X0Y0;
