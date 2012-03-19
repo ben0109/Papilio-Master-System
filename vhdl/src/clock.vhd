@@ -8,7 +8,7 @@ entity clock is
 port (
 	clk_in:		in  std_logic;
 	clk_cpu:		out std_logic;
-	clk_cpu_n:	out std_logic;
+	clk16:		out std_logic;
 	clk32:		out std_logic;
 	clk64:		out std_logic);
 end clock;
@@ -16,36 +16,36 @@ end clock;
 architecture BEHAVIORAL of clock is
 
    signal CLKFB_IN:		std_logic;
+   signal CLKDV_BUF:		std_logic;
    signal CLKFX_BUF:		std_logic;
-   signal CLKFX180_BUF:	std_logic;
    signal CLKIN_IBUFG:	std_logic;
    signal CLK2X_BUF:		std_logic;
    signal GND_BIT:		std_logic;
 	
 begin
    GND_BIT <= '0';
-   clk32 <= CLKIN_IBUFG;
-   clk64 <= CLKFB_IN;
    CLKFX_BUFG_INST : BUFG
       port map (I=>CLKFX_BUF,
                 O=>clk_cpu);
    
-   CLKFX180_BUFG_INST : BUFG
-      port map (I=>CLKFX180_BUF,
-                O=>clk_cpu_n);
+   CLKDV_BUFG_INST : BUFG
+      port map (I=>CLKDV_BUF,
+                O=>clk16);
    
    CLKIN_IBUFG_INST : IBUFG
       port map (I=>clk_in,
                 O=>CLKIN_IBUFG);
+   clk32 <= CLKIN_IBUFG;
    
    CLK2X_BUFG_INST : BUFG
       port map (I=>CLK2X_BUF,
-                O=>CLKFB_IN);
-   
+                O=>CLKFB_IN);   
+   clk64 <= CLKFB_IN;
+	
    DCM_SP_INST : DCM_SP
    generic map(
 		CLK_FEEDBACK => "2X",
-		CLKDV_DIVIDE => 4.0,
+		CLKDV_DIVIDE => 2.0,
 		CLKFX_DIVIDE => 32,
 		CLKFX_MULTIPLY => 8,
 		CLKIN_DIVIDE_BY_2 => FALSE,
@@ -76,9 +76,9 @@ begin
 		CLK90		=> open,
 		CLK180	=> open,
 		CLK270	=> open,
-		CLKDV		=> open,
+		CLKDV		=> CLKDV_BUF,
 		CLKFX		=> CLKFX_BUF,
-		CLKFX180	=> CLKFX180_BUF,
+		CLKFX180	=> open,
 		CLK2X		=> CLK2X_BUF,
 		CLK2X180	=> open);
    

@@ -39,7 +39,6 @@ architecture Behavioral of main is
    port (
 		clk_in:		in  std_logic;
 		clk_cpu:		out std_logic;
-		clk_cpu_n:	out std_logic;
 		clk32:		out std_logic;
 		clk64:		out std_logic);
 	end component;
@@ -179,10 +178,9 @@ architecture Behavioral of main is
 		ready:			out std_logic);
 	end component;
 	
-	signal clk32:				std_logic;
-	signal clk8:				std_logic;
-	signal clk8_n:				std_logic;
+	signal clk_cpu:			std_logic;
 	signal clk16:				std_logic := '0';
+	signal clk32:				std_logic;
 	signal clk64:				std_logic;
 	
 	signal RESET_n:			std_logic;
@@ -249,8 +247,7 @@ begin
 	clock_inst: clock
 	port map (
 		clk_in		=> clk,
-		clk_cpu		=> clk8,
-		clk_cpu_n	=> clk8_n,
+		clk_cpu		=> clk_cpu,
 		clk32			=> clk32,
 		clk64			=> clk64);
 
@@ -266,7 +263,7 @@ begin
 	z80_inst: T80s
 	port map(
 		RESET_n		=> RESET_n,
-		CLK_n			=> clk8_n,
+		CLK_n			=> clk_cpu,
 		WAIT_n		=> '1',
 		INT_n			=> '1',--IRQ_n,
 		NMI_n			=> '1',
@@ -301,7 +298,7 @@ begin
 
 	vdp_inst: vdp
 	port map (
-		cpu_clk		=> clk8_n,
+		cpu_clk		=> clk_cpu,
 		vdp_clk		=> clk16,
 		RD_n			=> vdp_RD_n,
 		WR_n			=> vdp_WR_n,
@@ -324,7 +321,7 @@ begin
 	
 	io_inst: io
    port map (
-		clk			=> clk8,
+		clk			=> clk_cpu,
 		WR_n			=> io_WR_n,
 		RD_n			=> io_RD_n,
 		A				=> A(7 downto 0),
@@ -348,7 +345,7 @@ begin
 		
 	ram_inst: ram
 	port map(
-		clk			=> clk8_n,
+		clk			=> clk_cpu,
 		RD_n			=> ram_RD_n,
 		WR_n			=> ram_WR_n,
 		A				=> A(12 downto 0),
@@ -357,7 +354,7 @@ begin
 
 	boot_rom_inst: boot_rom
 	port map(
-		clk			=> clk8_n,
+		clk			=> clk_cpu,
 		RD_n			=> boot_rom_RD_n,
 		A				=> A(12 downto 0),
 		D_out			=> boot_rom_D_out);
@@ -365,7 +362,7 @@ begin
 --	spi_inst: dummy_spi
 	spi_inst: spi
 	port map (
-		clk			=> clk16,
+		clk			=> clk_cpu,
 		RD_n			=> spi_RD_n,
 		WR_n			=> spi_WR_n,
 		A				=> A(7 downto 0),
@@ -379,7 +376,7 @@ begin
 
 	uart_tx_inst: uart_tx
 	port map (
-		clk			=> clk8_n,
+		clk			=> clk_cpu,
 		WR_n			=> uart_WR_n,
 		D_in			=> D_in,
 		serial_out	=> tx,
@@ -395,9 +392,9 @@ begin
 
 	reset_n <= '0' when reset_counter>0 else '1';
 
-	process (clk8_n)
+	process (clk_cpu)
 	begin
-		if rising_edge(clk8_n) then
+		if rising_edge(clk_cpu) then
 			if reset_counter>0 then
 				reset_counter <= reset_counter - 1;
 			end if;
@@ -449,9 +446,9 @@ begin
 	rom_WR_n <= bootloader or WR_n when "110--------------",
 					'1' when others;
 	
-	process (clk8_n)
+	process (clk_cpu)
 	begin
-		if rising_edge(clk8_n) then
+		if rising_edge(clk_cpu) then
 			if ctl_WR_n='0' then
 				-- memory control
 				if bootloader='0' then
@@ -480,9 +477,9 @@ begin
 				
 	-- external ram control
 	
-	process (clk8_n)
+	process (clk_cpu)
 	begin
-		if rising_edge(clk8_n) then
+		if rising_edge(clk_cpu) then
 			if WR_n='0' and A(15 downto 2)="11111111111111" then
 				case A(1 downto 0) is
 				when "01" => bank0 <= D_in(4 downto 0);
