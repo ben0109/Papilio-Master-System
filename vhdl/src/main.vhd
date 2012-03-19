@@ -37,11 +37,11 @@ architecture Behavioral of main is
 
 	component clock is
    port (
-		CLKIN_IN:			in  std_logic; 
-		CLKIN_IBUFG_OUT:	out std_logic;         
-		CLKFX_OUT:			out std_logic;
-		CLKFX180_OUT:		out std_logic;
-		CLK2X_OUT:			out std_logic);
+		clk_in:		in  std_logic;
+		clk_cpu:		out std_logic;
+		clk_cpu_n:	out std_logic;
+		clk32:		out std_logic;
+		clk64:		out std_logic);
 	end component;
 	
 --	component dummy_z80 is
@@ -248,11 +248,11 @@ begin
 
 	clock_inst: clock
 	port map (
-		clkin_in			=>clk,
-		clkin_ibufg_out=>clk32,
-		clk2x_out		=>clk64,
-		clkfx_out		=>clk8,
-		clkfx180_out	=>clk8_n);
+		clk_in		=> clk,
+		clk_cpu		=> clk8,
+		clk_cpu_n	=> clk8_n,
+		clk32			=> clk32,
+		clk64			=> clk64);
 
 	process (clk32)
 	begin
@@ -499,7 +499,7 @@ begin
 	ram_oe <= RD_n;
 	ram_we <= rom_WR_n;
 	ram_a(13 downto 0) <= A(13 downto 0);
-	process (A)
+	process (A,bank0,bank1,bank2)
 	begin
 		case A(15 downto 14) is
 		when "00" =>
