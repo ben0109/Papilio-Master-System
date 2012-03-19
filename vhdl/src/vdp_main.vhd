@@ -109,7 +109,7 @@ begin
 	
 	color <= cram_D;
 
-	process (x, y, spr_color, bg_color, overscan)
+	process (x, y, bg_priority, spr_color, bg_color, overscan)
 		variable spr_active : std_logic;
 		variable bg_active : std_logic;
 	begin
