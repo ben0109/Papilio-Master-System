@@ -39,6 +39,7 @@ architecture Behavioral of main is
    port (
 		clk_in:		in  std_logic;
 		clk_cpu:		out std_logic;
+		clk16:		out std_logic;
 		clk32:		out std_logic;
 		clk64:		out std_logic);
 	end component;
@@ -179,7 +180,7 @@ architecture Behavioral of main is
 	end component;
 	
 	signal clk_cpu:			std_logic;
-	signal clk16:				std_logic := '0';
+	signal clk16:				std_logic;
 	signal clk32:				std_logic;
 	signal clk64:				std_logic;
 	
@@ -248,15 +249,9 @@ begin
 	port map (
 		clk_in		=> clk,
 		clk_cpu		=> clk_cpu,
+		clk16			=> clk16,
 		clk32			=> clk32,
 		clk64			=> clk64);
-
-	process (clk32)
-	begin
-		if rising_edge(clk32) then
-			clk16 <= not clk16;
-		end if;
-	end process;
 	
 	
 --	z80_inst: dummy_z80
