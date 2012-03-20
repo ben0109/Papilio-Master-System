@@ -108,6 +108,10 @@ architecture Behavioral of vdp is
 		vdp_D:			out std_logic_vector(5 downto 0));
 	end component;
 	
+	signal vram_write: 		std_logic := '0';
+	signal address:			unsigned(15 downto 0);
+	signal address_ff:		std_logic := '0';
+	
 	signal control_A:			std_logic_vector(13 downto 0);
 	signal vram_cpu_WE:		std_logic;
 	signal vram_vdp_A:		std_logic_vector(13 downto 0);
@@ -148,34 +152,6 @@ architecture Behavioral of vdp is
 	signal hbl_irq:			std_logic;
 	
 begin
-
-	vdp_control_inst: vdp_control
-	port map (
-		cpu_clk			=> cpu_clk,
-		cpu_RD_n			=> RD_n,
-		cpu_WR_n			=> WR_n,
-		cpu_A				=> A,
-		cpu_D_in			=> D_in,
-
-		A					=> control_A,
-		vram_WE			=> vram_cpu_WE,
-		cram_WE			=> cram_cpu_WE,
-			
-		display_on		=> display_on,
-		mask_column0	=> mask_column0,
-		overscan			=> overscan,
-		
-		irq_frame_en	=> irq_frame_en,
-		irq_line_en		=> irq_line_en,
-		irq_line_count	=> irq_line_count,
-		
-		bg_address		=> bg_address,
-		bg_scroll_x		=> bg_scroll_x,
-		bg_scroll_y		=> bg_scroll_y,
-		spr_address		=> spr_address,
-		spr_high_bit	=> spr_high_bit,
-		spr_shift		=> spr_shift,
-		spr_tall			=> spr_tall);
 		
 	vdp_main_inst: vdp_main
 	port map(
@@ -229,5 +205,64 @@ begin
 		vdp_clk			=> vdp_clk,
 		vdp_A				=> cram_vdp_A,
 		vdp_D				=> cram_vdp_D);
+		
+		
+		
+
+	control_A <= std_logic_vector(address(13 downto 0));
+	cram_cpu_WE <= not WR_n and not A(0) and address(15) and address(14);
+	vram_cpu_WE <= not WR_n and not A(0) and not (address(15) and address(14));
+
+	process (cpu_clk)
+	begin
+		if rising_edge(cpu_clk) then
+			if WR_n='1' then
+				if vram_write='1' then
+					vram_write <= '0';
+					address <= address + 1;
+				end if;
+				
+			elsif WR_n='0' then
+				if A(0)='0' then
+					vram_write <= '1';
+				else
+					if address_ff='0' then
+						address(7 downto 0) <= unsigned(D_in);
+					else
+						address(15 downto 8) <= unsigned(D_in);
+						
+						if D_in(7)='1' and D_in(6)='0' then
+							case D_in(5 downto 0) is
+							when "000000" =>
+								mask_column0 <= address(5);
+								irq_line_en <= address(4);
+								spr_shift <= address(3);
+							when "000001" =>
+								display_on <= address(6);
+								irq_frame_en <= address(5);
+								spr_tall <= control_A(1);
+							when "000010" =>
+								bg_address <= std_logic_vector(address(3 downto 1));
+							when "000101" =>
+								spr_address <= std_logic_vector(address(6 downto 1));
+							when "000110" =>
+								spr_high_bit <= address(2);
+							when "000111" =>
+								overscan <= std_logic_vector(address(3 downto 0));
+							when "001000" =>
+								bg_scroll_x <= unsigned(address(7 downto 0));
+							when "001001" =>
+								bg_scroll_y <= unsigned(address(7 downto 0));
+							when "001010" =>
+								irq_line_count <= address(7 downto 0);
+							when others =>
+							end case;
+						end if;
+					end if;
+					address_ff <= not address_ff;
+				end if;
+			end if;
+		end if;
+	end process;
 	
 end Behavioral;
