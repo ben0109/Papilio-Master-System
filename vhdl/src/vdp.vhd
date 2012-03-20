@@ -20,36 +20,6 @@ entity vdp is
 end vdp;
 
 architecture Behavioral of vdp is
-
-	component vdp_control is
-	port (
-		cpu_clk:			in  STD_LOGIC;	
-		cpu_RD_n:		in  STD_LOGIC;
-		cpu_WR_n:		in  STD_LOGIC;
-		cpu_A:			in  STD_LOGIC_VECTOR (7 downto 0);
-		cpu_D_in:		in  STD_LOGIC_VECTOR (7 downto 0);
-			
-		A:					out STD_LOGIC_VECTOR (13 downto 0);
-		vram_WE:			out STD_LOGIC;
-		cram_WE:			out STD_LOGIC;
-			
-		display_on:		out STD_LOGIC;
-		mask_column0:	out STD_LOGIC;
-		overscan:		out STD_LOGIC_VECTOR (3 downto 0);
-			
-		irq_frame_en:	out STD_LOGIC;
-		irq_line_en:	out STD_LOGIC;
-		irq_line_count:out unsigned (7 downto 0);
-			
-		bg_address:		out STD_LOGIC_VECTOR (2 downto 0);
-		bg_scroll_x:	out unsigned (7 downto 0);
-		bg_scroll_y:	out unsigned (7 downto 0);
-
-		spr_address:	out STD_LOGIC_VECTOR (5 downto 0);
-		spr_shift:	 	out STD_LOGIC;
-		spr_high_bit:	out STD_LOGIC;
-		spr_tall:		out STD_LOGIC);
-	end component;
 	
 	component vdp_main is
 	port (
@@ -108,27 +78,29 @@ architecture Behavioral of vdp is
 		vdp_D:			out std_logic_vector(5 downto 0));
 	end component;
 	
-	signal data_write:		std_logic := '0';
+	-- helper bits
+	signal data_write:		std_logic;
 	signal address_ff:		std_logic := '0';
 	signal to_cram:			boolean := false;
 	
-	signal control_A:			std_logic_vector(13 downto 0);
+	-- vram and cram lines for the cpu interface
+	signal xram_cpu_A:		std_logic_vector(13 downto 0);
 	signal vram_cpu_WE:		std_logic;
-	signal vram_vdp_A:		std_logic_vector(13 downto 0);
-	signal vram_vdp_D:		std_logic_vector(7 downto 0);
-	
 	signal cram_cpu_WE:		std_logic;
+	
+	-- vram and cram lines for the video interface
+	signal vram_vdp_A:		std_logic_vector(13 downto 0);
+	signal vram_vdp_D:		std_logic_vector(7 downto 0);	
 	signal cram_vdp_A:		std_logic_vector(4 downto 0);
 	signal cram_vdp_D:		std_logic_vector(5 downto 0);
 			
+	-- control bits
 	signal display_on:		std_logic := '1';
 	signal mask_column0:		std_logic := '0';
-	signal overscan:			std_logic_vector (3 downto 0) := "0000";
-	
+	signal overscan:			std_logic_vector (3 downto 0) := "0000";	
 	signal irq_frame_en:		std_logic := '0';
 	signal irq_line_en:		std_logic := '0';
-	signal irq_line_count:	unsigned(7 downto 0) := (others=>'1');
-	
+	signal irq_line_count:	unsigned(7 downto 0) := (others=>'1');	
 	signal bg_address:		std_logic_vector (2 downto 0) := (others=>'0');
 	signal bg_scroll_x:		unsigned(7 downto 0) := (others=>'0');
 	signal bg_scroll_y:		unsigned(7 downto 0) := (others=>'0');
@@ -136,20 +108,6 @@ architecture Behavioral of vdp is
 	signal spr_shift:			std_logic := '0';
 	signal spr_tall:			std_logic := '0';
 	signal spr_high_bit:		std_logic := '0';
-
-	signal hcount:				unsigned(8 downto 0) := (others=>'0');
-	signal vcount:				unsigned(8 downto 0) := "000101000";
-
-	signal bg_vram_A:			std_logic_vector(13 downto 0);
-	signal bg_color:			std_logic_vector(4 downto 0);
-	signal bg_priority:		std_logic;
-	
-	signal spr_vram_A:		std_logic_vector(13 downto 0);
-	signal spr_color:			std_logic_vector(3 downto 0);
-
-	signal irq_counter:		unsigned(3 downto 0) := (others=>'0');
-	signal vbl_irq:			std_logic;
-	signal hbl_irq:			std_logic;
 	
 begin
 		
@@ -189,7 +147,7 @@ begin
 	port map (
 		cpu_clk			=> cpu_clk,
 		cpu_WE			=> vram_cpu_WE,
-		cpu_A				=> control_A(13 downto 0),
+		cpu_A				=> xram_cpu_A(13 downto 0),
 		cpu_D_in			=> D_in,
 		cpu_D_out		=> D_out,
 		vdp_clk			=> vdp_clk,
@@ -200,7 +158,7 @@ begin
 	port map (
 		cpu_clk			=> cpu_clk,
 		cpu_WE			=> cram_cpu_WE,
-		cpu_A 			=> control_A(4 downto 0),
+		cpu_A 			=> xram_cpu_A(4 downto 0),
 		cpu_D				=> D_in(5 downto 0),
 		vdp_clk			=> vdp_clk,
 		vdp_A				=> cram_vdp_A,
@@ -208,7 +166,6 @@ begin
 		
 		
 	data_write <= not WR_n and not A(0);
-
 	cram_cpu_WE <= data_write when to_cram else '0';
 	vram_cpu_WE <= data_write when not to_cram else '0';
 
@@ -217,37 +174,37 @@ begin
 		if rising_edge(cpu_clk) then
 			if WR_n='0' then
 				if A(0)='0' then
-					control_A <= std_logic_vector(unsigned(control_A) + 1);
+					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
 					
 				else
 					if address_ff='0' then
-						control_A(7 downto 0) <= D_in;
+						xram_cpu_A(7 downto 0) <= D_in;
 					else
-						control_A(13 downto 8) <= D_in(5 downto 0);
+						xram_cpu_A(13 downto 8) <= D_in(5 downto 0);
 						to_cram <= D_in(7 downto 6)="11";
 						case D_in is
 						when "10000000" =>
-							mask_column0	<= control_A(5);
-							irq_line_en		<= control_A(4);
-							spr_shift		<= control_A(3);
+							mask_column0	<= xram_cpu_A(5);
+							irq_line_en		<= xram_cpu_A(4);
+							spr_shift		<= xram_cpu_A(3);
 						when "10000001" =>
-							display_on		<= control_A(6);
-							irq_frame_en	<= control_A(5);
-							spr_tall			<= control_A(1);
+							display_on		<= xram_cpu_A(6);
+							irq_frame_en	<= xram_cpu_A(5);
+							spr_tall			<= xram_cpu_A(1);
 						when "10000010" =>
-							bg_address		<= control_A(3 downto 1);
+							bg_address		<= xram_cpu_A(3 downto 1);
 						when "10000101" =>
-							spr_address		<= control_A(6 downto 1);
+							spr_address		<= xram_cpu_A(6 downto 1);
 						when "10000110" =>
-							spr_high_bit	<= control_A(2);
+							spr_high_bit	<= xram_cpu_A(2);
 						when "10000111" =>
-							overscan			<= control_A(3 downto 0);
+							overscan			<= xram_cpu_A(3 downto 0);
 						when "10001000" =>
-							bg_scroll_x		<= unsigned(control_A(7 downto 0));
+							bg_scroll_x		<= unsigned(xram_cpu_A(7 downto 0));
 						when "10001001" =>
-							bg_scroll_y		<= unsigned(control_A(7 downto 0));
+							bg_scroll_y		<= unsigned(xram_cpu_A(7 downto 0));
 						when "10001010" =>
-							irq_line_count	<= unsigned(control_A(7 downto 0));
+							irq_line_count	<= unsigned(xram_cpu_A(7 downto 0));
 						when others =>
 						end case;
 					end if;
