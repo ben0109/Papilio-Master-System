@@ -108,9 +108,9 @@ architecture Behavioral of vdp is
 		vdp_D:			out std_logic_vector(5 downto 0));
 	end component;
 	
-	signal vram_write: 		std_logic := '0';
-	signal address:			unsigned(15 downto 0);
+	signal data_write:		std_logic := '0';
 	signal address_ff:		std_logic := '0';
+	signal to_cram:			boolean := false;
 	
 	signal control_A:			std_logic_vector(13 downto 0);
 	signal vram_cpu_WE:		std_logic;
@@ -189,7 +189,7 @@ begin
 	port map (
 		cpu_clk			=> cpu_clk,
 		cpu_WE			=> vram_cpu_WE,
-		cpu_A				=> control_A,
+		cpu_A				=> control_A(13 downto 0),
 		cpu_D_in			=> D_in,
 		cpu_D_out		=> D_out,
 		vdp_clk			=> vdp_clk,
@@ -207,57 +207,49 @@ begin
 		vdp_D				=> cram_vdp_D);
 		
 		
-		
+	data_write <= not WR_n and not A(0);
 
-	control_A <= std_logic_vector(address(13 downto 0));
-	cram_cpu_WE <= not WR_n and not A(0) and address(15) and address(14);
-	vram_cpu_WE <= not WR_n and not A(0) and not (address(15) and address(14));
+	cram_cpu_WE <= data_write when to_cram else '0';
+	vram_cpu_WE <= data_write when not to_cram else '0';
 
 	process (cpu_clk)
 	begin
 		if rising_edge(cpu_clk) then
-			if WR_n='1' then
-				if vram_write='1' then
-					vram_write <= '0';
-					address <= address + 1;
-				end if;
-				
-			elsif WR_n='0' then
+			if WR_n='0' then
 				if A(0)='0' then
-					vram_write <= '1';
+					control_A <= std_logic_vector(unsigned(control_A) + 1);
+					
 				else
 					if address_ff='0' then
-						address(7 downto 0) <= unsigned(D_in);
+						control_A(7 downto 0) <= D_in;
 					else
-						address(15 downto 8) <= unsigned(D_in);
-						
-						if D_in(7)='1' and D_in(6)='0' then
-							case D_in(5 downto 0) is
-							when "000000" =>
-								mask_column0 <= address(5);
-								irq_line_en <= address(4);
-								spr_shift <= address(3);
-							when "000001" =>
-								display_on <= address(6);
-								irq_frame_en <= address(5);
-								spr_tall <= control_A(1);
-							when "000010" =>
-								bg_address <= std_logic_vector(address(3 downto 1));
-							when "000101" =>
-								spr_address <= std_logic_vector(address(6 downto 1));
-							when "000110" =>
-								spr_high_bit <= address(2);
-							when "000111" =>
-								overscan <= std_logic_vector(address(3 downto 0));
-							when "001000" =>
-								bg_scroll_x <= unsigned(address(7 downto 0));
-							when "001001" =>
-								bg_scroll_y <= unsigned(address(7 downto 0));
-							when "001010" =>
-								irq_line_count <= address(7 downto 0);
-							when others =>
-							end case;
-						end if;
+						control_A(13 downto 8) <= D_in(5 downto 0);
+						to_cram <= D_in(7 downto 6)="11";
+						case D_in is
+						when "10000000" =>
+							mask_column0	<= control_A(5);
+							irq_line_en		<= control_A(4);
+							spr_shift		<= control_A(3);
+						when "10000001" =>
+							display_on		<= control_A(6);
+							irq_frame_en	<= control_A(5);
+							spr_tall			<= control_A(1);
+						when "10000010" =>
+							bg_address		<= control_A(3 downto 1);
+						when "10000101" =>
+							spr_address		<= control_A(6 downto 1);
+						when "10000110" =>
+							spr_high_bit	<= control_A(2);
+						when "10000111" =>
+							overscan			<= control_A(3 downto 0);
+						when "10001000" =>
+							bg_scroll_x		<= unsigned(control_A(7 downto 0));
+						when "10001001" =>
+							bg_scroll_y		<= unsigned(control_A(7 downto 0));
+						when "10001010" =>
+							irq_line_count	<= unsigned(control_A(7 downto 0));
+						when others =>
+						end case;
 					end if;
 					address_ff <= not address_ff;
 				end if;
