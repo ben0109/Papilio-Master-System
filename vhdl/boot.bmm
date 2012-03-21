@@ -12,14 +12,14 @@ ADDRESS_MAP bootrom PPC405 0
 	// VRAM
 	ADDRESS_SPACE vram_code RAMB16[0x00008000:0x0000BFFF]
 		BUS_BLOCK
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst7 [7:7];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst6 [6:6];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst5 [5:5];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst4 [4:4];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst3 [3:3];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst2 [2:2];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst1 [1:1];
-			vdp_inst/vdp_vram_inst/RAMB16_S1_inst0 [0:0];
+			vdp_inst/vdp_vram_inst/ram_bit[7].ramb_inst [7:7];
+			vdp_inst/vdp_vram_inst/ram_bit[6].ramb_inst [6:6];
+			vdp_inst/vdp_vram_inst/ram_bit[5].ramb_inst [5:5];
+			vdp_inst/vdp_vram_inst/ram_bit[4].ramb_inst [4:4];
+			vdp_inst/vdp_vram_inst/ram_bit[3].ramb_inst [3:3];
+			vdp_inst/vdp_vram_inst/ram_bit[2].ramb_inst [2:2];
+			vdp_inst/vdp_vram_inst/ram_bit[1].ramb_inst [1:1];
+			vdp_inst/vdp_vram_inst/ram_bit[0].ramb_inst [0:0];
 		END_BUS_BLOCK;
 	END_ADDRESS_SPACE;
 END_ADDRESS_MAP;
