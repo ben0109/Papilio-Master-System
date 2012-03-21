@@ -16,9 +16,8 @@ entity main is
 		joy_1_gnd:	out STD_LOGIC;
 		joy_1:		in	STD_LOGIC_VECTOR(5 downto 0);
 
---		tv_ground:	out STD_LOGIC;
---		video_out:	out STD_LOGIC_VECTOR(5 downto 0);
---		audio_out:	out STD_LOGIC;
+		audio_out:	out STD_LOGIC;
+		
 		red:			out STD_LOGIC_VECTOR(1 downto 0);
 		green:		out STD_LOGIC_VECTOR(1 downto 0);
 		blue:			out STD_LOGIC_VECTOR(1 downto 0);
@@ -307,12 +306,12 @@ begin
 		frame_reset	=> frame_reset,
 		line_reset	=> line_reset);
 		
---	psg_inst: psg
---	port map (
---		clk			=> clk8,
---		WR_n			=> psg_WR_n,
---		D_in			=> D_in,
---		output		=> audio_out);
+	psg_inst: psg
+	port map (
+		clk			=> clk_cpu,
+		WR_n			=> psg_WR_n,
+		D_in			=> D_in,
+		output		=> audio_out);
 	
 	io_inst: io
    port map (
