@@ -3,11 +3,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity psg_noise is
-    Port ( clk : in  STD_LOGIC;
-           style : in  STD_LOGIC_VECTOR (2 downto 0);
-           tone : in  STD_LOGIC_VECTOR (9 downto 0);
-           volume : in  STD_LOGIC_VECTOR (3 downto 0);
-           output : out  STD_LOGIC_VECTOR (3 downto 0));
+port (
+	clk		: in  STD_LOGIC;
+	style		: in  STD_LOGIC_VECTOR (2 downto 0);
+	tone		: in  STD_LOGIC_VECTOR (9 downto 0);
+	volume	: in  STD_LOGIC_VECTOR (3 downto 0);
+	output	: out STD_LOGIC_VECTOR (3 downto 0));
 end psg_noise;
 
 architecture rtl of psg_noise is

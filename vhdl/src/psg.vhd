@@ -53,35 +53,38 @@ begin
 
 	t0: psg_tone
 	port map (
-		clk	=>clk32,
-		tone	=>tone0,
-		volume=>volume0,
-		output=>output0);
+		clk		=> clk32,
+		tone		=> tone0,
+		volume	=> volume0,
+		output	=> output0);
+		
 	t1: psg_tone
 	port map (
-		clk	=>clk32,
-		tone	=>tone1,
-		volume=>volume1,
-		output=>output1);
+		clk		=> clk32,
+		tone		=> tone1,
+		volume	=> volume1,
+		output	=> output1);
+		
 	t2: psg_tone
 	port map (
-		clk	=>clk32,
-		tone	=>tone2,
-		volume=>volume2,
-		output=>output2);
+		clk		=> clk32,
+		tone		=> tone2,
+		volume	=> volume2,
+		output	=> output2);
+
 	t3: psg_noise
 	port map(
-		clk	=>clk32,
-		style	=>ctrl3,
-		tone	=>tone2,
-		volume=>volume3,
-		output=>output3);
+		clk		=> clk32,
+		style		=> ctrl3,
+		tone		=> tone2,
+		volume	=> volume3,
+		output	=> output3);
 		
 	inst_dac: dac
 	port map (
-		clk => clk,
-		input => outputs,
-		output => output );
+		clk		=> clk,
+		input		=> outputs,
+		output	=> output );
 
 	process (clk)
 	begin

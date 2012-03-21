@@ -110,13 +110,13 @@ begin
 	color <= cram_D;
 
 	process (x, y, bg_priority, spr_color, bg_color, overscan)
-		variable spr_active : std_logic;
-		variable bg_active : std_logic;
+		variable spr_active	: boolean;
+		variable bg_active	: boolean;
 	begin
 		if x<256 and y<192 then
-			spr_active := spr_color(0) or spr_color(1) or spr_color(2) or spr_color(3);
-			bg_active := bg_color(0) or bg_color(1) or bg_color(2) or bg_color(3);
-			if (bg_priority='0' and spr_active='1') or (bg_priority='1' and bg_active='0') then
+			spr_active	:= not spr_color="0000";
+			bg_active	:= not bg_color="0000";
+			if (bg_priority='0' and spr_active) or (bg_priority='1' and not bg_active) then
 				cram_A <= "1"&spr_color;
 			else
 				cram_A <= bg_color;

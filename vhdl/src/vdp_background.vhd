@@ -54,9 +54,9 @@ begin
 		variable char_address	: std_logic_vector(11 downto 0);
 	begin
 		if (rising_edge(clk)) then
-			table_address(12 downto 10) := address;
-			table_address(9 downto 5) := std_logic_vector(y(7 downto 3));
-			table_address(4 downto 0) := std_logic_vector(x(7 downto 3) + 1);
+			table_address(12 downto 10)	:= address;
+			table_address(9 downto 5)		:= std_logic_vector(y(7 downto 3));
+			table_address(4 downto 0)		:= std_logic_vector(x(7 downto 3) + 1);
 			char_address := tile_index & tile_y;
 			
 			case x(2 downto 0) is
@@ -90,7 +90,7 @@ begin
 				data1 <= vram_D;
 			when "110" =>
 				data2 <= vram_D;
-			when "111" =>
+--			when "111" =>
 --				data3 <= vram_D;
 			when others =>
 			end case;
@@ -101,12 +101,12 @@ begin
 		if (rising_edge(clk)) then
 			case x(2 downto 0) is
 			when "111" =>
-				shift0 <= data0;
-				shift1 <= data1;
-				shift2 <= data2;
-				shift3 <= vram_D;
-				color(4) <= palette;
-				priority <= priority_latch;
+				shift0	<= data0;
+				shift1	<= data1;
+				shift2	<= data2;
+				shift3	<= vram_D;
+				color(4)	<= palette;
+				priority	<= priority_latch;
 			when others =>
 				shift0(7 downto 1) <= shift0(6 downto 0);
 				shift1(7 downto 1) <= shift1(6 downto 0);

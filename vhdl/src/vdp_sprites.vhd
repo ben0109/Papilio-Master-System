@@ -30,9 +30,10 @@ architecture Behavioral of vdp_sprites is
 
 	-- FIFO
 	type tindex is array (0 to 7) of std_logic_vector(5 downto 0);
+	type tenable is array (0 to 7) of boolean;
 	signal index	: tindex;-- := (others=>"101010");
 	signal count	: integer range 0 to 8;
-	signal enable	: std_logic_vector(7 downto 0);
+	signal enable	: tenable;
 	
 	-- data for sprite
 	signal spr_n	: std_logic_vector(7 downto 0);
@@ -51,102 +52,28 @@ architecture Behavioral of vdp_sprites is
 	signal active		: std_logic_vector(7 downto 0);
 	
 begin
-
-	shifter0: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(0),
-				spr_d0=> spr_d0(0),
-				spr_d1=> spr_d1(0),
-				spr_d2=> spr_d2(0),
-				spr_d3=> spr_d3(0),
-				color => spr_color(0),
-				active=> active(0));
-
-	shifter1: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(1),
-				spr_d0=> spr_d0(1),
-				spr_d1=> spr_d1(1),
-				spr_d2=> spr_d2(1),
-				spr_d3=> spr_d3(1),
-				color => spr_color(1),
-				active=> active(1));
-
-	shifter2: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(2),
-				spr_d0=> spr_d0(2),
-				spr_d1=> spr_d1(2),
-				spr_d2=> spr_d2(2),
-				spr_d3=> spr_d3(2),
-				color => spr_color(2),
-				active=> active(2));
-
-	shifter3: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(3),
-				spr_d0=> spr_d0(3),
-				spr_d1=> spr_d1(3),
-				spr_d2=> spr_d2(3),
-				spr_d3=> spr_d3(3),
-				color => spr_color(3),
-				active=> active(3));
-
-	shifter4: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(4),
-				spr_d0=> spr_d0(4),
-				spr_d1=> spr_d1(4),
-				spr_d2=> spr_d2(4),
-				spr_d3=> spr_d3(4),
-				color => spr_color(4),
-				active=> active(4));
-
-	shifter5: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(5),
-				spr_d0=> spr_d0(5),
-				spr_d1=> spr_d1(5),
-				spr_d2=> spr_d2(5),
-				spr_d3=> spr_d3(5),
-				color => spr_color(5),
-				active=> active(5));
-
-	shifter6: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(0),
-				spr_d0=> spr_d0(6),
-				spr_d1=> spr_d1(6),
-				spr_d2=> spr_d2(6),
-				spr_d3=> spr_d3(6),
-				color => spr_color(6),
-				active=> active(6));
-
-	shifter7: vpd_sprite_shifter
-	port map(clk	=> clk,
-				x		=> x(7 downto 0),
-				spr_x	=> spr_x(7),
-				spr_d0=> spr_d0(7),
-				spr_d1=> spr_d1(7),
-				spr_d2=> spr_d2(7),
-				spr_d3=> spr_d3(7),
-				color => spr_color(7),
-				active=> active(7));
-				
+	shifters:
+	for i in 0 to 7 generate
+	begin
+		shifter: vpd_sprite_shifter
+		port map(clk	=> clk,
+					x		=> x(7 downto 0),
+					spr_x	=> spr_x(i),
+					spr_d0=> spr_d0(i),
+					spr_d1=> spr_d1(i),
+					spr_d2=> spr_d2(i),
+					spr_d3=> spr_d3(i),
+					color => spr_color(i),
+					active=> active(i));
+	end generate;
 
 	process (clk)
 		variable i: integer range 0 to 7;
 	begin
 		if rising_edge(clk) then
 			if x<256 then
-			
+				-- nothing
+				
 			elsif x<320 then
 				vram_a(13 downto 8) <= address;
 				vram_a(7 downto 0) <= "00" & std_logic_vector(x(5 downto 0));
@@ -177,9 +104,9 @@ begin
 	end process;
 
 	process (clk)
-		variable i: integer range 0 to 7;
-		variable y9 : unsigned(8 downto 0);
-		variable d9 : unsigned(8 downto 0);
+		variable i		: integer range 0 to 7;
+		variable y9 	: unsigned(8 downto 0);
+		variable d9		: unsigned(8 downto 0);
 		variable delta : unsigned(8 downto 0);
 		variable x2		: unsigned(8 downto 0);
 	begin
@@ -190,16 +117,17 @@ begin
 			x2 := x-2;
 			
 			if x2<255 then
+				-- nothing
 
 			elsif x2=255 then
 				count <= 0;
-				enable <= (others=>'0');
+				enable <= (others=>false);
 				
 			elsif x2<320 then
 				if 0<=delta and ((delta<8 and tall='0') or (delta<16 and tall='1')) then
 					if count<8 then
 						index(count) <= std_logic_vector(x2(5 downto 0));
-						enable(count) <= '1';
+						enable(count) <= true;
 						count <= count+1;
 					end if;
 				end if;
@@ -207,8 +135,8 @@ begin
 			elsif x2<384 then
 				i := to_integer(x2(5 downto 3));
 				case x2(2 downto 0) is
-				when "000" => spr_y <= std_logic_vector(delta(3 downto 0));
-				when "001" => spr_n <= vram_d;
+				when "000" => spr_y		<= std_logic_vector(delta(3 downto 0));
+				when "001" => spr_n		<= vram_d;
 				when "010" => spr_x(i)	<= unsigned(vram_d);
 				when "100" => spr_d0(i)	<= vram_d;
 				when "101" => spr_d1(i)	<= vram_d;
@@ -223,24 +151,24 @@ begin
 	process (clk)
 	begin
 		if rising_edge(clk) then
-			if enable(0)='1' and active(0)='1' then
+			if enable(0) and active(0)='1' then
 				color <= spr_color(0);
-			elsif enable(1)='1' and active(1)='1' then
+			elsif enable(1) and active(1)='1' then
 				color <= spr_color(1);
-			elsif enable(2)='1' and active(2)='1' then
+			elsif enable(2) and active(2)='1' then
 				color <= spr_color(2);
-			elsif enable(3)='1' and active(3)='1' then
+			elsif enable(3) and active(3)='1' then
 				color <= spr_color(3);
-			elsif enable(4)='1' and active(4)='1' then
+			elsif enable(4) and active(4)='1' then
 				color <= spr_color(4);
-			elsif enable(5)='1' and active(5)='1' then
+			elsif enable(5) and active(5)='1' then
 				color <= spr_color(5);
-			elsif enable(6)='1' and active(6)='1' then
+			elsif enable(6) and active(6)='1' then
 				color <= spr_color(6);
-			elsif enable(7)='1' and active(7)='1' then
+			elsif enable(7) and active(7)='1' then
 				color <= spr_color(7);
 			else
-				color <= "0000";
+				color <= (others=>'0');
 			end if;
 		end if;
 	end process;
