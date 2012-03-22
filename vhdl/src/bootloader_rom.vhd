@@ -14,48 +14,20 @@ end entity;
 
 architecture Behavioral of boot_rom is
 begin
-   RAMB16_S2_inst0 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> '0',
-      ADDR	=> a,
-      DI		=> "00",
-      DO		=> D_out(1 downto 0)
-   );
 
-   RAMB16_S2_inst1 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> '0',
-      ADDR	=> a,
-      DI		=> "00",
-      DO		=> D_out(3 downto 2)
-   );
-
-   RAMB16_S2_inst2 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> '0',
-      ADDR	=> a,
-      DI		=> "00",
-      DO		=> D_out(5 downto 4)
-   );
-
-   RAMB16_S2_inst3 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> '0',
-      ADDR	=> a,
-      DI		=> "00",
-      DO		=> D_out(7 downto 6)
-   );
+	ram_blocks:
+	for i in 0 to 3 generate
+	begin
+		inst : RAMB16_S2
+		port map (
+			CLK	=> clk,
+			EN		=> '1',
+			SSR	=> '0',
+			WE		=> '0',
+			ADDR	=> A,
+			DI		=> "00",
+			DO		=> D_out((2*i+1) downto (2*i))
+		);
+	end generate;
 
 end Behavioral;

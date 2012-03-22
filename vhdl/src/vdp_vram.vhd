@@ -18,10 +18,10 @@ end vdp_vram;
 
 architecture Behavioral of vdp_vram is
 begin
-	ram_bit:
+	ram_blocks:
 	for b in 0 to 7 generate
 	begin
-		ramb_inst: RAMB16_S1_S1
+		inst: RAMB16_S1_S1
 		port map (
 			CLKA	=> cpu_clk,
 			ADDRA	=> cpu_A,

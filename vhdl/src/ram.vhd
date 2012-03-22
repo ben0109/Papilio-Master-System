@@ -16,50 +16,20 @@ end entity;
 
 architecture Behavioral of ram is
 begin
-
-   RAMB16_S2_inst0 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> not WR_n,
-      ADDR	=> a,
-      DI		=> D_in(1 downto 0),
-      DO		=> D_out(1 downto 0)
-   );
-
-   RAMB16_S2_inst1 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> not WR_n,
-      ADDR	=> a,
-      DI		=> D_in(3 downto 2),
-      DO		=> D_out(3 downto 2)
-   );
-
-   RAMB16_S2_inst2 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> not WR_n,
-      ADDR	=> a,
-      DI		=> D_in(5 downto 4),
-      DO		=> D_out(5 downto 4)
-   );
-
-   RAMB16_S2_inst3 : RAMB16_S2
-   port map (
-      CLK	=> clk,
-      EN		=> '1',
-      SSR	=> '0',
-      WE		=> not WR_n,
-      ADDR	=> a,
-      DI		=> D_in(7 downto 6),
-      DO		=> D_out(7 downto 6)
-   );
+	ram_blocks:
+	for i in 0 to 3 generate
+	begin
+		RAMB16_S2_inst : RAMB16_S2
+		port map (
+			CLK	=> clk,
+			EN		=> '1',
+			SSR	=> '0',
+			WE		=> not WR_n,
+			ADDR	=> a,
+			DI		=> D_in((2*i+1) downto (2*i)),
+			DO		=> D_out((2*i+1) downto (2*i))
+		);
+	end generate;
 
 end Behavioral;
 
