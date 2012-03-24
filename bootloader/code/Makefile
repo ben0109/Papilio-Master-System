@@ -1,51 +1,56 @@
-COMP = ../compiler/compiler
-LINK = ../compiler/linker
-CONV = ../compiler/conv_bin
+CC = zcc
+LD = zcc
+
+CFLAGS = +sms -DDEBUG
+
+C_FILES=main.c console.c debug.c sd.c fat.c
+OBJECT_FILES=$(C_FILES:%.c=%.o)
 
 #PATH_EMU=/home/ben/prog/JSMS
 PATH_EMU=/home/backup/workspace/JSMS
 EMU=java -cp $(PATH_EMU)/bin/ org.jsms.awt.SwingJsms
 
-boot.o: boot.asm
-	z80asm -o $@ $^
+all.mem: vram.mem boot.mem
+	cat boot.mem vram.mem > all.mem
 
 boot.mem: boot.o
 	srec_cat boot.o -binary -line_length 59 -o boot.mem -vmem 8
 
-vram.mem: vram.bin
-	srec_cat vram.bin -binary -offset 0x8000 -line_length 59 -o vram.mem -vmem 8
+vram.mem: font.mem
+	cat font.mem > vram.mem
 
-all.mem: vram.mem boot.mem
-	cat boot.mem vram.mem > all.mem
+font.mem: font.bin
+	srec_cat font.bin -binary -offset 0x8400 -line_length 59 -o font.mem -vmem 8
+
+
+
+
+boot.o: $(OBJECT_FILES)
+	$(LD) $(CFLAGS) $(OBJECT_FILES) -o $@ -m
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
+
+crt0.opt: crt0.asm
+	cp $< $@
+
+
+
+
+
+run: boot.sms vram.bin
+	$(EMU) -vram vram.bin boot.sms
 
 boot.sms: boot.o
 	srec_cat boot.o -binary -fill 0 0 0x8000 -o boot.sms -binary
 
-run: boot.sms
-	$(EMU) boot.sms
+vram.bin: vram.mem
+	srec_cat vram.mem -vmem -offset -0x8000 -fill 0 0 0x4000 -o vram.bin -binary
+
+
+
 
 clean:
-	rm *.mco
-
-
-OBJECTS := main.mco console.mco sd.mco fat.mco sort.mco debug.mco music.mco
-OBJECTS := $(OBJECTS) int32.mco video.mco spi.mco
-OBJECTS := $(OBJECTS) palette.mco #font.mco arrow.mco sega.mco tune.mco
-
-boot.asm: startup.asm end.asm $(OBJECTS)
-	$(LINK) $(OBJECTS) > $@
-
-sega.mco: sega.bin
-	$(CONV) -l sega_logo sega.bin > $@
-
-tune.mco: tune.bin
-	$(CONV) -l music_data tune.bin > $@
-
-%.mco: %.mc
-	$(COMP) $^ > $@
-
-%.mco: %.asm
-	echo "%code" > $@
-	cat $< >> $@
-	echo "%end" >> $@
+	rm -f *.o *.opt boot.map zcc_opt.def
+	rm -f *.mem vram.bin boot.sms
 
