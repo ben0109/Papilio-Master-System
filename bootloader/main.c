@@ -143,7 +143,14 @@ void load_rom(file_descr_t *entry)
 	fat_open_file(&file, entry->cluster);
 	size = 0;
 	while (1) {
-		UBYTE* data = fat_load_file_sector(&file);
+		UBYTE* data;
+		if ((size&0x3fff)==0) {
+			// switch page 1
+			*((UBYTE*)0xfffe) = (size>>14)&0xff;
+		}
+		// write to page 1
+		data = 0x4000+(size&0x3fff);
+		data = fat_load_file_sector(&file,data);
 		if (data==0) {
 			console_puts("error while reading file\n");
 		} else if (data==FAT_EOF) {

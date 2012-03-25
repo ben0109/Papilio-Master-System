@@ -167,17 +167,9 @@ int load_fat_sector(DWORD sector)
 	return FALSE;
 }
 
-int load_data_sector(DWORD sector)
+int load_data_sector(UBYTE *buffer, DWORD sector)
 {
-	if (fat->current_data_sector==sector) {
-		return TRUE;
-	}
-
-	if (sd_load_sector(data_buffer, sector)) {
-		fat->current_data_sector = sector;
-		return TRUE;
-	}
-	return FALSE;
+	return sd_load_sector(buffer, sector);
 }
 
 DWORD first_sector_of_cluster(DWORD cluster)
@@ -217,14 +209,16 @@ int fat_is_last_cluster(DWORD cluster)
 	}
 }
 
-void fat_open_file(file_t *file, DWORD cluster)
+int fat_open_file(file_t *file, DWORD cluster)
 {
 	file->cluster = cluster;
 	file->sector  = first_sector_of_cluster(cluster);
+	return TRUE;
 }
 
-UBYTE* fat_load_file_sector(file_t *file)
+int fat_load_file_sector(file_t *file, UBYTE *buffer)
 {
+	int i;
 	if (file->sector==first_sector_of_cluster(file->cluster+1)) {
 		file->cluster = fat_next_cluster(file->cluster);
 #ifdef DEBUG
@@ -244,12 +238,7 @@ UBYTE* fat_load_file_sector(file_t *file)
 			file->sector  = first_sector_of_cluster(file->cluster);
 		}
 	}
-	if (load_data_sector(file->sector)) {
-		file->sector++;
-		return data_buffer;
-	} else {
-		return 0;
-	}
+	return sd_load_sector(buffer, file->sector++)
 }
 
 void clear_directory_buffer()
@@ -315,7 +304,7 @@ file_descr_t* fat_open_root_directory16()
 	sector = fat->root_directory;
 	directory_ptr = directory_buffer;
 	for (i=fat->root_directory_size; i>0; --i) {
-		if (!load_data_sector(sector)) {
+		if (!sd_load_sector(data_buffer, sector)) {
 			console_puts("error while reading\n");
 			return 0;
 		}
@@ -353,7 +342,7 @@ file_descr_t* fat_open_directory(DWORD first_cluster)
 		UBYTE i;
 		sector = first_sector_of_cluster(cluster);
 		for(i=8; i>0; --i) {
-			if (!load_data_sector(sector)) {
+			if (!sd_load_sector(data_buffer, sector)) {
 				return 0;
 			}
 			if (process_directory_sector(&directory_ptr,data_buffer)) {
