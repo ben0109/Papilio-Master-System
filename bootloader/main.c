@@ -11,6 +11,7 @@ unsigned char pal[] = {
 
 void print_dir(file_descr_t *entries, file_descr_t *current);
 void load_rom(file_descr_t *entry);
+void start_rom();
 void wait_key();
 
 void irq_handler()
@@ -29,8 +30,8 @@ void main()
 	int i;
 	char *ptr;
 
-	vdp_set_address(0x8004) // mode 4, disable hbl irq
-	vdp_set_address(0x8100); // screen on, enable vbl irq
+	vdp_set_address(0x8004); // mode 4, disable hbl irq
+	vdp_set_address(0x8160); // screen on, enable vbl irq
 	vdp_set_address(0x820e); // name table @ $3800
 	vdp_set_address(0x85ff); // sprite table @ $3f00
 	vdp_set_address(0x8700); // backdrop is color 0
@@ -49,8 +50,6 @@ void main()
 
 	console_init();
 	console_clear();
-
-	vdp_set_address(0x8140); // screen on, enable vbl irq
 
 	console_gotoxy(0,0);
 	console_puts("SMS bootloader v0.92\n");
@@ -116,6 +115,7 @@ void main()
 				current = entries;
 			} else {
 				load_rom(current);
+				start_rom();
 				return;
 			}
 			break;
@@ -165,6 +165,14 @@ void load_rom(file_descr_t *entry)
 			console_puts(" bytes loaded");
 		}
 	}
+}
+
+void start_rom()
+{
+	// any write to $00 when in bootloader mode sets normal mode and reboots the CPU
+	#asm
+	out ($00),a
+	#endasm
 }
 
 void print_dir_entry(file_descr_t *entry)
