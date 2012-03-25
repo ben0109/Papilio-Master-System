@@ -5,6 +5,10 @@
 int debug_putc(char c)
 {
     #asm
+debug_putc_wait:
+	in a,($20)
+	and a,1
+	jr z,debug_putc_wait
     ld hl,2
     add hl,sp              ; skip over return address on stack
     ld a,(hl)

@@ -64,9 +64,9 @@ int fat_init()
 
 	sector = load_dword(&data_buffer[0x1c6]);
 #ifdef DEBUG_FAT
-	console_puts("first sector: ");
-	console_print_dword(sector);
-	console_puts("\n");
+	debug_puts("first sector: ");
+	debug_print_dword(sector);
+	debug_puts("\n");
 #endif
 
 	if (!sd_load_sector(data_buffer, sector)) {
@@ -96,18 +96,18 @@ int fat_init()
 	}
 
 #ifdef DEBUG_FAT
-	console_puts("sectors_per_cluster: ");
-	console_print_byte(fat->sectors_per_cluster);
-	console_puts("\n");
-	console_puts("first_fat_sector: ");
-	console_print_dword(fat->first_fat_sector);
-	console_puts("\n");
-	console_puts("first_data_sector: ");
-	console_print_dword(fat->first_data_sector);
-	console_puts("\n");
-	console_puts("root_directory: ");
-	console_print_dword(fat->root_directory);
-	console_puts("\n");
+	debug_puts("sectors_per_cluster: ");
+	debug_print_byte(fat->sectors_per_cluster);
+	debug_puts("\n");
+	debug_puts("first_fat_sector: ");
+	debug_print_dword(fat->first_fat_sector);
+	debug_puts("\n");
+	debug_puts("first_data_sector: ");
+	debug_print_dword(fat->first_data_sector);
+	debug_puts("\n");
+	debug_puts("root_directory: ");
+	debug_print_dword(fat->root_directory);
+	debug_puts("\n");
 #endif
 
 	return TRUE;
@@ -121,9 +121,9 @@ void fat_init32()
 	nb_fats = data_buffer[0x10];
 	fat_size= load_dword(&data_buffer[0x24]);
 #ifdef DEBUG_FAT
-	console_puts("fat_size: ");
-	console_print_dword(fat_size);
-	console_puts("\n");
+	debug_puts("fat_size: ");
+	debug_print_dword(fat_size);
+	debug_puts("\n");
 #endif
 
 	fat->first_data_sector = fat->first_fat_sector;

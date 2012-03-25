@@ -1,7 +1,7 @@
 CC = zcc
 LD = zcc
 
-CFLAGS = +sms #-DDEBUG
+CFLAGS = +sms -DDEBUG #-DDEBUG_FAT
 
 C_FILES=main.c console.c debug.c sd.c fat.c
 OBJECT_FILES=$(C_FILES:%.c=%.o)

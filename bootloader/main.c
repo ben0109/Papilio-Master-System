@@ -25,7 +25,6 @@ void nmi_handler()
 
 void main()
 {
-
 	file_descr_t *entries,*top_of_screen,*current;
 	int i;
 	char *ptr;
