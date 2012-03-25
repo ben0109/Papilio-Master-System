@@ -45,17 +45,32 @@ UBYTE spi_in_01()
 
 void spi_set_speed(BYTE delay)
 {
-	spi_out_c0(delay&0x7f);
+	#asm
+	ld	hl, 2
+	add	hl, sp
+	ld	a, (hl)
+	and a, $7f
+	or a,$80
+	out ($c0),a
+	#endasm
 }
 
 void spi_assert_cs()
 {
-	spi_out_c0(spi_in_00()&0x7f);
+	#asm
+	in a,($00)
+	and a,$7f
+	out ($c0),a
+	#endasm
 }
 
 void spi_deassert_cs()
 {
-	spi_out_c0(spi_in_00()|0x80);
+	#asm
+	in a,($00)
+	or a,$80
+	out ($c0),a
+	#endasm
 }
 
 UBYTE spi_send_byte(BYTE data)
