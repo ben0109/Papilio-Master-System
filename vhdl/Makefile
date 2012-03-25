@@ -1,11 +1,11 @@
-MEM_PATH:=~/prog/vhdl/master_system/bootloader/code
+MEM_PATH:=~/prog/vhdl/master_system/bootloader
 ISE_PATH:=/home/ben/prog/Xilinx/13.1/ISE_DS/ISE
 DATA2MEM:=$(ISE_PATH)/bin/lin/data2mem
 
 load: final.bit
 	sudo papilio-prog -v -f final.bit
 
-final.bit: main.bit boot_bd.bmm $(MEM_PATH)/boot.mem
+final.bit: main.bit boot_bd.bmm $(MEM_PATH)/all.mem
 	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt main.bit -o b final.bit
 
 

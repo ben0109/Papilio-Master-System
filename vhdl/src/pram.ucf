@@ -2,6 +2,9 @@ NET "clk" PERIOD = 31.25 ns;
 NET "clk" IOSTANDARD = LVCMOS25;
 NET "clk" LOC = C8;
 
+#NET "rx" LOC = "C2" | IOSTANDARD = LVCMOS25;
+NET "tx" LOC = "C1" | IOSTANDARD = LVCMOS25 | DRIVE = 4 | SLEW = SLOW;
+
 NET "red[1]"		LOC = A3;
 NET "green[1]"		LOC = A4;
 #NET "a<13>"		LOC = A5;
