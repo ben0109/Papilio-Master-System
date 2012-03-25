@@ -5,44 +5,6 @@
 
 //#define DEBUG_SD
 
-void spi_out_c0(BYTE value)
-{
-	#asm
-	ld	hl, 2
-	add	hl, sp
-	ld	a, (hl)
-	out ($c0),a
-	#endasm
-}
-
-void spi_out_c1(BYTE value)
-{
-	#asm
-	ld	hl, 2
-	add	hl, sp
-	ld	a, (hl)
-	out ($c1),a
-	#endasm
-}
-
-UBYTE spi_in_00()
-{
-	#asm
-	in	a,($00)
-	ld	l,a
-	ld	h,0
-	#endasm
-}
-
-UBYTE spi_in_01()
-{
-	#asm
-	in	a,($01)
-	ld	l,a
-	ld	h,0
-	#endasm
-}
-
 void spi_set_speed(BYTE delay)
 {
 	#asm
@@ -73,11 +35,25 @@ void spi_deassert_cs()
 	#endasm
 }
 
-UBYTE spi_send_byte(BYTE data)
+void spi_wait()
 {
-	spi_out_c1(data);
-	while ((spi_in_00()&0x80)==0) {}
-	return spi_in_01();
+	#asm
+send_byte_loop:
+	in a,($00)
+	and a,$80
+	jr z,send_byte_loop
+	#endasm
+}
+
+void spi_send_byte(BYTE data)
+{
+	#asm
+	ld	hl, 2
+	add	hl, sp
+	ld	a, (hl)
+	out ($c1),a
+	#endasm
+	spi_wait();
 }
 
 void spi_delay()
@@ -87,7 +63,12 @@ void spi_delay()
 
 UBYTE spi_receive_byte()
 {
-	return spi_send_byte(0xff);
+	spi_delay();
+	#asm
+	in a,($01)
+	ld l,a
+	ld h,0
+	#endasm
 }
 
 
@@ -255,7 +236,7 @@ int sd_init()
 	}
 
 	spi_deassert_cs();
-	spi_set_speed(0x01); // max speed
+	spi_set_speed(0x00); // max speed
 	return TRUE;
 }
 
@@ -306,13 +287,7 @@ int sd_load_sector(UBYTE* target, DWORD sector)
 
 	// read block
 	for (i=0; i<0x200; i++) {
-		*target = spi_receive_byte();
-/*#ifdef DEBUG
-		debug_print_byte(*target);
-		if ((i&0x1f)==0x1f)
-			debug_puts("\n");
-#endif*/
-		target++;
+		*target++ = spi_receive_byte();
 	}
 
 	// skip crc
