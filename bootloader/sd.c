@@ -240,12 +240,44 @@ int sd_init()
 	return TRUE;
 }
 
+/* loads $200 bytes from spi */
+void load_data(UBYTE *target)
+{
+/*
+	int i;
+	for (i=0; i<0x200; i++) {
+		*target++ = spi_receive_byte();
+	}
+*/
+	#asm
+	ld	hl, 2
+	add	hl, sp
+	ld	e, (hl)
+	inc hl
+	ld	d, (hl)
+	ex de,hl
+	ld bc,$0002
+load_data_loop:
+	ld a,$ff
+	out ($c1),a
+load_data_wait:
+	in a,($00)
+	and a,$80
+	jr z,load_data_wait
+	in a,($01)
+	ld (hl),a
+	inc hl
+	djnz load_data_loop
+	dec c
+	jr nz,load_data_loop
+	#endasm
+}
+
 int sd_load_sector(UBYTE* target, DWORD sector)
 {
 	DWORD address;
 	BYTE r;
 	BYTE timeout;
-	int i;
 
 	address = sector<<9;
 
@@ -286,9 +318,7 @@ int sd_load_sector(UBYTE* target, DWORD sector)
 	}
 
 	// read block
-	for (i=0; i<0x200; i++) {
-		*target++ = spi_receive_byte();
-	}
+	load_data(target);
 
 	// skip crc
 	spi_delay();
