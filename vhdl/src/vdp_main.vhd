@@ -64,6 +64,7 @@ architecture Behavioral of vdp_main is
 		color:			out std_logic_vector(3 downto 0));
 	end component;
 
+	signal bg_y:			unsigned(7 downto 0);
 	signal bg_vram_A:		std_logic_vector(13 downto 0);
 	signal bg_color:		std_logic_vector(4 downto 0);
 	signal bg_priority:	std_logic;
@@ -76,14 +77,24 @@ architecture Behavioral of vdp_main is
 	signal hbl_irq:		std_logic;
 
 begin
+
+	process (y,bg_scroll_y)
+		variable sum: unsigned(8 downto 0);
+	begin
+		sum := ('0'&y)+('0'&bg_scroll_y);
+		if (sum>=224) then
+			sum := sum-224;
+		end if;
+		bg_y <= sum(7 downto 0);
+	end process;
 		
 	vdp_bg_inst: vdp_background
 	port map (
 		clk				=> clk,
 		address			=> bg_address,
-		scroll_x 		=> (others=>'0'),
+		scroll_x 		=> bg_scroll_x,--(others=>'0'),
 		reset				=> line_reset,
-		y					=> y,
+		y					=> bg_y,
 		
 		vram_A			=> bg_vram_A,
 		vram_D			=> vram_D,		
@@ -104,7 +115,7 @@ begin
 		color				=> spr_color);
 		
 
-	vbl_irq <= frame_reset or irq_frame_en;
+	vbl_irq <= frame_reset and irq_frame_en;
 	hbl_irq <= '0';
 	
 	color <= cram_D;

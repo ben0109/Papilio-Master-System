@@ -42,7 +42,7 @@ begin
 	process (clk) begin
 		if (rising_edge(clk)) then
 			if (reset='1') then
-				x <= scroll_x+248;
+				x <= 248-scroll_x;
 			else
 				x <= x + 1;
 			end if;
@@ -101,10 +101,17 @@ begin
 		if (rising_edge(clk)) then
 			case x(2 downto 0) is
 			when "111" =>
-				shift0	<= data0;
-				shift1	<= data1;
-				shift2	<= data2;
-				shift3	<= vram_D;
+				if flip_x='0' then
+					shift0	<= data0;
+					shift1	<= data1;
+					shift2	<= data2;
+					shift3	<= vram_D;
+				else
+					shift0	<= data0(0)&data0(1)&data0(2)&data0(3)&data0(4)&data0(5)&data0(6)&data0(7);
+					shift1	<= data1(0)&data1(1)&data1(2)&data1(3)&data1(4)&data1(5)&data1(6)&data1(7);
+					shift2	<= data2(0)&data2(1)&data2(2)&data2(3)&data2(4)&data2(5)&data2(6)&data2(7);
+					shift3	<= vram_D(0)&vram_D(1)&vram_D(2)&vram_D(3)&vram_D(4)&vram_D(5)&vram_D(6)&vram_D(7);
+				end if;
 				color(4)	<= palette;
 				priority	<= priority_latch;
 			when others =>
