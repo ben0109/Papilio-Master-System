@@ -1837,9 +1837,11 @@ begin
 					Set_Addr_To <= aXY;
 				when 3 =>
 					if IR(3) = '0' then
-						IncDec_16 <= "0010";
+						--IncDec_16 <= "0010";
+						IncDec_16 <= "0110";
 					else
-						IncDec_16 <= "1010";
+						--IncDec_16 <= "0010";
+						IncDec_16 <= "0110";
 					end if;
 					TStates <= "100";
 					Write <= '1';
@@ -1866,9 +1868,11 @@ begin
 					Set_Addr_To <= aBC;
 				when 3 =>
 					if IR(3) = '0' then
-						IncDec_16 <= "0010";
+						--IncDec_16 <= "0010";
+						IncDec_16 <= "0110";
 					else
-						IncDec_16 <= "1010";
+						--IncDec_16 <= "0010";
+						IncDec_16 <= "0110";
 					end if;
 					IORQ <= '1';
 					Write <= '1';
