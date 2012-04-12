@@ -207,11 +207,11 @@ architecture Behavioral of main is
 	signal io_WR_n:			std_logic;
 	signal io_D_out:			std_logic_vector(7 downto 0);
 	
-	signal ram_RD_n:			std_logic;
+--	signal ram_RD_n:			std_logic;
 	signal ram_WR_n:			std_logic;
 	signal ram_D_out:			std_logic_vector(7 downto 0);
 	
-	signal rom_RD_n:			std_logic;
+--	signal rom_RD_n:			std_logic;
 	signal rom_WR_n:			std_logic;
 	signal rom_D_out:			std_logic_vector(7 downto 0);
 	
@@ -219,7 +219,7 @@ architecture Behavioral of main is
 	signal spi_WR_n:			std_logic;
 	signal spi_D_out:			std_logic_vector(7 downto 0);
 	
-	signal boot_rom_RD_n:	std_logic;
+--	signal boot_rom_RD_n:	std_logic;
 	signal boot_rom_D_out:	std_logic_vector(7 downto 0);
 	
 	signal uart_WR_n:			std_logic;
@@ -340,7 +340,7 @@ begin
 	ram_inst: ram
 	port map(
 		clk			=> clk_cpu,
-		RD_n			=> ram_RD_n,
+		RD_n			=> '0',--ram_RD_n,
 		WR_n			=> ram_WR_n,
 		A				=> A(12 downto 0),
 		D_in			=> D_in,
@@ -349,7 +349,7 @@ begin
 	boot_rom_inst: boot_rom
 	port map(
 		clk			=> clk_cpu,
-		RD_n			=> boot_rom_RD_n,
+		RD_n			=> '0',--boot_rom_RD_n,
 		A				=> A(12 downto 0),
 		D_out			=> boot_rom_D_out);
 	
@@ -384,89 +384,69 @@ begin
 	
 	-- glue logic
 
-	reset_n <= '0' when reset_counter>0 else '1';
+	vdp_WR_n <= WR_n when io_n='0' and A(7 downto 6)="10" else '1';
+					
+	vdp_RD_n <= RD_n when io_n='0' and (A(7 downto 6)="01" or A(7 downto 6)="10") else '1';
+	
+	psg_WR_n <= WR_n when io_n='0' and A(7 downto 6)="01" else '1';
 
+	ctl_WR_n <=	WR_n when io_n='0' and A(7 downto 6)="00" and A(0)='0' else '1';
+
+	io_WR_n <=	WR_n when io_n='0' and A(7 downto 6)="00" and A(0)='1' else '1';
+					
+	io_RD_n <=	RD_n when io_n='0' and A(7 downto 6)="11" else '1';
+					
+	spi_RD_n <= bootloader or RD_n when io_n='0' and A(7 downto 5)="000" else '1';
+
+	spi_WR_n <= bootloader or WR_n when io_n='0' and A(7 downto 5)="110" else '1';
+
+	uart_WR_n<= bootloader or WR_n when io_n='0' and A(7 downto 5)="111" else '1';
+	
+	ram_WR_n <= WR_n when io_n='1' and A(15 downto 14)="11" else '1';
+	
+	rom_WR_n <= bootloader or WR_n when io_n='1' and A(15 downto 14)="10" else '1';
+	
 	process (clk_cpu)
 	begin
 		if rising_edge(clk_cpu) then
-			if reset_counter>0 then
+			-- memory control
+			if ctl_WR_n='0' then
+				if bootloader='0' then
+					bootloader <= '1';
+					reset_counter <= (others=>'1');
+				end if;
+			elsif reset_counter>0 then
 				reset_counter <= reset_counter - 1;
 			end if;
 		end if;
 	end process;
-	
-	with io_n&A select
-	vdp_WR_n <= WR_n when "0--------10------",
-					'1' when others;
-					
-	with io_n&A select
-	vdp_RD_n <= RD_n when "0--------01------",
-					RD_n when "0--------10------",
-					'1' when others;
-	
-	with io_n&A select
-	psg_WR_n <= WR_n when "0--------01------",
-					'1' when others;
-
-	with io_n&A select
-	ctl_WR_n <=	WR_n when "0--------00-----0",
-					'1' when others;
-
-	with io_n&A select
-	io_WR_n <=	WR_n when "0--------00-----1",
-					'1' when others;
-					
-	with io_n&A select
-	io_RD_n <=	RD_n when "0--------11------",
-					'1' when others;
-	
-	with io_n&A select
-	ram_WR_n <= WR_n when "111--------------",
-					'1' when others;
-					
-	with io_n&A select
-	spi_RD_n <= bootloader or RD_n when "0--------00------",
-					'1' when others;
-
-	with io_n&A select
-	spi_WR_n <= bootloader or WR_n when "0--------110-----",
-					'1' when others;
-
-	with io_n&A select
-	uart_WR_n<= bootloader or WR_n when "0--------111-----",
-					'1' when others;
-	
-	with io_n&A select
-	rom_WR_n <= bootloader or WR_n when "110--------------",
-					'1' when others;
-	
-	process (clk_cpu)
-	begin
-		if rising_edge(clk_cpu) then
-			if ctl_WR_n='0' then
-				-- memory control
-				if bootloader='0' then
-					bootloader <= D_in(7);
-				end if;
-			end if;
-		end if;
-	end process;
+	reset_n <= '0' when reset_counter>0 else '1';
 	
 	with bootloader select
 	irom_D_out <=	boot_rom_D_out when '0',
 						rom_D_out when others;
 	
-	with io_n&A select
-	D_out <= spi_D_out		when "0--------000-----",
-				uart_D_out		when "0--------001-----",
-				vdp_D_out		when "0--------01------",
-				vdp_D_out		when "0--------10------",
-				io_D_out			when "0--------11------",
-				irom_D_out		when "100--------------",
-				irom_D_out		when "101--------------",
-				irom_D_out		when "110--------------",
-				ram_D_out		when "111--------------",
-				(others=>'-')	when others;
+	process (io_n,A,spi_D_out,uart_D_out,vdp_D_out,vdp_D_out,io_D_out,irom_D_out,irom_D_out,irom_D_out,ram_D_out)
+	begin
+		if io_n='0' then
+			case A(7 downto 5) is
+			when "000" =>
+				D_out <= spi_D_out; 
+			when "001" =>
+				D_out <= uart_D_out;
+			when "110"|"111" =>
+				D_out <= io_D_out;
+			when others =>
+				D_out <= vdp_D_out;
+			end case;
+		else
+			if A(15 downto 14)="11" then
+				D_out <= ram_D_out;
+			else
+				D_out <= irom_D_out;
+			end if;
+		end if;
+	end process;
 				
 				
 	-- external ram control
