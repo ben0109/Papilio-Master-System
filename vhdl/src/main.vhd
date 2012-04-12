@@ -6,10 +6,11 @@ entity main is
 	port (
 		clk:			in  STD_LOGIC;
 		
-		ram_ce:		out STD_LOGIC;
-		ram_be:		out STD_LOGIC;
-		ram_oe:		out STD_LOGIC;
-		ram_we:		out STD_LOGIC;
+		ram_cs_n:	out STD_LOGIC;
+		ram_we_n:	out STD_LOGIC;
+		ram_oe_n:	out STD_LOGIC;
+		ram_ble_n:	out STD_LOGIC;
+		ram_bhe_n:	out STD_LOGIC;
 		ram_a:		out STD_LOGIC_VECTOR(18 downto 0);
 		ram_d:		inout STD_LOGIC_VECTOR(15 downto 0);
 
@@ -18,9 +19,9 @@ entity main is
 
 		audio_out:	out STD_LOGIC;
 		
-		red:			out STD_LOGIC_VECTOR(1 downto 0);
-		green:		out STD_LOGIC_VECTOR(1 downto 0);
-		blue:			out STD_LOGIC_VECTOR(1 downto 0);
+		red:			out STD_LOGIC;
+		green:		out STD_LOGIC;
+		blue:			out STD_LOGIC;
 		hsync:		out STD_LOGIC;
 		vsync:		out STD_LOGIC;
 
@@ -44,7 +45,7 @@ architecture Behavioral of main is
 	end component;
 	
 --	component dummy_z80 is
-	component T80s is
+	component T80se is
 	generic(
 		Mode : integer := 0;	-- 0 => Z80, 1 => Fast Z80, 2 => 8080, 3 => GB
 		T2Write : integer := 0;	-- 0 => WR_n active in T3, /=0 => WR_n active in T2
@@ -53,8 +54,9 @@ architecture Behavioral of main is
 	port(
 		RESET_n:			in std_logic;
 		CLK_n:			in std_logic;
+		CLKEN:			in std_logic;
 		WAIT_n:			in std_logic;
-		INT_n:				in std_logic;
+		INT_n:			in std_logic;
 		NMI_n:			in std_logic;
 		BUSRQ_n:			in std_logic;
 		M1_n:				out std_logic;
@@ -231,6 +233,9 @@ architecture Behavioral of main is
 	signal y:					unsigned(7 downto 0);
 	
 	
+	signal redV:				std_logic_vector(1 downto 0);
+	signal greenV:				std_logic_vector(1 downto 0);
+	signal blueV:				std_logic_vector(1 downto 0);
 	
 	
 
@@ -254,12 +259,13 @@ begin
 	
 	
 --	z80_inst: dummy_z80
-	z80_inst: T80s
+	z80_inst: T80se
 	port map(
 		RESET_n		=> RESET_n,
 		CLK_n			=> clk_cpu,
+		CLKEN			=> '1',
 		WAIT_n		=> '1',
-		INT_n			=> '1',--IRQ_n,
+		INT_n			=> IRQ_n,
 		NMI_n			=> '1',
 		BUSRQ_n		=> '1',
 		M1_n			=> open,
@@ -285,10 +291,14 @@ begin
 		color			=> color,
 		hsync			=> hsync,
 		vsync			=> vsync,
-		red			=> red,
-		green			=> green,
-		blue			=> blue
+		red			=> redV,
+		green			=> greenV,
+		blue			=> blueV
 	);
+	
+	red <= redV(1);
+	green <= greenV(1);
+	blue <= blueV(1);
 
 	vdp_inst: vdp
 	port map (
@@ -410,21 +420,19 @@ begin
 	begin
 		if rising_edge(clk_cpu) then
 			-- memory control
-			if ctl_WR_n='0' then
+			if reset_counter>0 then
+				reset_counter <= reset_counter - 1;
+			elsif ctl_WR_n='0' then
 				if bootloader='0' then
 					bootloader <= '1';
 					reset_counter <= (others=>'1');
 				end if;
-			elsif reset_counter>0 then
-				reset_counter <= reset_counter - 1;
 			end if;
 		end if;
 	end process;
 	reset_n <= '0' when reset_counter>0 else '1';
 	
-	with bootloader select
-	irom_D_out <=	boot_rom_D_out when '0',
-						rom_D_out when others;
+	irom_D_out <=	boot_rom_D_out when bootloader='0' and A(15 downto 14)="00" else rom_D_out;
 	
 	process (io_n,A,spi_D_out,uart_D_out,vdp_D_out,vdp_D_out,io_D_out,irom_D_out,irom_D_out,irom_D_out,ram_D_out)
 	begin
@@ -465,10 +473,12 @@ begin
 		end if;
 	end process;
 	
-	ram_ce <= '1';
-	ram_be <= '0';
-	ram_oe <= RD_n;
-	ram_we <= rom_WR_n;
+	ram_cs_n <= '0';
+	ram_oe_n <= RD_n;
+	ram_we_n <= rom_WR_n;
+	ram_ble_n <= '0';
+	ram_bhe_n <= '0';
+	
 	ram_a(13 downto 0) <= A(13 downto 0);
 	process (A,bank0,bank1,bank2)
 	begin
@@ -488,9 +498,7 @@ begin
 		end case;
 	end process;
 	
-	with RD_n select
-	ram_d(7 downto 0) <= (others=>'Z') when '0',
-								D_in when others;
+	ram_d(7 downto 0) <= (others=>'Z') when RD_n='0' else D_in;
 	ram_d(15 downto 8) <= (others=>'Z');
 				
 	rom_D_out <= ram_d(7 downto 0);
