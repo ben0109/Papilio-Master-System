@@ -49,11 +49,10 @@ void main()
 	vdp_write(0xd0);
 
 	console_init();
-	console_clear();
+//	console_clear();
 
 	console_gotoxy(0,0);
 	console_puts("SMS bootloader v0.92\n");
-
 
 	if (!sd_init()) {
 		console_puts("could not initialize sd card\n");
@@ -146,16 +145,15 @@ void load_rom(file_descr_t *entry)
 		UBYTE* data;
 		if ((size&0x3fff)==0) {
 			// switch page 1
-			*((UBYTE*)0xfffe) = (size>>14)&0xff;
+			*((UBYTE*)0xffff) = (size>>14)&0xff;
 		}
-		// write to page 1
-		data = 0x4000+(size&0x3fff);
+		// write to page 2
+		data = 0x8000+(size&0x3fff);
 		data = fat_load_file_sector(&file,data);
 		if (data==0) {
 			console_puts("error while reading file\n");
 		} else if (data==FAT_EOF) {
 			console_gotoxy(0,2);
-			console_puts("booting rom...\n");
 			return;
 		} else {
 			// process data
@@ -168,7 +166,25 @@ void load_rom(file_descr_t *entry)
 }
 
 void start_rom()
-{
+{/*
+	UBYTE *ptr;
+	int i,j,k;
+	for (k=0; k<2; k++) {
+		*((UBYTE*)0xffff) = k;
+		ptr = 0x8000;
+		for (i=0; i<16; i++) {
+			console_print_byte(*ptr++);
+		}
+		ptr = 0xBFF0;
+		for (i=0; i<16; i++) {
+			console_print_byte(*ptr++);
+		}
+		console_puts("\n");
+	}*/
+	*((UBYTE*)0xfffd) = 0;
+	*((UBYTE*)0xfffe) = 1;
+	*((UBYTE*)0xffff) = 2;
+	console_puts("booting rom...\n");
 	// any write to $00 when in bootloader mode sets normal mode and reboots the CPU
 	#asm
 	out ($00),a
