@@ -27,8 +27,6 @@ begin
 	process (clk)
 	begin
 		if rising_edge(clk) then
-			color <= shift3(7)&shift2(7)&shift1(7)&shift0(7);
-			active <= shift3(7) or shift2(7) or shift1(7) or shift0(7);
 			if spr_x=x then
 				shift0 <= spr_d0;
 				shift1 <= spr_d1;
@@ -42,6 +40,9 @@ begin
 			end if;
 		end if;
 	end process;
+	
+	color <= shift3(7)&shift2(7)&shift1(7)&shift0(7);
+	active <= shift3(7) or shift2(7) or shift1(7) or shift0(7);
 	
 end Behavioral;
 
