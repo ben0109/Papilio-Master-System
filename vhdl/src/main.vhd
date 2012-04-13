@@ -155,7 +155,6 @@ architecture Behavioral of main is
 	end component;
 
 	
---	component dummy_spi is
 	component spi is
 	port (
 		clk:				in  STD_LOGIC;
