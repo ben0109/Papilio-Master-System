@@ -108,33 +108,33 @@ begin
 		variable y9 	: unsigned(8 downto 0);
 		variable d9		: unsigned(8 downto 0);
 		variable delta : unsigned(8 downto 0);
-		variable x2		: unsigned(8 downto 0);
+		variable x1		: unsigned(8 downto 0);
 	begin
 		if rising_edge(clk) then
 			y9 := "0"&y;
 			d9 := "0"&unsigned(vram_D);
 			delta := y9-d9;
-			x2 := x-2;
+			x1 := x-1;
 			
-			if x2<255 then
+			if x1<255 then
 				-- nothing
 
-			elsif x2=255 then
+			elsif x1=255 then
 				count <= 0;
 				enable <= (others=>false);
 				
-			elsif x2<320 then
+			elsif x1<320 then
 				if 0<=delta and ((delta<8 and tall='0') or (delta<16 and tall='1')) then
 					if count<8 then
-						index(count) <= std_logic_vector(x2(5 downto 0));
+						index(count) <= std_logic_vector(x1(5 downto 0));
 						enable(count) <= true;
 						count <= count+1;
 					end if;
 				end if;
 				
-			elsif x2<384 then
-				i := to_integer(x2(5 downto 3));
-				case x2(2 downto 0) is
+			elsif x1<384 then
+				i := to_integer(x1(5 downto 3));
+				case x1(2 downto 0) is
 				when "000" => spr_y		<= std_logic_vector(delta(3 downto 0));
 				when "001" => spr_n		<= vram_d;
 				when "010" => spr_x(i)	<= unsigned(vram_d);
