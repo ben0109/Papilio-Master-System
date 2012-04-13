@@ -92,7 +92,7 @@ begin
 	port map (
 		clk				=> clk,
 		address			=> bg_address,
-		scroll_x 		=> bg_scroll_x,--(others=>'0'),
+		scroll_x 		=> bg_scroll_x,
 		reset				=> line_reset,
 		y					=> bg_y,
 		
@@ -125,8 +125,8 @@ begin
 		variable bg_active	: boolean;
 	begin
 		if x<256 and y<192 then
-			spr_active	:= not spr_color="0000";
-			bg_active	:= not bg_color(3 downto 0)="0000";
+			spr_active	:= not (spr_color="0000");
+			bg_active	:= not (bg_color(3 downto 0)="0000");
 			if (bg_priority='0' and spr_active) or (bg_priority='1' and not bg_active) then
 				cram_A <= "1"&spr_color;
 			else
