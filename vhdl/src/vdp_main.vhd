@@ -16,7 +16,6 @@ entity vdp_main is
 		frame_reset:		std_logic;
 			
 		color:				out std_logic_vector (5 downto 0);
-		irq_n:				out std_logic;
 					
 		display_on:			in  std_logic;
 		mask_column0:		in  std_logic;
@@ -42,7 +41,7 @@ architecture Behavioral of vdp_main is
 	port (
 		clk:				in  std_logic;
 		reset:			in  std_logic;
-		address:			in  std_logic_vector(2 downto 0);
+		table_address:	in  std_logic_vector(13 downto 11);
 		scroll_x:		in  unsigned(7 downto 0);
 		y:					in  unsigned(7 downto 0);
 		vram_A:			out std_logic_vector(13 downto 0);
@@ -54,9 +53,9 @@ architecture Behavioral of vdp_main is
 	component vdp_sprites is
 	port (
 		clk:				in  std_logic;
-		address:			in  std_logic_vector(5 downto 0);
+		table_address:	in  std_logic_vector(13 downto 8);
 		char_high_bit:	in  std_logic;
-		tall:				in  STD_LOGIC;
+		tall:				in  std_logic;
 		x:					in  unsigned(8 downto 0);
 		y:					in  unsigned(7 downto 0);
 		vram_A:			out std_logic_vector(13 downto 0);
@@ -71,10 +70,6 @@ architecture Behavioral of vdp_main is
 	
 	signal spr_vram_A:	std_logic_vector(13 downto 0);
 	signal spr_color:		std_logic_vector(3 downto 0);
-
-	signal irq_counter:	unsigned(5 downto 0) := (others=>'0');
-	signal vbl_irq:		std_logic;
-	signal hbl_irq:		std_logic;
 
 begin
 
@@ -91,7 +86,7 @@ begin
 	vdp_bg_inst: vdp_background
 	port map (
 		clk				=> clk,
-		address			=> bg_address,
+		table_address	=> bg_address,
 		scroll_x 		=> bg_scroll_x,
 		reset				=> line_reset,
 		y					=> bg_y,
@@ -104,7 +99,7 @@ begin
 	vdp_spr_inst: vdp_sprites
 	port map (
 		clk				=> clk,
-		address			=> spr_address,
+		table_address	=> spr_address,
 		char_high_bit	=> spr_high_bit,
 		tall				=> spr_tall,
 		x					=> x,
@@ -113,12 +108,6 @@ begin
 		vram_A			=> spr_vram_A,
 		vram_D			=> vram_D,		
 		color				=> spr_color);
-		
-
-	vbl_irq <= frame_reset and irq_frame_en;
-	hbl_irq <= '0';
-	
-	color <= cram_D;
 
 	process (x, y, bg_priority, spr_color, bg_color, overscan)
 		variable spr_active	: boolean;
@@ -139,17 +128,7 @@ begin
 	
 	vram_A <= spr_vram_A when x>=256 and x<384 else bg_vram_A;
 	
-	process (clk)
-	begin
-		if rising_edge(clk) then
-			if vbl_irq='1' or hbl_irq='1' then
-				irq_counter <= (others=>'1');
-			elsif irq_counter>0 then
-				irq_counter <= irq_counter-1;
-			end if;
-		end if;
-	end process;
-	IRQ_n <= '0' when irq_counter>0 else '1';
+	color <= cram_D;
 
 end Behavioral;
 

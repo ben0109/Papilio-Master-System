@@ -35,7 +35,6 @@ architecture Behavioral of vdp is
 		frame_reset:	std_logic;
 			
 		color:			out std_logic_vector (5 downto 0);
-		irq_n:			out std_logic;
 					
 		display_on:		in  std_logic;
 		mask_column0:	in  std_logic;
@@ -87,6 +86,7 @@ architecture Behavioral of vdp is
 	signal xram_cpu_A:		std_logic_vector(13 downto 0);
 	signal vram_cpu_WE:		std_logic;
 	signal cram_cpu_WE:		std_logic;
+	signal vram_cpu_D_out:	std_logic_vector(7 downto 0);	
 	
 	-- vram and cram lines for the video interface
 	signal vram_vdp_A:		std_logic_vector(13 downto 0);
@@ -108,6 +108,10 @@ architecture Behavioral of vdp is
 	signal spr_shift:			std_logic := '0';
 	signal spr_tall:			std_logic := '0';
 	signal spr_high_bit:		std_logic := '0';
+
+	signal irq_counter:	unsigned(5 downto 0) := (others=>'0');
+	signal vbl_irq:		std_logic;
+	signal hbl_irq:		std_logic;
 	
 begin
 		
@@ -124,7 +128,6 @@ begin
 		line_reset		=> line_reset,
 		frame_reset		=> frame_reset,
 		color				=> color,
-		irq_n				=> irq_n,
 						
 		display_on		=> '1',--display_on,
 		mask_column0	=> mask_column0,
@@ -149,7 +152,7 @@ begin
 		cpu_WE			=> vram_cpu_WE,
 		cpu_A				=> xram_cpu_A(13 downto 0),
 		cpu_D_in			=> D_in,
-		cpu_D_out		=> D_out,
+		cpu_D_out		=> vram_cpu_D_out,
 		vdp_clk			=> vdp_clk,
 		vdp_A				=> vram_vdp_A,
 		vdp_D_out		=> vram_vdp_D);
@@ -210,8 +213,39 @@ begin
 					end if;
 					address_ff <= not address_ff;
 				end if;
+				
+			elsif RD_n='0' then
+				case A(6 downto 5)&A(0) is
+				when "010" =>
+					D_out <= std_logic_vector(y);
+				when "011" =>
+					--D_out <= (vbl counter);
+				when "100" =>
+					D_out <= (others=>'0');
+					-- TODO: 0x80 when vint pending, reset vint pending
+				when "101" =>
+					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
+					D_out <= vram_cpu_D_out;
+				when others =>
+				end case;
 			end if;
 		end if;
 	end process;
+		
+
+	vbl_irq <= frame_reset and irq_frame_en;
+	hbl_irq <= '0';
+	
+	process (vdp_clk)
+	begin
+		if rising_edge(vdp_clk) then
+			if vbl_irq='1' or hbl_irq='1' then
+				irq_counter <= (others=>'1');
+			elsif irq_counter>0 then
+				irq_counter <= irq_counter-1;
+			end if;
+		end if;
+	end process;
+	IRQ_n <= '0' when irq_counter>0 else '1';
 	
 end Behavioral;
