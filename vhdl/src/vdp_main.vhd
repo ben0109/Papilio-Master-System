@@ -25,10 +25,6 @@ entity vdp_main is
 		bg_scroll_x:		in  unsigned(7 downto 0);
 		bg_scroll_y:		in  unsigned(7 downto 0);
 			
-		irq_frame_en:		in  std_logic;
-		irq_line_en:		in  std_logic;
-		irq_line_count:	in  unsigned(7 downto 0);
-			
 		spr_address:		in  std_logic_vector (5 downto 0);
 		spr_high_bit:		in  std_logic;
 		spr_shift:			in  std_logic;	

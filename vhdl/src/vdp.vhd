@@ -44,10 +44,6 @@ architecture Behavioral of vdp is
 		bg_scroll_x:	in  unsigned(7 downto 0);
 		bg_scroll_y:	in  unsigned(7 downto 0);
 			
-		irq_frame_en:	in  std_logic;
-		irq_line_en:	in  std_logic;
-		irq_line_count:in  unsigned(7 downto 0);
-			
 		spr_address:	in  std_logic_vector (5 downto 0);
 		spr_high_bit:	in  std_logic;
 		spr_shift:		in  std_logic;	
@@ -109,9 +105,14 @@ architecture Behavioral of vdp is
 	signal spr_tall:			std_logic := '0';
 	signal spr_high_bit:		std_logic := '0';
 
-	signal irq_counter:	unsigned(5 downto 0) := (others=>'0');
-	signal vbl_irq:		std_logic;
-	signal hbl_irq:		std_logic;
+	-- various counters
+	signal vbl_counter:		unsigned(7 downto 0) := (others=>'0');
+	signal virq_flag:			std_logic := '0';
+	signal reset_virq_flag:	boolean := false;
+	signal irq_counter:		unsigned(5 downto 0) := (others=>'0');
+	signal hbl_counter:		unsigned(7 downto 0) := (others=>'0');
+	signal vbl_irq:			std_logic;
+	signal hbl_irq:			std_logic;
 	
 begin
 		
@@ -132,10 +133,6 @@ begin
 		display_on		=> '1',--display_on,
 		mask_column0	=> mask_column0,
 		overscan			=> overscan,
-				
-		irq_frame_en	=> irq_frame_en,
-		irq_line_en		=> irq_line_en,
-		irq_line_count	=> irq_line_count,
 
 		bg_address		=> bg_address,
 		bg_scroll_x		=> bg_scroll_x,
@@ -213,28 +210,75 @@ begin
 					end if;
 					address_ff <= not address_ff;
 				end if;
+				reset_virq_flag <= false;
 				
 			elsif RD_n='0' then
-				case A(6 downto 5)&A(0) is
+				case A(7 downto 6)&A(0) is
 				when "010" =>
-					D_out <= std_logic_vector(y);
+					D_out <= std_logic_vector(vbl_counter);
+					reset_virq_flag <= false;
 				when "011" =>
-					--D_out <= (vbl counter);
+					D_out <= std_logic_vector(y);
+					reset_virq_flag <= false;
 				when "100" =>
-					D_out <= (others=>'0');
-					-- TODO: 0x80 when vint pending, reset vint pending
-				when "101" =>
-					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
 					D_out <= vram_cpu_D_out;
+					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
+					reset_virq_flag <= false;
+				when "101" =>
+					D_out <= virq_flag&"0000000";
+					reset_virq_flag <= true;
 				when others =>
 				end case;
+				
+			else
+				reset_virq_flag <= false;
 			end if;
 		end if;
 	end process;
 		
-
-	vbl_irq <= frame_reset and irq_frame_en;
-	hbl_irq <= '0';
+	
+	process (vdp_clk)
+	begin
+		if rising_edge(vdp_clk) then
+			if frame_reset='1' then
+				vbl_irq <= irq_frame_en;
+				vbl_counter <= vbl_counter+1;
+			else
+				vbl_irq <= '0';
+			end if;
+		end if;
+	end process;
+	
+	process (vdp_clk)
+	begin
+		if rising_edge(vdp_clk) then
+			if x=256 then
+				if y<192 then
+					if hbl_counter=0 then
+						hbl_irq <= irq_line_en;
+						hbl_counter <= irq_line_count;
+					else
+						hbl_counter <= hbl_counter-1;
+					end if;
+				else
+					hbl_counter <= irq_line_count;
+				end if;
+			else
+				hbl_irq <= '0';
+			end if;
+		end if;
+	end process;
+	
+	process (vdp_clk)
+	begin
+		if rising_edge(vdp_clk) then
+			if vbl_irq='1' then
+				virq_flag <= '1';
+			elsif reset_virq_flag then
+				virq_flag <= '0';
+			end if;
+		end if;
+	end process;
 	
 	process (vdp_clk)
 	begin
