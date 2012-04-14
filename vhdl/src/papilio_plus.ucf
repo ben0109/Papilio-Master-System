@@ -43,7 +43,7 @@ NET "joy_1<0>"		LOC="P75"  | IOSTANDARD=LVTTL | PULLUP ;
 NET "vsync"			LOC="P79"  | IOSTANDARD=LVTTL;                                # A8
 NET "hsync"			LOC="P81"  | IOSTANDARD=LVTTL;                                # A9
 NET "blue"			LOC="P83"  | IOSTANDARD=LVTTL;                                # A10
-NET "audio_out"	LOC="P85"  | IOSTANDARD=LVTTL;                                # A11
+#NET A(11)			LOC="P85"  | IOSTANDARD=LVTTL;                                # A11
 #NET A(12)			LOC="P88"  | IOSTANDARD=LVTTL;                                # A12
 #NET A(13)			LOC="P93"  | IOSTANDARD=LVTTL;                                # A13
 NET "green"			LOC="P98"  | IOSTANDARD=LVTTL;                                # A14
@@ -58,14 +58,14 @@ NET "spi_cs_n"		LOC="P84"  | IOSTANDARD=LVTTL;                                # 
 #NET B(6)			LOC="P80"  | IOSTANDARD=LVTTL;                                # B6
 #NET B(7)			LOC="P78"  | IOSTANDARD=LVTTL;                                # B7
 
-#NET B(8)     LOC="P74"  | IOSTANDARD=LVTTL;                                # B8
-#NET B(9)     LOC="P95"  | IOSTANDARD=LVTTL;                                # B9
-#NET B(10)    LOC="P62"  | IOSTANDARD=LVTTL;                                # B10
-#NET B(11)    LOC="P59"  | IOSTANDARD=LVTTL;                                # B11
-#NET B(12)    LOC="P57"  | IOSTANDARD=LVTTL;                                # B12
-#NET B(13)    LOC="P55"  | IOSTANDARD=LVTTL;                                # B13
-#NET B(14)    LOC="P50"  | IOSTANDARD=LVTTL;                                # B14
-#NET B(15)    LOC="P47"  | IOSTANDARD=LVTTL;                                # B15
+#NET B(8)			LOC="P74"  | IOSTANDARD=LVTTL;                                # B8
+#NET B(9)			LOC="P95"  | IOSTANDARD=LVTTL;                                # B9
+#NET B(10)			LOC="P62"  | IOSTANDARD=LVTTL;                                # B10
+#NET B(11)			LOC="P59"  | IOSTANDARD=LVTTL;                                # B11
+#NET B(12)		  	LOC="P57"  | IOSTANDARD=LVTTL;                                # B12
+NET "audio_l"		LOC="P55"  | IOSTANDARD=LVTTL;                                # B13
+#NET B(14)			LOC="P50"  | IOSTANDARD=LVTTL;                                # B14
+NET "audio_r"		LOC="P47"  | IOSTANDARD=LVTTL;                                # B15
 
 #NET C(0)     LOC="P114" | IOSTANDARD=LVTTL;                                # C0
 #NET C(1)     LOC="P115" | IOSTANDARD=LVTTL;                                # C1

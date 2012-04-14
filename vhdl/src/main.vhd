@@ -17,7 +17,8 @@ entity main is
 		joy_1_gnd:	out STD_LOGIC;
 		joy_1:		in	STD_LOGIC_VECTOR(5 downto 0);
 
-		audio_out:	out STD_LOGIC;
+		audio_l:		out STD_LOGIC;
+		audio_r:		out STD_LOGIC;
 		
 		red:			out STD_LOGIC;
 		green:		out STD_LOGIC;
@@ -201,6 +202,7 @@ architecture Behavioral of main is
 	signal color:				std_logic_vector(5 downto 0);
 	
 	signal psg_WR_n:			std_logic;
+	signal audio_out:			std_logic;
 	
 	signal ctl_WR_n:			std_logic;
 	
@@ -321,6 +323,9 @@ begin
 		WR_n			=> psg_WR_n,
 		D_in			=> D_in,
 		output		=> audio_out);
+		
+	audio_l <= audio_out;
+	audio_r <= audio_out;
 	
 	io_inst: io
    port map (
