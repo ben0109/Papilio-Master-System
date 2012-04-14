@@ -4,17 +4,17 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_background is
 port (
-	clk		: in  std_logic;
-	reset		: in  std_logic;
-	address	: in  std_logic_vector(2 downto 0);
-	scroll_x	: in  unsigned(7 downto 0);
-	y			: in  unsigned(7 downto 0);
+	clk:				in  std_logic;
+	reset:			in  std_logic;
+	table_address:	in  std_logic_vector(13 downto 11);
+	scroll_x:		in  unsigned(7 downto 0);
+	y:					in  unsigned(7 downto 0);
 
-	vram_A	: out std_logic_vector(13 downto 0);
-	vram_D	: in  std_logic_vector(7 downto 0);
+	vram_A:			out std_logic_vector(13 downto 0);
+	vram_D:			in  std_logic_vector(7 downto 0);
 
-	color		: out std_logic_vector(4 downto 0);
-	priority	: out std_logic
+	color:			out std_logic_vector(4 downto 0);
+	priority:		out std_logic
 );
 end entity;
 
@@ -50,22 +50,22 @@ begin
 	end process;
 
 	process (clk)
-		variable table_address	: std_logic_vector(12 downto 0);
-		variable char_address	: std_logic_vector(11 downto 0);
+		variable char_address	: std_logic_vector(12 downto 0);
+		variable data_address	: std_logic_vector(11 downto 0);
 	begin
 		if (rising_edge(clk)) then
-			table_address(12 downto 10)	:= address;
-			table_address(9 downto 5)		:= std_logic_vector(y(7 downto 3));
-			table_address(4 downto 0)		:= std_logic_vector(x(7 downto 3) + 1);
-			char_address := tile_index & tile_y;
+			char_address(12 downto 10)	:= table_address;
+			char_address(9 downto 5)	:= std_logic_vector(y(7 downto 3));
+			char_address(4 downto 0)	:= std_logic_vector(x(7 downto 3) + 1);
+			data_address					:= tile_index & tile_y;
 			
 			case x(2 downto 0) is
-			when "000" => vram_A <= table_address & "0";
-			when "001" => vram_A <= table_address & "1";
-			when "011" => vram_A <= char_address & "00";
-			when "100" => vram_A <= char_address & "01";
-			when "101" => vram_A <= char_address & "10";
-			when "110" => vram_A <= char_address & "11";
+			when "000" => vram_A <= char_address & "0";
+			when "001" => vram_A <= char_address & "1";
+			when "011" => vram_A <= data_address & "00";
+			when "100" => vram_A <= data_address & "01";
+			when "101" => vram_A <= data_address & "10";
+			when "110" => vram_A <= data_address & "11";
 			when others =>
 			end case;
 		end if;
