@@ -2,6 +2,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+use work.all;
+
 entity main is
 	port (
 		clk:			in		STD_LOGIC;
@@ -21,7 +23,6 @@ entity main is
 		j1_right:	in		STD_LOGIC;
 		j1_tl:		in		STD_LOGIC;
 		j1_tr:		inout	STD_LOGIC;
-		j1_th:		inout	STD_LOGIC;
 
 		audio_l:		out	STD_LOGIC;
 		audio_r:		out	STD_LOGIC;
@@ -50,6 +51,7 @@ architecture Behavioral of main is
 		clk32:		out std_logic;
 		clk64:		out std_logic);
 	end component;
+
 	
 --	component dummy_z80 is
 	component T80se is
@@ -134,14 +136,12 @@ architecture Behavioral of main is
 		J1_right:		in 	STD_LOGIC;
 		J1_tl:			in 	STD_LOGIC;
 		J1_tr:			inout STD_LOGIC;
-		J1_th:			inout STD_LOGIC;
 		J2_up:			in 	STD_LOGIC;
 		J2_down:			in 	STD_LOGIC;
 		J2_left:			in 	STD_LOGIC;
 		J2_right:		in 	STD_LOGIC;
 		J2_tl:			in 	STD_LOGIC;
 		J2_tr:			inout STD_LOGIC;
-		J2_th:			inout STD_LOGIC;
 		RESET:			in 	STD_LOGIC);
 	end component;
 
@@ -216,9 +216,8 @@ architecture Behavioral of main is
 	
 	signal io_RD_n:			std_logic;
 	signal io_WR_n:			std_logic;
-	signal io_J2_tr:			std_logic;
-	signal io_J2_th:			std_logic;
 	signal io_D_out:			std_logic_vector(7 downto 0);
+	signal j2_tr:				std_logic;
 	
 --	signal ram_RD_n:			std_logic;
 	signal ram_WR_n:			std_logic;
@@ -349,17 +348,15 @@ begin
 		J1_down		=> j1_down,
 		J1_left		=> j1_left,
 		J1_right		=> j1_right,
-		RESET			=> '1',
 		J1_tl			=> j1_tl,
 		J1_tr			=> j1_tr,
-		J1_th			=> j1_th,
 		J2_up			=> '1',
 		J2_down		=> '1',
 		J2_left		=> '1',
 		J2_right		=> '1',
 		J2_tl			=> '1',
-		J2_tr			=> io_J2_tr,
-		J2_th			=> io_J2_th);
+		J2_tr			=> j2_tr,
+		RESET			=> '1');
 		
 	j1_gnd <= '0';
 		
