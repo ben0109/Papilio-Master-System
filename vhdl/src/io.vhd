@@ -24,18 +24,20 @@ entity io is
 		J1_right:in 	STD_LOGIC;
 		J1_tl:	in 	STD_LOGIC;
 		J1_tr:	inout STD_LOGIC;
-		J1_th:	inout STD_LOGIC;
 		J2_up:	in 	STD_LOGIC;
 		J2_down:	in 	STD_LOGIC;
 		J2_left:	in 	STD_LOGIC;
 		J2_right:in 	STD_LOGIC;
 		J2_tl:	in 	STD_LOGIC;
 		J2_tr:	inout STD_LOGIC;
-		J2_th:	inout STD_LOGIC;
 		RESET:	in 	STD_LOGIC);
 end io;
 
 architecture rtl of io is
+
+	signal j1_th:	std_logic := '0';
+	signal j2_th:	std_logic := '0';
+
 begin
 
 	process (clk)
@@ -43,9 +45,9 @@ begin
 		if rising_edge(clk) then
 			if WR_n='0'  and A(0)='0' then
 				if D_in(0)='1' then J1_tr <= 'Z'; else J1_tr <= D_in(4); end if;
-				if D_in(1)='1' then J1_th <= 'Z'; else J1_th <= D_in(5); end if;
+				if D_in(1)='1' then J1_th <= '0'; else J1_th <= D_in(5); end if;
 				if D_in(2)='1' then J2_tr <= 'Z'; else J2_tr <= D_in(6); end if;
-				if D_in(3)='1' then J2_th <= 'Z'; else J2_th <= D_in(7); end if;
+				if D_in(3)='1' then J2_th <= '0'; else J2_th <= D_in(7); end if;
 			end if;
 		end if;
 	end process;
