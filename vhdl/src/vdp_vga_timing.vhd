@@ -38,9 +38,11 @@ end vdp_vga_timing;
 
 architecture Behavioral of vdp_vga_timing is
 
-	signal hcount:		unsigned (8 downto 0);
-	signal vcount:		unsigned (8 downto 0);
+	signal hcount:		unsigned (8 downto 0) := (others=>'0');
+	signal vcount:		unsigned (8 downto 0) := (others=>'0');
 	signal visible:	boolean;
+	
+	signal screen_n:	std_logic_vector (1 downto 0) := (others=>'0');
 	
 begin
 	
@@ -70,9 +72,56 @@ begin
 	vsync			<= '0' when vcount<2 else '1';
 	
 	visible		<= vcount>=35 and vcount<35+480 and hcount>=91 and hcount<91+406;
-	red			<= color(1 downto 0) when visible else "00";
-	green			<= color(3 downto 2) when visible else "00";
-	blue			<= color(5 downto 4) when visible else "00";
+	
+	process (clk_16)
+	begin
+		if rising_edge(clk_16) then
+			if vcount=0 and hcount=0 then
+				case screen_n is
+				when "00"	=> screen_n <= "01";
+				when "01"	=> screen_n <= "11";
+				when "11"	=> screen_n <= "10";
+				when others	=> screen_n <= "00";
+				end case;
+			end if;
+		end if;
+	end process;
+	
+	process (clk_16)
+		variable pixel_n: std_logic_vector(1 downto 0);
+	begin
+		if rising_edge(clk_16) then
+			if visible then
+				pixel_n := std_logic_vector(hcount(0 downto 0))&std_logic_vector(vcount(0 downto 0));
+				pixel_n(0) := pixel_n(0) xor screen_n(0);
+				pixel_n(1) := pixel_n(1) xor screen_n(1);
+				case pixel_n is
+				when "00" =>
+					red(1)	<= color(0);
+					green(1)	<= color(2);
+					blue(1)	<= color(4);
+				when "01" | "10" =>
+					red(1)	<= color(1);
+					green(1)	<= color(3);
+					blue(1)	<= color(5);
+				when others =>
+					red(1)	<= color(0) and color(1);
+					green(1)	<= color(2) and color(3);
+					blue(1)	<= color(4) and color(5);
+				end case;
+				red(0)	<= '0';
+				green(0)	<= '0';
+				blue(0)	<= '0';
+			else
+				red	<= "00";
+				green	<= "00";
+				blue	<= "00";
+			end if;
+		end if;
+	end process;
+--	red			<= color(1 downto 0) when visible else "00";
+--	green			<= color(3 downto 2) when visible else "00";
+--	blue			<= color(5 downto 4) when visible else "00";
 
 end Behavioral;
 
