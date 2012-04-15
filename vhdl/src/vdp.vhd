@@ -106,6 +106,7 @@ architecture Behavioral of vdp is
 	signal spr_high_bit:		std_logic := '0';
 
 	-- various counters
+	signal last_y0:			std_logic := '0';
 	signal vbl_counter:		unsigned(7 downto 0) := (others=>'0');
 	signal virq_flag:			std_logic := '0';
 	signal reset_virq_flag:	boolean := false;
@@ -130,7 +131,7 @@ begin
 		frame_reset		=> frame_reset,
 		color				=> color,
 						
-		display_on		=> '1',--display_on,
+		display_on		=> display_on,
 		mask_column0	=> mask_column0,
 		overscan			=> overscan,
 
@@ -210,22 +211,19 @@ begin
 					end if;
 					address_ff <= not address_ff;
 				end if;
-				reset_virq_flag <= false;
 				
 			elsif RD_n='0' then
 				case A(7 downto 6)&A(0) is
 				when "010" =>
 					D_out <= std_logic_vector(vbl_counter);
-					reset_virq_flag <= false;
 				when "011" =>
 					D_out <= std_logic_vector(y);
-					reset_virq_flag <= false;
 				when "100" =>
 					D_out <= vram_cpu_D_out;
 					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
-					reset_virq_flag <= false;
 				when "101" =>
-					D_out <= virq_flag&"0000000";
+					D_out(7) <= virq_flag;
+					D_out(6 downto 0) <= (others=>'0');
 					reset_virq_flag <= true;
 				when others =>
 				end case;
@@ -252,7 +250,8 @@ begin
 	process (vdp_clk)
 	begin
 		if rising_edge(vdp_clk) then
-			if x=256 then
+			if x=256 and not (last_y0=std_logic(y(0))) then
+				last_y0 <= std_logic(y(0));
 				if y<192 then
 					if hbl_counter=0 then
 						hbl_irq <= irq_line_en;
