@@ -113,14 +113,14 @@ NET ram_d(4)  LOC="P5"   | IOSTANDARD=LVTTL;                                # DA
 NET ram_d(5)  LOC="P2"   | IOSTANDARD=LVTTL;                                # DATA5
 NET ram_d(6)  LOC="P1"   | IOSTANDARD=LVTTL;                                # DATA6
 NET ram_d(7)  LOC="P143" | IOSTANDARD=LVTTL;                                # DATA7
-#NET ram_d(8)  LOC="P39"  | IOSTANDARD=LVTTL;                                # DATA8
-#NET ram_d(9)  LOC="P35"  | IOSTANDARD=LVTTL;                                # DATA9
-#NET ram_d(10) LOC="P34"  | IOSTANDARD=LVTTL;                                # DATA10
-#NET ram_d(11) LOC="P33"  | IOSTANDARD=LVTTL;                                # DATA11
-#NET ram_d(12) LOC="P17"  | IOSTANDARD=LVTTL;                                # DATA12
-#NET ram_d(13) LOC="P21"  | IOSTANDARD=LVTTL;                                # DATA13
-#NET ram_d(14) LOC="P22"  | IOSTANDARD=LVTTL;                                # DATA14
-#NET ram_d(15) LOC="P23"  | IOSTANDARD=LVTTL;                                # DATA15
+NET ram_d(8)  LOC="P39"  | IOSTANDARD=LVTTL;                                # DATA8
+NET ram_d(9)  LOC="P35"  | IOSTANDARD=LVTTL;                                # DATA9
+NET ram_d(10) LOC="P34"  | IOSTANDARD=LVTTL;                                # DATA10
+NET ram_d(11) LOC="P33"  | IOSTANDARD=LVTTL;                                # DATA11
+NET ram_d(12) LOC="P17"  | IOSTANDARD=LVTTL;                                # DATA12
+NET ram_d(13) LOC="P21"  | IOSTANDARD=LVTTL;                                # DATA13
+NET ram_d(14) LOC="P22"  | IOSTANDARD=LVTTL;                                # DATA14
+NET ram_d(15) LOC="P23"  | IOSTANDARD=LVTTL;                                # DATA15
 
 NET ram_CS_n  LOC="P11"  | IOSTANDARD=LVTTL;                                # nCS
 NET ram_WE_n  LOC="P142" | IOSTANDARD=LVTTL;                                # nWE

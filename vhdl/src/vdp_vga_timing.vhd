@@ -22,18 +22,18 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_vga_timing is
-port (
-	clk_16:			in  std_logic;
-	x: 				out unsigned(8 downto 0);
-	y:					out unsigned(7 downto 0);
-	vblank:			out std_logic;
-	hblank:			out std_logic;
-	color:			in  std_logic_vector(5 downto 0);
-	hsync:			out std_logic;
-	vsync:			out std_logic;
-	red:				out std_logic;
-	green:			out std_logic;
-	blue:				out std_logic);
+	port (
+		clk_16:			in  std_logic;
+		x: 				out unsigned(8 downto 0);
+		y:					out unsigned(7 downto 0);
+		vblank:			out std_logic;
+		hblank:			out std_logic;
+		color:			in  std_logic_vector(5 downto 0);
+		hsync:			out std_logic;
+		vsync:			out std_logic;
+		red:				out std_logic;
+		green:			out std_logic;
+		blue:				out std_logic);
 end vdp_vga_timing;
 
 architecture Behavioral of vdp_vga_timing is
@@ -96,31 +96,25 @@ begin
 				pixel_n(1) := pixel_n(1) xor screen_n(1);
 				case pixel_n is
 				when "00" =>
-					red(1)	<= color(0);
-					green(1)	<= color(2);
-					blue(1)	<= color(4);
+					red	<= color(0);
+					green	<= color(2);
+					blue	<= color(4);
 				when "01" | "10" =>
-					red(1)	<= color(1);
-					green(1)	<= color(3);
-					blue(1)	<= color(5);
+					red	<= color(1);
+					green	<= color(3);
+					blue	<= color(5);
 				when others =>
-					red(1)	<= color(0) and color(1);
-					green(1)	<= color(2) and color(3);
-					blue(1)	<= color(4) and color(5);
+					red	<= color(0) and color(1);
+					green	<= color(2) and color(3);
+					blue	<= color(4) and color(5);
 				end case;
-				red(0)	<= '0';
-				green(0)	<= '0';
-				blue(0)	<= '0';
 			else
-				red	<= "00";
-				green	<= "00";
-				blue	<= "00";
+				red	<= '0';
+				green	<= '0';
+				blue	<= '0';
 			end if;
 		end if;
 	end process;
---	red			<= color(1 downto 0) when visible else "00";
---	green			<= color(3 downto 2) when visible else "00";
---	blue			<= color(5 downto 4) when visible else "00";
 
 end Behavioral;
 
