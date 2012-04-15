@@ -87,9 +87,9 @@ architecture Behavioral of main is
 		clk_16:			in  std_logic;
 		x: 				out unsigned(8 downto 0);
 		y:					out unsigned(7 downto 0);
-		line_reset:		out std_logic;
-		frame_reset:	out std_logic;
-		color:			in std_logic_vector(5 downto 0);
+		vblank:			out std_logic;
+		hblank:			out std_logic;
+		color:			in  std_logic_vector(5 downto 0);
 		hsync:			out std_logic;
 		vsync:			out std_logic;
 		red:				out std_logic_vector(1 downto 0);
@@ -109,8 +109,8 @@ architecture Behavioral of main is
 		D_out:			out STD_LOGIC_VECTOR(7 downto 0);			
 		x:					in  unsigned(8 downto 0);
 		y:					in  unsigned(7 downto 0);
-		line_reset:		in  std_logic;
-		frame_reset:	in  std_logic;			
+		vblank:			in  std_logic;
+		hblank:			in  std_logic;
 		color: 			out std_logic_vector (5 downto 0));
 	end component;
 	
@@ -205,8 +205,6 @@ architecture Behavioral of main is
 	signal vdp_RD_n:			std_logic;
 	signal vdp_WR_n:			std_logic;
 	signal vdp_D_out:			std_logic_vector(7 downto 0);
-	signal frame_reset:		std_logic;
-	signal line_reset:		std_logic;
 	signal color:				std_logic_vector(5 downto 0);
 	
 	signal psg_WR_n:			std_logic;
@@ -236,18 +234,11 @@ architecture Behavioral of main is
 	
 	signal uart_WR_n:			std_logic;
 	signal uart_D_out:		std_logic_vector(7 downto 0);
-	
-	signal pal:					std_logic := '0';
 
 	signal x:					unsigned(8 downto 0);
 	signal y:					unsigned(7 downto 0);
-	
-	
-	signal redV:				std_logic_vector(1 downto 0);
-	signal greenV:				std_logic_vector(1 downto 0);
-	signal blueV:				std_logic_vector(1 downto 0);
-	
-	
+	signal vblank:				std_logic;	
+	signal hblank:				std_logic;	
 
 	signal reset_counter:	unsigned(3 downto 0) := "1111";
 	signal bootloader:		std_logic := '0';
@@ -296,19 +287,15 @@ begin
 		clk_16		=> clk16,
 		x	 			=> x,
 		y				=> y,
-		line_reset	=> line_reset,
-		frame_reset	=> frame_reset,
+		vblank		=> vblank,
+		hblank		=> hblank,
 		color			=> color,
 		hsync			=> hsync,
 		vsync			=> vsync,
-		red			=> redV,
-		green			=> greenV,
-		blue			=> blueV
+		red			=> red,
+		green			=> green,
+		blue			=> blue
 	);
-	
-	red <= redV(1);
-	green <= greenV(1);
-	blue <= blueV(1);
 
 	vdp_inst: vdp
 	port map (
@@ -322,9 +309,9 @@ begin
 		D_out			=> vdp_D_out,
 		x				=> x,
 		y				=> y,
-		color			=> color,
-		frame_reset	=> frame_reset,
-		line_reset	=> line_reset);
+		vblank		=> vblank,
+		hblank		=> hblank,
+		color			=> color);
 		
 	psg_inst: psg
 	port map (

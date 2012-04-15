@@ -26,14 +26,14 @@ port (
 	clk_16:			in  std_logic;
 	x: 				out unsigned(8 downto 0);
 	y:					out unsigned(7 downto 0);
-	line_reset:		out std_logic;
-	frame_reset:	out std_logic;
-	color:			in std_logic_vector(5 downto 0);
+	vblank:			out std_logic;
+	hblank:			out std_logic;
+	color:			in  std_logic_vector(5 downto 0);
 	hsync:			out std_logic;
 	vsync:			out std_logic;
-	red:				out std_logic_vector(1 downto 0);
-	green:			out std_logic_vector(1 downto 0);
-	blue:				out std_logic_vector(1 downto 0));
+	red:				out std_logic;
+	green:			out std_logic;
+	blue:				out std_logic);
 end vdp_vga_timing;
 
 architecture Behavioral of vdp_vga_timing is
@@ -62,11 +62,10 @@ begin
 		end if;
 	end process;
 	
-	frame_reset	<= '1' when vcount=0 and hcount=0 else '0';
-	line_reset	<= '1' when hcount=156 else '0';
-	
 	x				<= hcount-(91+75);
 	y				<= vcount(8 downto 1)-(17+20);
+	hblank		<= '1' when hcount=0 and vcount(0 downto 0)=0 else '0';
+	vblank		<= '1' when hcount=0 and vcount=0 else '0';
 	
 	hsync			<= '0' when hcount<61 else '1';
 	vsync			<= '0' when vcount<2 else '1';

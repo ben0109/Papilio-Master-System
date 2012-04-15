@@ -14,8 +14,8 @@ entity vdp is
 		D_out:			out STD_LOGIC_VECTOR (7 downto 0);
 		x:					unsigned(8 downto 0);
 		y:					unsigned(7 downto 0);
-		line_reset:		std_logic;
-		frame_reset:	std_logic;
+		vblank:			std_logic;
+		hblank:			std_logic;
 		color:			out std_logic_vector (5 downto 0));
 end vdp;
 
@@ -31,8 +31,6 @@ architecture Behavioral of vdp is
 			
 		x:					unsigned(8 downto 0);
 		y:					unsigned(7 downto 0);
-		line_reset:		std_logic;
-		frame_reset:	std_logic;
 			
 		color:			out std_logic_vector (5 downto 0);
 					
@@ -127,8 +125,6 @@ begin
 				
 		x					=> x,
 		y					=> y,
-		line_reset		=> line_reset,
-		frame_reset		=> frame_reset,
 		color				=> color,
 						
 		display_on		=> display_on,
@@ -238,7 +234,7 @@ begin
 	process (vdp_clk)
 	begin
 		if rising_edge(vdp_clk) then
-			if frame_reset='1' then
+			if vblank='1' then
 				vbl_irq <= irq_frame_en;
 				vbl_counter <= vbl_counter+1;
 			else

@@ -12,8 +12,6 @@ entity vdp_main is
 			
 		x:						unsigned(8 downto 0);
 		y:						unsigned(7 downto 0);
-		line_reset:			std_logic;
-		frame_reset:		std_logic;
 			
 		color:				out std_logic_vector (5 downto 0);
 					
@@ -66,6 +64,8 @@ architecture Behavioral of vdp_main is
 	
 	signal spr_vram_A:	std_logic_vector(13 downto 0);
 	signal spr_color:		std_logic_vector(3 downto 0);
+	
+	signal line_reset:	std_logic;
 
 begin
 
@@ -78,6 +78,8 @@ begin
 		end if;
 		bg_y <= sum(7 downto 0);
 	end process;
+	
+	line_reset <= '1' when x=0 else '0';
 		
 	vdp_bg_inst: vdp_background
 	port map (
