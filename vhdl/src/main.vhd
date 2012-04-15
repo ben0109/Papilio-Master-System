@@ -4,34 +4,40 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity main is
 	port (
-		clk:			in  STD_LOGIC;
+		clk:			in		STD_LOGIC;
 		
-		ram_cs_n:	out STD_LOGIC;
-		ram_we_n:	out STD_LOGIC;
-		ram_oe_n:	out STD_LOGIC;
-		ram_ble_n:	out STD_LOGIC;
-		ram_bhe_n:	out STD_LOGIC;
-		ram_a:		out STD_LOGIC_VECTOR(18 downto 0);
-		ram_d:		inout STD_LOGIC_VECTOR(15 downto 0);
+		ram_cs_n:	out	STD_LOGIC;
+		ram_we_n:	out	STD_LOGIC;
+		ram_oe_n:	out	STD_LOGIC;
+		ram_ble_n:	out	STD_LOGIC;
+		ram_bhe_n:	out	STD_LOGIC;
+		ram_a:		out	STD_LOGIC_VECTOR(18 downto 0);
+		ram_d:		inout	STD_LOGIC_VECTOR(15 downto 0);
 
-		joy_1_gnd:	out STD_LOGIC;
-		joy_1:		in	STD_LOGIC_VECTOR(5 downto 0);
+		j1_gnd:		out	STD_LOGIC;
+		j1_up:		in		STD_LOGIC;
+		j1_down:		in		STD_LOGIC;
+		j1_left:		in		STD_LOGIC;
+		j1_right:	in		STD_LOGIC;
+		j1_tl:		in		STD_LOGIC;
+		j1_tr:		inout	STD_LOGIC;
+		j1_th:		inout	STD_LOGIC;
 
-		audio_l:		out STD_LOGIC;
-		audio_r:		out STD_LOGIC;
+		audio_l:		out	STD_LOGIC;
+		audio_r:		out	STD_LOGIC;
 		
-		red:			out STD_LOGIC;
-		green:		out STD_LOGIC;
-		blue:			out STD_LOGIC;
-		hsync:		out STD_LOGIC;
-		vsync:		out STD_LOGIC;
+		red:			out	STD_LOGIC;
+		green:		out	STD_LOGIC;
+		blue:			out	STD_LOGIC;
+		hsync:		out	STD_LOGIC;
+		vsync:		out	STD_LOGIC;
 
-		spi_do:		in  STD_LOGIC;
-		spi_sclk:	out STD_LOGIC;
-		spi_di:		out STD_LOGIC;
-		spi_cs_n:	out STD_LOGIC;
+		spi_do:		in		STD_LOGIC;
+		spi_sclk:	out	STD_LOGIC;
+		spi_di:		out	STD_LOGIC;
+		spi_cs_n:	out	STD_LOGIC;
 
-		tx:			out STD_LOGIC);
+		tx:			out	STD_LOGIC);
 end main;
 
 architecture Behavioral of main is
@@ -116,25 +122,27 @@ architecture Behavioral of main is
 	
 	component io is
    port (
-		clk:				in  STD_LOGIC;
-		WR_n:				in  STD_LOGIC;
-		RD_n:				in  STD_LOGIC;
-		A:					in  STD_LOGIC_VECTOR (7 downto 0);
-		D_in:				in  STD_LOGIC_VECTOR (7 downto 0);
-		D_out:			out STD_LOGIC_VECTOR (7 downto 0);
-		J1_up:			in  STD_LOGIC;
-		J1_down:			in  STD_LOGIC;
-		J1_left:			in  STD_LOGIC;
-		J1_right:		in  STD_LOGIC;
-		J1_tl:			in  STD_LOGIC;
-		J1_tr:			in  STD_LOGIC;
-		J2_up:			in  STD_LOGIC;
-		J2_down:			in  STD_LOGIC;
-		J2_left:			in  STD_LOGIC;
-		J2_right:		in  STD_LOGIC;
-		J2_tl:			in  STD_LOGIC;
-		J2_tr:			in  STD_LOGIC;
-		RESET:			in  STD_LOGIC);
+		clk:				in		STD_LOGIC;
+		WR_n:				in		STD_LOGIC;
+		RD_n:				in		STD_LOGIC;
+		A:					in		STD_LOGIC_VECTOR (7 downto 0);
+		D_in:				in		STD_LOGIC_VECTOR (7 downto 0);
+		D_out:			out	STD_LOGIC_VECTOR (7 downto 0);
+		J1_up:			in 	STD_LOGIC;
+		J1_down:			in 	STD_LOGIC;
+		J1_left:			in 	STD_LOGIC;
+		J1_right:		in 	STD_LOGIC;
+		J1_tl:			in 	STD_LOGIC;
+		J1_tr:			inout STD_LOGIC;
+		J1_th:			inout STD_LOGIC;
+		J2_up:			in 	STD_LOGIC;
+		J2_down:			in 	STD_LOGIC;
+		J2_left:			in 	STD_LOGIC;
+		J2_right:		in 	STD_LOGIC;
+		J2_tl:			in 	STD_LOGIC;
+		J2_tr:			inout STD_LOGIC;
+		J2_th:			inout STD_LOGIC;
+		RESET:			in 	STD_LOGIC);
 	end component;
 
 	component ram is
@@ -208,6 +216,8 @@ architecture Behavioral of main is
 	
 	signal io_RD_n:			std_logic;
 	signal io_WR_n:			std_logic;
+	signal io_J2_tr:			std_logic;
+	signal io_J2_th:			std_logic;
 	signal io_D_out:			std_logic_vector(7 downto 0);
 	
 --	signal ram_RD_n:			std_logic;
@@ -335,21 +345,23 @@ begin
 		A				=> A(7 downto 0),
 		D_in			=> D_in,
 		D_out			=> io_D_out,
-		J1_up			=> joy_1(0),
-		J1_down		=> joy_1(1),
-		J1_left		=> joy_1(2),
-		J1_right		=> joy_1(3),
+		J1_up			=> j1_up,
+		J1_down		=> j1_down,
+		J1_left		=> j1_left,
+		J1_right		=> j1_right,
 		RESET			=> '1',
-		J1_tl			=> joy_1(4),
-		J1_tr			=> joy_1(5),
+		J1_tl			=> j1_tl,
+		J1_tr			=> j1_tr,
+		J1_th			=> j1_th,
 		J2_up			=> '1',
 		J2_down		=> '1',
 		J2_left		=> '1',
 		J2_right		=> '1',
 		J2_tl			=> '1',
-		J2_tr			=> '1');
+		J2_tr			=> io_J2_tr,
+		J2_th			=> io_J2_th);
 		
-	joy_1_gnd <= '0';
+	j1_gnd <= '0';
 		
 	ram_inst: ram
 	port map(
