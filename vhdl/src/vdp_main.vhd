@@ -79,7 +79,7 @@ begin
 		bg_y <= sum(7 downto 0);
 	end process;
 	
-	line_reset <= '1' when x=0 else '0';
+	line_reset <= '1' when x=512-16 else '0';
 		
 	vdp_bg_inst: vdp_background
 	port map (
@@ -111,7 +111,7 @@ begin
 		variable spr_active	: boolean;
 		variable bg_active	: boolean;
 	begin
-		if x<256 and y<192 then
+		if x<256 and y<192 and (mask_column0='0' or x>=8) then
 			spr_active	:= not (spr_color="0000");
 			bg_active	:= not (bg_color(3 downto 0)="0000");
 			if (bg_priority='0' and spr_active) or (bg_priority='1' and not bg_active) then

@@ -42,7 +42,7 @@ begin
 	process (clk) begin
 		if (rising_edge(clk)) then
 			if (reset='1') then
-				x <= 248-scroll_x;
+				x <= 240-scroll_x;
 			else
 				x <= x + 1;
 			end if;
