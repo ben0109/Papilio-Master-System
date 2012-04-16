@@ -215,21 +215,7 @@ void load_rom(file_descr_t *entry)
 }
 
 void start_rom()
-{/*
-	UBYTE *ptr;
-	int i,j,k;
-	for (k=0; k<2; k++) {
-		*((UBYTE*)0xffff) = k;
-		ptr = 0x8000;
-		for (i=0; i<16; i++) {
-			console_print_byte(*ptr++);
-		}
-		ptr = 0xBFF0;
-		for (i=0; i<16; i++) {
-			console_print_byte(*ptr++);
-		}
-		console_puts("\n");
-	}*/
+{
 	*((UBYTE*)0xfffd) = 0;
 	*((UBYTE*)0xfffe) = 1;
 	*((UBYTE*)0xffff) = 2;
