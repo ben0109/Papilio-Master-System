@@ -3,7 +3,7 @@
 #include "console.h"
 #include "debug.h"
 
-//#define DEBUG_SD
+#define DEBUG_SD
 
 void spi_set_speed(BYTE delay)
 {
@@ -99,9 +99,9 @@ UBYTE sd_cmd0()
 	r = sd_wait_r1();
 
 #ifdef DEBUG_SD
-	console_puts("cmd0:");
-	console_print_byte(r);
-	console_puts("\n");
+	debug_puts("cmd0:");
+	debug_print_byte(r);
+	debug_puts("\n");
 #endif
 	return r;
 }
@@ -125,14 +125,14 @@ UBYTE sd_cmd8()
 	spi_delay();
 
 #ifdef DEBUG_SD
-	console_puts("cmd8:");
-	console_print_byte(r);
-	console_puts("\n");
+	debug_puts("cmd8:");
+	debug_print_byte(r);
+	debug_puts("\n");
 #endif
 	return r;
 }
 
-UBYTE sd_acmd41()
+UBYTE sd_acmd41(UBYTE byte0)
 {
 	BYTE r;
 
@@ -146,7 +146,7 @@ UBYTE sd_acmd41()
 	r = sd_wait_r1();
 
 	spi_send_byte(0x69); // CMD41
-	spi_send_byte(0x40);
+	spi_send_byte(byte0);
 	spi_send_byte(0x00);
 	spi_send_byte(0x00);
 	spi_send_byte(0x00);
@@ -155,9 +155,9 @@ UBYTE sd_acmd41()
 	r = sd_wait_r1();
 
 #ifdef DEBUG_SD
-	console_puts("cmd41:");
-	console_print_byte(r);
-	console_puts("\n");
+	debug_puts("cmd41:");
+	debug_print_byte(r);
+	debug_puts("\n");
 #endif
 	return r;
 }
@@ -180,9 +180,9 @@ UBYTE sd_cmd58()
 	spi_delay();
 
 #ifdef DEBUG_SD
-	console_puts("cmd58:");
-	console_print_byte(r);
-	console_puts("\n");
+	debug_puts("cmd58:");
+	debug_print_byte(r);
+	debug_puts("\n");
 #endif
 	return r;
 }
@@ -214,25 +214,50 @@ int sd_init()
 		timeout = timeout-1;
 	}
 
-	if (sd_cmd8() != 0x01) {
-		spi_deassert_cs();
-		return FALSE;
-	}
+	if (sd_cmd8() == 0x01) {
+		// SD card V2+
+#ifdef DEBUG_SD
+		debug_puts("SD card V2+\n");
+#endif
+		// initialize card
+		timeout = 0xff;
+		while ((sd_acmd41(0x40)&1)!=0) {
+			if (timeout==0) {
+				spi_deassert_cs();
+				return FALSE;
+			}
+			timeout = timeout-1;
+		}
 
-	// initialize card
-	timeout = 0xff;
-	while ((sd_acmd41()&1)!=0) {
-		if (timeout==0) {
+		// read OCR
+		if (sd_cmd58()!=0) {
 			spi_deassert_cs();
 			return FALSE;
 		}
-		timeout = timeout-1;
-	}
 
-	// read OCR
-	if (sd_cmd58()!=0) {
-		spi_deassert_cs();
-		return FALSE;
+	} else {
+		// SD card V1 or MMC
+		if (sd_acmd41(0x00)<=1) {
+			// SD V1
+#ifdef DEBUG_SD
+			debug_puts("SD V1\n");
+#endif
+			timeout = 0xff;
+			while ((sd_acmd41(0x00)&1)!=0) {
+				if (timeout==0) {
+					spi_deassert_cs();
+					return FALSE;
+				}
+				timeout = timeout-1;
+			}
+		} else {
+			// MM Card : fail
+#ifdef DEBUG_SD
+			debug_puts("MMC\n");
+#endif
+			spi_deassert_cs();
+			return FALSE;
+		}
 	}
 
 	spi_deassert_cs();
@@ -282,9 +307,9 @@ int sd_load_sector(UBYTE* target, DWORD sector)
 	address = sector<<9;
 
 #ifdef DEBUG_SD
-	console_puts("loading address ");
-	console_print_dword(address);
-	console_puts("\n");
+	debug_puts("loading address ");
+	debug_print_dword(address);
+	debug_puts("\n");
 #endif
 
 	// read block
@@ -298,9 +323,9 @@ int sd_load_sector(UBYTE* target, DWORD sector)
 
 	r = sd_wait_r1();
 #ifdef DEBUG_SD
-	console_puts("cmd17:");
-	console_print_byte(r);
-	console_puts("\n");
+	debug_puts("cmd17:");
+	debug_print_byte(r);
+	debug_puts("\n");
 #endif
 	if ((r&0x80)!=0) {
 		spi_deassert_cs();
