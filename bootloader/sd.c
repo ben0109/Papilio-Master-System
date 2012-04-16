@@ -3,7 +3,7 @@
 #include "console.h"
 #include "debug.h"
 
-#define DEBUG_SD
+//#define DEBUG_SD
 
 void spi_set_speed(BYTE delay)
 {

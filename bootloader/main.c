@@ -11,6 +11,7 @@ unsigned char pal[] = {
 
 void print_dir(file_descr_t *entries, file_descr_t *current);
 void load_rom(file_descr_t *entry);
+void pick_and_load_rom();
 void start_rom();
 void wait_key();
 
@@ -26,7 +27,6 @@ void nmi_handler()
 
 void main()
 {
-	file_descr_t *entries,*top_of_screen,*current;
 	int i;
 	char *ptr;
 
@@ -48,29 +48,78 @@ void main()
 	vdp_set_address(0x3f00);
 	vdp_write(0xd0);
 
-	console_init();
-//	console_clear();
+	while (1) {
+		console_init();
+		console_clear();
 
-	console_gotoxy(0,0);
-	console_puts("SMS bootloader v0.92\n");
+		console_gotoxy(0,0);
+		console_puts("SMS bootloader v0.92\n");
 
-	if (!sd_init()) {
-		console_puts("could not initialize sd card\n");
-		return;
-#ifdef DEBUG
-	} else {
-		console_puts("sd card initialized\n");
-#endif
+		i = 0;
+		if (!sd_init()) {
+			console_puts("could not initialize sd card\n");
+		} else {
+	#ifdef DEBUG
+			console_puts("sd card initialized\n");
+	#endif
+			if (!fat_init()) {
+				console_puts("could not initialize fat system\n");
+	#ifdef DEBUG
+			} else {
+				console_puts("fat system initialized\n");
+	#endif
+				i = 1;
+			}
+		}
+
+
+		choose_mode(i);
 	}
+}
 
-	if (!fat_init()) {
-		console_puts("could not initialize fat system\n");
-		return;
-#ifdef DEBUG
+void choose_mode(int sd_ok)
+{
+	int i = 0;
+	console_gotoxy(9,10);
+	if (sd_ok) {
+		console_puts("load from SD card");
 	} else {
-		console_puts("fat system initialized\n");
-#endif
+		console_puts("retry SD card");
 	}
+	console_gotoxy(9,12);
+	console_puts("boot SRAM");
+
+	for (;;) {
+		int key;
+		console_gotoxy(6,10);
+		if (i==0) { console_puts("=>"); } else { console_puts("  "); }
+		console_gotoxy(6,12);
+		if (i==1) { console_puts("=>"); } else { console_puts("  "); }
+		key = wait_key();
+		switch (key) {
+		case JOY_UP:
+			i = 0;
+			break;
+		case JOY_DOWN:
+			i = 1;
+			break;
+		case JOY_FIREA:
+		case JOY_FIREB:
+			if (i==0) {
+				if (sd_ok) {
+					pick_and_load_rom();
+				}
+			} else {
+				start_rom();
+			}
+			return;
+		}
+	}
+}
+
+void pick_and_load_rom()
+{
+	file_descr_t *entries,*top_of_screen,*current;
 
 	entries = fat_open_root_directory();
 	if (entries==0) {
