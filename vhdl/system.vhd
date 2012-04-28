@@ -212,9 +212,9 @@ architecture Behavioral of system is
 	signal irom_D_out:		std_logic_vector(7 downto 0);
 	signal irom_RD_n:			std_logic := '1';
 
-	signal bank0:				std_logic_vector(4 downto 0);
-	signal bank1:				std_logic_vector(4 downto 0);
-	signal bank2:				std_logic_vector(4 downto 0);
+	signal bank0:				std_logic_vector(5 downto 0);
+	signal bank1:				std_logic_vector(5 downto 0);
+	signal bank2:				std_logic_vector(5 downto 0);
 begin	
 	
 --	z80_inst: dummy_z80
@@ -402,9 +402,9 @@ begin
 		if rising_edge(clk_cpu) then
 			if WR_n='0' and A(15 downto 2)="11111111111111" then
 				case A(1 downto 0) is
-				when "01" => bank0 <= D_in(4 downto 0);
-				when "10" => bank1 <= D_in(4 downto 0);
-				when "11" => bank2 <= D_in(4 downto 0);
+				when "01" => bank0 <= D_in(5 downto 0);
+				when "10" => bank1 <= D_in(5 downto 0);
+				when "11" => bank2 <= D_in(5 downto 0);
 				when others =>
 				end case;
 			end if;
@@ -414,32 +414,35 @@ begin
 	ram_cs_n <= '0';
 	ram_oe_n <= RD_n;
 	ram_we_n <= rom_WR_n;
-	ram_ble_n <= '0';
-	ram_bhe_n <= '0';
 	
-	ram_a(13 downto 0) <= A(13 downto 0);
+	ram_ble_n <= not A(0);
+	ram_bhe_n <= A(0);
+	
+	ram_a(12 downto 0) <= A(13 downto 1);
 	process (A,bank0,bank1,bank2)
 	begin
 		case A(15 downto 14) is
 		when "00" =>
 			-- first kilobyte is always from bank 0
 			if A(13 downto 10)="0000" then
-				ram_a(18 downto 14) <= (others=>'0');
+				ram_a(18 downto 13) <= (others=>'0');
 			else
-				ram_a(18 downto 14) <= bank0;
+				ram_a(18 downto 13) <= bank0;
 			end if;
 		when "01" =>
-			ram_a(18 downto 14) <= bank1;
+			ram_a(18 downto 13) <= bank1;
 			
 		when others =>
-			ram_a(18 downto 14) <= bank2;
+			ram_a(18 downto 13) <= bank2;
 		end case;
 	end process;
 	
 	ram_d(7 downto 0) <= (others=>'Z') when RD_n='0' else D_in;
-	ram_d(15 downto 8) <= (others=>'Z');
+	ram_d(15 downto 8) <= (others=>'Z') when RD_n='0' else D_in;
 				
-	rom_D_out <= ram_d(7 downto 0);
+	with A(0) select
+	rom_D_out<= ram_d(7 downto 0)		when '1',
+					ram_d(15 downto 8)	when others;
 
 end Behavioral;
 
