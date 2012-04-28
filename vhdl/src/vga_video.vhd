@@ -21,9 +21,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity vdp_vga_timing is
+entity vga_video is
 	port (
-		clk_16:			in  std_logic;
+		clk16:			in  std_logic;
 		x: 				out unsigned(8 downto 0);
 		y:					out unsigned(7 downto 0);
 		vblank:			out std_logic;
@@ -34,9 +34,9 @@ entity vdp_vga_timing is
 		red:				out std_logic;
 		green:			out std_logic;
 		blue:				out std_logic);
-end vdp_vga_timing;
+end vga_video;
 
-architecture Behavioral of vdp_vga_timing is
+architecture Behavioral of vga_video is
 
 	signal hcount:		unsigned (8 downto 0) := (others=>'0');
 	signal vcount:		unsigned (8 downto 0) := (others=>'0');
@@ -46,9 +46,9 @@ architecture Behavioral of vdp_vga_timing is
 	
 begin
 	
-	process (clk_16)
+	process (clk16)
 	begin
-		if rising_edge(clk_16) then
+		if rising_edge(clk16) then
 			if hcount=507 then
 				hcount <= (others => '0');
 				if vcount=524 then
@@ -72,9 +72,9 @@ begin
 	
 	visible		<= vcount>=35 and vcount<35+480 and hcount>=91 and hcount<91+406;
 	
-	process (clk_16)
+	process (clk16)
 	begin
-		if rising_edge(clk_16) then
+		if rising_edge(clk16) then
 			if vcount=0 and hcount=0 then
 				case screen_n is
 				when "00"	=> screen_n <= "01";
@@ -86,10 +86,10 @@ begin
 		end if;
 	end process;
 	
-	process (clk_16)
+	process (clk16)
 		variable pixel_n: std_logic_vector(1 downto 0);
 	begin
-		if rising_edge(clk_16) then
+		if rising_edge(clk16) then
 			if visible then
 				pixel_n := std_logic_vector(hcount(0 downto 0))&std_logic_vector(vcount(0 downto 0));
 				pixel_n(0) := pixel_n(0) xor screen_n(0);

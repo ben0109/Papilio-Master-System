@@ -9,13 +9,14 @@ use IEEE.NUMERIC_STD.ALL;
 -- color: 222 RGB (b1b0g1g0r1r0)
 -- output: 6 bit linear output, "000000" is 0v, "111111" is 1.3V (step is 0.02V)
 entity color_encoder is
-    Port ( clk				: in  STD_LOGIC;
-           pal				: in  STD_LOGIC;
-           sync			: in  STD_LOGIC;
-           line_visible	: in  STD_LOGIC;
-           line_even		: in  STD_LOGIC;
-           color			: in  STD_LOGIC_VECTOR (5 downto 0);
-           output			: out STD_LOGIC_VECTOR (5 downto 0));
+	Port (
+		clk:				in  STD_LOGIC;
+		pal:				in  STD_LOGIC;
+		sync:				in  STD_LOGIC;
+		line_visible:	in  STD_LOGIC;
+		line_even:		in  STD_LOGIC;
+		color:			in  STD_LOGIC_VECTOR (5 downto 0);
+		output:			out STD_LOGIC_VECTOR (5 downto 0));
 end color_encoder;
 
 architecture Behavioral of color_encoder is

@@ -2,11 +2,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-use work.all;
-
-entity main is
+entity sms_tv is
 	port (
-		clk:			in		STD_LOGIC;
+		clk:		in  STD_LOGIC;
 		
 		ram_cs_n:	out	STD_LOGIC;
 		ram_we_n:	out	STD_LOGIC;
@@ -23,15 +21,10 @@ entity main is
 		j1_right:	in		STD_LOGIC;
 		j1_tl:		in		STD_LOGIC;
 		j1_tr:		inout	STD_LOGIC;
-
-		audio_l:		out	STD_LOGIC;
-		audio_r:		out	STD_LOGIC;
 		
-		red:			out	STD_LOGIC;
-		green:		out	STD_LOGIC;
-		blue:			out	STD_LOGIC;
-		hsync:		out	STD_LOGIC;
-		vsync:		out	STD_LOGIC;
+		tv_gnd:		out	STD_LOGIC;
+		video:		out	STD_LOGIC_VECTOR (6 downto 1);
+		audio:		out	STD_LOGIC;
 
 		spi_do:		in		STD_LOGIC;
 		spi_sclk:	out	STD_LOGIC;
@@ -39,9 +32,9 @@ entity main is
 		spi_cs_n:	out	STD_LOGIC;
 
 		tx:			out	STD_LOGIC);
-end main;
+end sms_tv;
 
-architecture Behavioral of main is
+architecture Behavioral of sms_tv is
 
 	component clock is
    port (
@@ -93,63 +86,56 @@ architecture Behavioral of main is
 
 		tx:			out	STD_LOGIC);
 	end component;
-	
-	component vdp_vga_timing is
-	port (
-		clk_16:			in  std_logic;
-		x: 				out unsigned(8 downto 0);
+
+	component tv_video is
+	Port (
+		clk8:				in  STD_LOGIC;
+		clk64:			in  STD_LOGIC;
+		x:					out unsigned(8 downto 0);
 		y:					out unsigned(7 downto 0);
-		vblank:			out std_logic;
-		hblank:			out std_logic;
-		color:			in  std_logic_vector(5 downto 0);
-		hsync:			out std_logic;
-		vsync:			out std_logic;
-		red:				out std_logic;
-		green:			out std_logic;
-		blue:				out std_logic);
+		vblank:			out STD_LOGIC;
+		hblank:			out STD_LOGIC;
+		color:			in  STD_LOGIC_VECTOR(5 downto 0);
+		video:	out  STD_LOGIC_VECTOR (6 downto 1));
 	end component;
 	
 	signal clk_cpu:			std_logic;
-	signal clk16:				std_logic;
+	signal clk64:				std_logic;
 	
 	signal x:					unsigned(8 downto 0);
 	signal y:					unsigned(7 downto 0);
 	signal vblank:				std_logic;
 	signal hblank:				std_logic;
 	signal color:				std_logic_vector(5 downto 0);
-	signal audio:				std_logic;
 	
 	signal j2_tr:				std_logic;
-	
+
 begin
 
 	clock_inst: clock
 	port map (
 		clk_in		=> clk,
 		clk_cpu		=> clk_cpu,
-		clk16			=> clk16,
+		clk16			=> open,
 		clk32			=> open,
-		clk64			=> open);
-	
-	vdp_timing_inst: vdp_vga_timing
+		clk64			=> clk64);
+
+
+	video_inst: tv_video
 	port map (
-		clk_16		=> clk16,
-		x	 			=> x,
-		y				=> y,
-		vblank		=> vblank,
-		hblank		=> hblank,
-		color			=> color,
-		
-		hsync			=> hsync,
-		vsync			=> vsync,
-		red			=> red,
-		green			=> green,
-		blue			=> blue);
+		clk8				=> clk_cpu,
+		clk64				=> clk64,
+		x					=> x,
+		y					=> y,
+		vblank			=> open,
+		hblank			=> open,
+		color				=> color,
+		video				=> video);
 
 	system_inst: system
 	port map (
 		clk_cpu		=> clk_cpu,
-		clk_vdp		=> clk16,
+		clk_vdp		=> clk_cpu,
 		
 		ram_cs_n		=> ram_cs_n,
 		ram_we_n		=> ram_we_n,
@@ -186,10 +172,9 @@ begin
 		spi_cs_n		=> spi_cs_n,
 
 		tx				=> tx);
-	
+		
 	j1_gnd <= '0';
-	audio_l <= audio;
-	audio_r <= audio;
-	
+	tv_gnd <= '0';
+		
 end Behavioral;
 

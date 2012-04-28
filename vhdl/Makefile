@@ -5,8 +5,8 @@ DATA2MEM:=$(ISE_PATH)/bin/lin/data2mem
 load: final.bit
 	sudo papilio-prog -v -f final.bit
 
-final.bit: main.bit boot_bd.bmm $(MEM_PATH)/all.mem
-	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt main.bit -o b final.bit
+final.bit: sms_vga.bit boot_bd.bmm $(MEM_PATH)/all.mem
+	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt sms_vga.bit -o b final.bit
 
 
 #=================================================================
@@ -45,7 +45,7 @@ DESIGN       := main
 HDL_LANG     := VHDL
 VLG_EXT      := v
 VHDL_EXT     := vhd
-DUT          := xc3s500evq100-4
+DUT          := xc6slx9tqg144-3
 
 TOP_PATH     := ~/prog/vhdl/master_system/vhdl
 SIM_PATH     := $(TOP_PATH)/test
@@ -54,20 +54,19 @@ CON_PATH     := $(TOP_PATH)/src
 BLD_PATH     := $(TOP_PATH)/build
 
 # The TOP_FILE is either the top HDL file, or a project file (.prj);
-# assumption is that it's placed in the HDL directory.
-TOP_FILE     := $(HDL_PATH)/main.vhd
+TOP_FILE     := $(TOP_PATH)/main.prj
 
-CON_FILE     := $(CON_PATH)/main.ucf
+CON_FILE     := $(CON_PATH)/papilio_plus.ucf
 TOP_MODULE   := main
 SIM_HDL_TB   := $(SIM_PATH)/main_tb.vhd
 SIM_HDL_TOP  := main_tb
 XST_FILE     := $(DESIGN).xstbp
 SYN_BASE      = -top $(TOP_MODULE) \
                 -ifn $(TOP_FILE) \
-                -ifmt $(HDL_LANG) \
                 -ofn $(DESIGN) \
                 -ofmt ngc \
                 -p $(DUT)
+#                -ifmt $(HDL_LANG) \
 
 # build directory names
 SIM          := simulation
@@ -308,3 +307,9 @@ check-d:
 	else echo "ERROR: Can't locate $(BIT_OBJS)"; exit 2; fi
 	@echo "-- Done. Found generated files."
 
+#xst -intstyle ise -ifn "/home/ben/prog/vhdl/master_system/vhdl/main.xst" -ofn "/home/ben/prog/vhdl/master_system/vhdl/main.syr"
+#ngdbuild -intstyle ise -dd _ngo -nt timestamp -uc src/papilio_plus.ucf -bm boot.bmm -p xc6slx9-tqg144-3 main.ngc main.ngd
+#map -intstyle ise -p xc6slx9-tqg144-3 -w -logic_opt off -ol high -t 1 -xt 0 -register_duplication off -r 4 -global_opt off -mt off -ir off -pr off -lc off -power off -o main_map.ncd main.ngd main.pcf
+#par -w -intstyle ise -ol high -mt off main_map.ncd main.ncd main.pcf
+#trce -intstyle ise -v 3 -s 3 -n 3 -fastpaths -xml main.twx main.ncd -o main.twr main.pcf
+#bitgen -intstyle ise -f main.ut main.ncd
