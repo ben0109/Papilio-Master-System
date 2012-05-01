@@ -3,7 +3,7 @@
 #include "console.h"
 #include "debug.h"
 
-//#define DEBUG_SD
+#define DEBUG_SD
 
 void spi_set_speed(BYTE delay)
 {
@@ -85,9 +85,23 @@ UBYTE sd_wait_r1()
 	return r;
 }
 
+UBYTE sd_wait_ready()
+{
+	BYTE timeout,r;
+	spi_receive_byte();
+	for (timeout=0x20; timeout>0; --timeout) {
+		r = spi_receive_byte();
+		if (r==0xff) {
+			break;
+		}
+	}
+	return r;
+}
+
 UBYTE sd_cmd0()
 {
 	BYTE r;
+	sd_wait_ready();
 
 	spi_send_byte(0x40);
 	spi_send_byte(0x00);
@@ -109,6 +123,7 @@ UBYTE sd_cmd0()
 UBYTE sd_cmd8()
 {
 	BYTE r;
+	sd_wait_ready();
 
 	spi_send_byte(0x48);
 	spi_send_byte(0x00);
@@ -144,6 +159,16 @@ UBYTE sd_acmd41(UBYTE byte0)
 	spi_send_byte(0xff);
 
 	r = sd_wait_r1();
+	if (r>1) {
+	#ifdef DEBUG_SD
+		debug_puts("cmd55 failed:");
+		debug_print_byte(r);
+		debug_puts("\n");
+	#endif
+		return -1;
+	}
+
+	sd_wait_ready();
 
 	spi_send_byte(0x69); // CMD41
 	spi_send_byte(byte0);
@@ -155,7 +180,7 @@ UBYTE sd_acmd41(UBYTE byte0)
 	r = sd_wait_r1();
 
 #ifdef DEBUG_SD
-	debug_puts("cmd41:");
+	debug_puts("acmd41:");
 	debug_print_byte(r);
 	debug_puts("\n");
 #endif
@@ -165,6 +190,7 @@ UBYTE sd_acmd41(UBYTE byte0)
 UBYTE sd_cmd58()
 {
 	BYTE r;
+	sd_wait_ready();
 
 	spi_send_byte(0x7a);
 	spi_send_byte(0x00);
@@ -312,6 +338,7 @@ int sd_load_sector(UBYTE* target, DWORD sector)
 	debug_puts("\n");
 #endif
 
+	sd_wait_ready();
 	// read block
 	spi_assert_cs();
 	spi_send_byte(0x51);		// CMD17
