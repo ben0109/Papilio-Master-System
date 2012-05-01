@@ -22,6 +22,7 @@ entity vdp_main is
 		bg_address:			in  std_logic_vector (2 downto 0);
 		bg_scroll_x:		in  unsigned(7 downto 0);
 		bg_scroll_y:		in  unsigned(7 downto 0);
+		disable_hscroll:	in  std_logic;
 			
 		spr_address:		in  std_logic_vector (5 downto 0);
 		spr_high_bit:		in  std_logic;
@@ -33,28 +34,29 @@ architecture Behavioral of vdp_main is
 	
 	component vdp_background is
 	port (
-		clk:				in  std_logic;
-		reset:			in  std_logic;
-		table_address:	in  std_logic_vector(13 downto 11);
-		scroll_x:		in  unsigned(7 downto 0);
-		y:					in  unsigned(7 downto 0);
-		vram_A:			out std_logic_vector(13 downto 0);
-		vram_D:			in  std_logic_vector(7 downto 0);
-		color:			out std_logic_vector(4 downto 0);
-		priority:		out std_logic);
+		clk:					in  std_logic;
+		reset:				in  std_logic;
+		table_address:		in  std_logic_vector(13 downto 11);
+		scroll_x:			in  unsigned(7 downto 0);
+		disable_hscroll:	in  std_logic;
+		y:						in  unsigned(7 downto 0);
+		vram_A:				out std_logic_vector(13 downto 0);
+		vram_D:				in  std_logic_vector(7 downto 0);
+		color:				out std_logic_vector(4 downto 0);
+		priority:			out std_logic);
 	end component;
 	
 	component vdp_sprites is
 	port (
-		clk:				in  std_logic;
-		table_address:	in  std_logic_vector(13 downto 8);
-		char_high_bit:	in  std_logic;
-		tall:				in  std_logic;
-		x:					in  unsigned(8 downto 0);
-		y:					in  unsigned(7 downto 0);
-		vram_A:			out std_logic_vector(13 downto 0);
-		vram_D:			in  std_logic_vector(7 downto 0);
-		color:			out std_logic_vector(3 downto 0));
+		clk:					in  std_logic;
+		table_address:		in  std_logic_vector(13 downto 8);
+		char_high_bit:		in  std_logic;
+		tall:					in  std_logic;
+		x:						in  unsigned(8 downto 0);
+		y:						in  unsigned(7 downto 0);
+		vram_A:				out std_logic_vector(13 downto 0);
+		vram_D:				in  std_logic_vector(7 downto 0);
+		color:				out std_logic_vector(3 downto 0));
 	end component;
 
 	signal bg_y:			unsigned(7 downto 0);
@@ -85,8 +87,9 @@ begin
 	port map (
 		clk				=> clk,
 		table_address	=> bg_address,
-		scroll_x 		=> bg_scroll_x,
 		reset				=> line_reset,
+		disable_hscroll=> disable_hscroll,
+		scroll_x 		=> bg_scroll_x,
 		y					=> bg_y,
 		
 		vram_A			=> bg_vram_A,

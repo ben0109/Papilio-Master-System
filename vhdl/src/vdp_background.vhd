@@ -4,17 +4,18 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity vdp_background is
 port (
-	clk:				in  std_logic;
-	reset:			in  std_logic;
-	table_address:	in  std_logic_vector(13 downto 11);
-	scroll_x:		in  unsigned(7 downto 0);
-	y:					in  unsigned(7 downto 0);
+	clk:					in  std_logic;
+	reset:				in  std_logic;
+	table_address:		in  std_logic_vector(13 downto 11);
+	scroll_x:			in  unsigned(7 downto 0);
+	disable_hscroll:	in  std_logic;
+	y:						in  unsigned(7 downto 0);
 
-	vram_A:			out std_logic_vector(13 downto 0);
-	vram_D:			in  std_logic_vector(7 downto 0);
+	vram_A:				out std_logic_vector(13 downto 0);
+	vram_D:				in  std_logic_vector(7 downto 0);
 
-	color:			out std_logic_vector(4 downto 0);
-	priority:		out std_logic
+	color:				out std_logic_vector(4 downto 0);
+	priority:			out std_logic
 );
 end entity;
 
@@ -42,7 +43,11 @@ begin
 	process (clk) begin
 		if (rising_edge(clk)) then
 			if (reset='1') then
-				x <= 240-scroll_x;
+				if disable_hscroll='0' or y>=16 then
+					x <= 240-scroll_x;
+				else
+					x <= "11110000"; -- 240
+				end if;
 			else
 				x <= x + 1;
 			end if;

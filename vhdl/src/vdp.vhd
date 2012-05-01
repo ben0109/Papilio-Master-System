@@ -23,29 +23,30 @@ architecture Behavioral of vdp is
 	
 	component vdp_main is
 	port (
-		clk:				in  std_logic;			
-		vram_A:			out std_logic_vector(13 downto 0);
-		vram_D:			in  std_logic_vector(7 downto 0);
-		cram_A:			out std_logic_vector(4 downto 0);
-		cram_D:			in  std_logic_vector(5 downto 0);
+		clk:					in  std_logic;			
+		vram_A:				out std_logic_vector(13 downto 0);
+		vram_D:				in  std_logic_vector(7 downto 0);
+		cram_A:				out std_logic_vector(4 downto 0);
+		cram_D:				in  std_logic_vector(5 downto 0);
 			
-		x:					unsigned(8 downto 0);
-		y:					unsigned(7 downto 0);
+		x:						unsigned(8 downto 0);
+		y:						unsigned(7 downto 0);
 			
-		color:			out std_logic_vector (5 downto 0);
+		color:				out std_logic_vector (5 downto 0);
 					
-		display_on:		in  std_logic;
-		mask_column0:	in  std_logic;
-		overscan:		in  std_logic_vector (3 downto 0);
+		display_on:			in  std_logic;
+		mask_column0:		in  std_logic;
+		overscan:			in  std_logic_vector (3 downto 0);
 
-		bg_address:		in  std_logic_vector (2 downto 0);
-		bg_scroll_x:	in  unsigned(7 downto 0);
-		bg_scroll_y:	in  unsigned(7 downto 0);
+		bg_address:			in  std_logic_vector (2 downto 0);
+		bg_scroll_x:		in  unsigned(7 downto 0);
+		bg_scroll_y:		in  unsigned(7 downto 0);
+		disable_hscroll:	in  std_logic;
 			
-		spr_address:	in  std_logic_vector (5 downto 0);
-		spr_high_bit:	in  std_logic;
-		spr_shift:		in  std_logic;	
-		spr_tall:		in  std_logic);	
+		spr_address:		in  std_logic_vector (5 downto 0);
+		spr_high_bit:		in  std_logic;
+		spr_shift:			in  std_logic;	
+		spr_tall:			in  std_logic);	
 	end component;
 
 	component vdp_vram is
@@ -90,6 +91,7 @@ architecture Behavioral of vdp is
 			
 	-- control bits
 	signal display_on:		std_logic := '1';
+	signal disable_hscroll:	std_logic := '0';
 	signal mask_column0:		std_logic := '0';
 	signal overscan:			std_logic_vector (3 downto 0) := "0000";	
 	signal irq_frame_en:		std_logic := '0';
@@ -105,10 +107,9 @@ architecture Behavioral of vdp is
 
 	-- various counters
 	signal last_y0:			std_logic := '0';
-	signal vbl_counter:		unsigned(7 downto 0) := (others=>'0');
 	signal virq_flag:			std_logic := '0';
 	signal reset_virq_flag:	boolean := false;
-	signal irq_counter:		unsigned(5 downto 0) := (others=>'0');
+	signal irq_counter:		unsigned(4 downto 0) := (others=>'0');
 	signal hbl_counter:		unsigned(7 downto 0) := (others=>'0');
 	signal vbl_irq:			std_logic;
 	signal hbl_irq:			std_logic;
@@ -134,6 +135,7 @@ begin
 		bg_address		=> bg_address,
 		bg_scroll_x		=> bg_scroll_x,
 		bg_scroll_y		=> bg_scroll_y,
+		disable_hscroll=>disable_hscroll,
 				
 		spr_address		=> spr_address,
 		spr_high_bit	=> spr_high_bit,
@@ -181,6 +183,7 @@ begin
 						to_cram <= D_in(7 downto 6)="11";
 						case D_in is
 						when "10000000" =>
+							disable_hscroll<= xram_cpu_A(6);
 							mask_column0	<= xram_cpu_A(5);
 							irq_line_en		<= xram_cpu_A(4);
 							spr_shift		<= xram_cpu_A(3);
@@ -211,7 +214,7 @@ begin
 			elsif RD_n='0' then
 				case A(7 downto 6)&A(0) is
 				when "010" =>
-					D_out <= std_logic_vector(vbl_counter);
+					D_out <= (others=>'0');
 				when "011" =>
 					D_out <= std_logic_vector(y);
 				when "100" =>
@@ -236,7 +239,6 @@ begin
 		if rising_edge(vdp_clk) then
 			if vblank='1' then
 				vbl_irq <= irq_frame_en;
-				vbl_counter <= vbl_counter+1;
 			else
 				vbl_irq <= '0';
 			end if;
