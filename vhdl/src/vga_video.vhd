@@ -39,9 +39,10 @@ end vga_video;
 architecture Behavioral of vga_video is
 
 	signal hcount:		unsigned (8 downto 0) := (others=>'0');
-	signal vcount:		unsigned (8 downto 0) := (others=>'0');
+	signal vcount:		unsigned (9 downto 0) := (others=>'0');
 	signal visible:	boolean;
 	
+	signal y9:			unsigned (8 downto 0);
 	signal screen_n:	std_logic_vector (1 downto 0) := (others=>'0');
 	
 begin
@@ -51,7 +52,7 @@ begin
 		if rising_edge(clk16) then
 			if hcount=507 then
 				hcount <= (others => '0');
-				if vcount=524 then
+				if vcount=523 then
 					vcount <= (others=>'0');
 				else
 					vcount <= vcount + 1;
@@ -63,7 +64,8 @@ begin
 	end process;
 	
 	x				<= hcount-(91+75);
-	y				<= vcount(8 downto 1)-(17+20);
+	y9				<= vcount(9 downto 1)-(13+27);
+	y				<= y9(7 downto 0);
 	hblank		<= '1' when hcount=0 and vcount(0 downto 0)=0 else '0';
 	vblank		<= '1' when hcount=0 and vcount=0 else '0';
 	
