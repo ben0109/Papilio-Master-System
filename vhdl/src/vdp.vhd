@@ -82,6 +82,7 @@ architecture Behavioral of vdp is
 	signal vram_cpu_WE:		std_logic;
 	signal cram_cpu_WE:		std_logic;
 	signal vram_cpu_D_out:	std_logic_vector(7 downto 0);	
+	signal xram_cpu_A_incr:	std_logic := '0';
 	
 	-- vram and cram lines for the video interface
 	signal vram_vdp_A:		std_logic_vector(13 downto 0);
@@ -173,7 +174,7 @@ begin
 		if rising_edge(cpu_clk) then
 			if WR_n='0' then
 				if A(0)='0' then
-					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
+					xram_cpu_A_incr <= '1';
 					
 				else
 					if address_ff='0' then
@@ -219,13 +220,17 @@ begin
 					D_out <= std_logic_vector(y);
 				when "100" =>
 					D_out <= vram_cpu_D_out;
-					xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
+					xram_cpu_A_incr <= '1';
 				when "101" =>
 					D_out(7) <= virq_flag;
 					D_out(6 downto 0) <= (others=>'0');
 					reset_virq_flag <= true;
 				when others =>
 				end case;
+				
+			elsif xram_cpu_A_incr='1' then
+				xram_cpu_A <= std_logic_vector(unsigned(xram_cpu_A) + 1);
+				xram_cpu_A_incr <= '0';
 				
 			else
 				reset_virq_flag <= false;
