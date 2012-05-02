@@ -127,8 +127,8 @@ begin
 		clk64				=> clk64,
 		x					=> x,
 		y					=> y,
-		vblank			=> open,
-		hblank			=> open,
+		vblank			=> vblank,
+		hblank			=> hblank,
 		color				=> color,
 		video				=> video);
 

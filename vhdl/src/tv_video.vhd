@@ -44,9 +44,9 @@ begin
 	process (clk8)
 	begin
 		if rising_edge(clk8) then
-			if hcount=511 then
+			if hcount=507 then
 				hcount <= (others => '0');
-				if vcount=311 then
+				if vcount=261 then
 					vcount <= (others=>'0');
 				else
 					vcount <= vcount + 1;
@@ -59,24 +59,17 @@ begin
 	
 	process (hcount)
 	begin
-		if hcount<37 then
+		if hcount<38 then
 			screen_sync <= '0';
 		else
 			screen_sync <= '1';
 		end if;
 	end process;
 	
-	process (vcount)
-	begin
-		if vcount>=5 and vcount<309 then
-			in_vbl <= '0';
-		else
-			in_vbl <= '1';
-		end if;
-	end process;
+	in_vbl <= '1' when vcount<9 else '0';
 	
-	x					<= hcount-(37+12+18+17+80);
-	y9					<= vcount-64 when vcount<256 else (others=>'1');
+	x					<= hcount-166;
+	y9					<= vcount-40;
 	y					<= y9(7 downto 0);
 	vblank			<= '1' when hcount=0 and vcount=0 else '0';
 	hblank			<= '1' when hcount=0 else '0';
@@ -85,20 +78,16 @@ begin
 	
 	process (vcount,hcount)
 	begin
-		if vcount<2 then
-			if hcount<240 or (hcount>=256 and hcount<496) then
-				vbl_sync <= '0';
-			else
-				vbl_sync <= '1';
-			end if;
-		elsif vcount=2 then
-			if hcount<240 or (hcount>=256 and hcount<272) then
+		if vcount<3 or (vcount>=6 and vcount<9) then
+			-- _^^^^^_^^^^^ : low pulse = 2.35us
+			if hcount<19 or (hcount>=254 and hcount<254+19) then
 				vbl_sync <= '0';
 			else
 				vbl_sync <= '1';
 			end if;
 		else
-			if hcount<16 or (hcount>=256 and hcount<272) then
+			-- ____^^ : high pulse = 4.7us
+			if hcount<(254-38) or (hcount>=254 and hcount<508-38) then
 				vbl_sync <= '0';
 			else
 				vbl_sync <= '1';
@@ -118,7 +107,7 @@ begin
 	encode_inst: color_encoder
 	port map (
 		clk				=> clk64,
-		pal				=> '1',
+		pal				=> '0',
 		sync				=> sync,
 		line_visible	=> line_visible,
 		line_even		=> line_even,
