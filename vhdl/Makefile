@@ -5,8 +5,8 @@ DATA2MEM:=$(ISE_PATH)/bin/lin/data2mem
 load: final.bit
 	sudo papilio-prog -v -f final.bit
 
-final.bit: sms_vga.bit boot_bd.bmm $(MEM_PATH)/all.mem
-	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt sms_vga.bit -o b final.bit
+final.bit: sms_tv.bit boot_bd.bmm $(MEM_PATH)/all.mem
+	$(DATA2MEM) -bm boot_bd.bmm -bd $(MEM_PATH)/all.mem -bt sms_tv.bit -o b final.bit
 
 
 #=================================================================
