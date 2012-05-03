@@ -7,8 +7,8 @@ load: sms_vga_final.bit
 
 TARGETS := sms_vga sms_tv
 
-%_final.bit: %.bit sms_bd.bmm $(MEM_PATH)/all.mem
-	$(DATA2MEM) -bm sms_bd.bmm -bd $(MEM_PATH)/all.mem -bt $*.bit -o b $*_final.bit
+%_final.bit: %.bit src/sms_bd.bmm $(MEM_PATH)/all.mem
+	$(DATA2MEM) -bm src/sms_bd.bmm -bd $(MEM_PATH)/all.mem -bt $*.bit -o b $*_final.bit
 
 # remove Make's built-in rules
 .SUFFIXES:
@@ -38,7 +38,7 @@ clean:
 
 # ngdbuild: convert netlist to Xilinx format
 %.ngd: %.ngc src/%.ucf
-	ngdbuild $(MODE) -p $(DUT) -uc src/$*.ucf -bm sms.bmm $*.ngc $*.ngd
+	ngdbuild $(MODE) -p $(DUT) -uc src/$*.ucf -bm src/sms.bmm $*.ngc $*.ngd
 
 # map: place/route design
 %_map.ncd %.pcf: %.ngd
