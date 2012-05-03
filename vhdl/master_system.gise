@@ -147,7 +147,6 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="sms_tv_map.ncd" xil_pn:subbranch="Map"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGM" xil_pn:name="sms_tv_map.ngm" xil_pn:subbranch="Map"/>
     <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_tv_map.xrpt"/>
-    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_tv_ngdbuild.xrpt"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_EXCEL_REPORT" xil_pn:name="sms_tv_pad.csv" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_TXT_REPORT" xil_pn:name="sms_tv_pad.txt" xil_pn:subbranch="Par"/>
     <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_tv_par.xrpt"/>
@@ -165,15 +164,18 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGC" xil_pn:name="sms_vga.ngc"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGD" xil_pn:name="sms_vga.ngd"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGR" xil_pn:name="sms_vga.ngr"/>
+    <file xil_pn:fileType="FILE_PAD_MISC" xil_pn:name="sms_vga.pad"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAR_REPORT" xil_pn:name="sms_vga.par" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PCF" xil_pn:name="sms_vga.pcf" xil_pn:subbranch="Map"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="sms_vga.prj"/>
+    <file xil_pn:fileType="FILE_TRCE_MISC" xil_pn:name="sms_vga.ptwx"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_STX" xil_pn:name="sms_vga.stx"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_REPORT" xil_pn:name="sms_vga.syr"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_TXT_REPORT" xil_pn:name="sms_vga.twr" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_XML_REPORT" xil_pn:name="sms_vga.twx" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="sms_vga.unroutes" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="sms_vga.ut" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:fileType="FILE_XPI" xil_pn:name="sms_vga.xpi"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="sms_vga.xst"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="sms_vga_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="sms_vga_guide.ncd" xil_pn:origination="imported"/>
@@ -181,9 +183,14 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="sms_vga_map.mrp" xil_pn:subbranch="Map"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="sms_vga_map.ncd" xil_pn:subbranch="Map"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGM" xil_pn:name="sms_vga_map.ngm" xil_pn:subbranch="Map"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_vga_map.xrpt"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_vga_ngdbuild.xrpt"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_EXCEL_REPORT" xil_pn:name="sms_vga_pad.csv" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_TXT_REPORT" xil_pn:name="sms_vga_pad.txt" xil_pn:subbranch="Par"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_vga_par.xrpt"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="sms_vga_summary.html"/>
+    <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="sms_vga_summary.xml"/>
+    <file xil_pn:fileType="FILE_WEBTALK" xil_pn:name="sms_vga_usage.xml"/>
     <file xil_pn:fileType="FILE_XRPT" xil_pn:name="sms_vga_xst.xrpt"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="spi_tb_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="spi_tb_stx_beh.prj"/>
@@ -271,31 +278,31 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="-1098933486965593891" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="-7784753622268130063" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="8722031676994007981" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="3973836683279670497" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="-7363737403549524513" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="6837646014976778803" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="250970745955965653" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="250970745955965653" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335987592" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="7566298838395672183" xil_pn:start_ts="1335987592">
+    <transform xil_pn:end_ts="1336074587" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="2728141156953692395" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335989375" xil_pn:in_ck="-1901113383195458182" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="7221528193570996410" xil_pn:start_ts="1335989321">
+    <transform xil_pn:end_ts="1336074642" xil_pn:in_ck="-1901113383195458182" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="-281358173307128466" xil_pn:start_ts="1336074587">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
@@ -303,79 +310,78 @@
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name=".lso"/>
       <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.lso"/>
-      <outfile xil_pn:name="sms_tv.ngc"/>
-      <outfile xil_pn:name="sms_tv.ngr"/>
-      <outfile xil_pn:name="sms_tv.prj"/>
-      <outfile xil_pn:name="sms_tv.stx"/>
-      <outfile xil_pn:name="sms_tv.syr"/>
-      <outfile xil_pn:name="sms_tv.xst"/>
-      <outfile xil_pn:name="sms_tv_xst.xrpt"/>
+      <outfile xil_pn:name="sms_vga.lso"/>
+      <outfile xil_pn:name="sms_vga.ngc"/>
+      <outfile xil_pn:name="sms_vga.ngr"/>
+      <outfile xil_pn:name="sms_vga.prj"/>
+      <outfile xil_pn:name="sms_vga.stx"/>
+      <outfile xil_pn:name="sms_vga.syr"/>
+      <outfile xil_pn:name="sms_vga.xst"/>
+      <outfile xil_pn:name="sms_vga_xst.xrpt"/>
       <outfile xil_pn:name="webtalk_pn.xml"/>
       <outfile xil_pn:name="xst"/>
     </transform>
-    <transform xil_pn:end_ts="1335987646" xil_pn:in_ck="-4777938352913246906" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="-6781145180009193164" xil_pn:start_ts="1335987646">
+    <transform xil_pn:end_ts="1336076155" xil_pn:in_ck="-4777938352913246906" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="7581093267779890952" xil_pn:start_ts="1336076155">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1335989387" xil_pn:in_ck="-140318528579893394" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="952229056036732184" xil_pn:start_ts="1335989375">
+    <transform xil_pn:end_ts="1336076560" xil_pn:in_ck="-140318528579893394" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="4300145939577733612" xil_pn:start_ts="1336076548">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_ngo"/>
       <outfile xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.bld"/>
-      <outfile xil_pn:name="sms_tv.ngd"/>
-      <outfile xil_pn:name="sms_tv_ngdbuild.xrpt"/>
+      <outfile xil_pn:name="sms_vga.bld"/>
+      <outfile xil_pn:name="sms_vga.ngd"/>
+      <outfile xil_pn:name="sms_vga_ngdbuild.xrpt"/>
     </transform>
-    <transform xil_pn:end_ts="1335989449" xil_pn:in_ck="-109514889347014924" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="6093601622908603872" xil_pn:start_ts="1335989387">
+    <transform xil_pn:end_ts="1336076626" xil_pn:in_ck="-109514889347014924" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="6093601622908603872" xil_pn:start_ts="1336076560">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_xmsgs/map.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.pcf"/>
-      <outfile xil_pn:name="sms_tv_map.map"/>
-      <outfile xil_pn:name="sms_tv_map.mrp"/>
-      <outfile xil_pn:name="sms_tv_map.ncd"/>
-      <outfile xil_pn:name="sms_tv_map.ngm"/>
-      <outfile xil_pn:name="sms_tv_map.xrpt"/>
-      <outfile xil_pn:name="sms_tv_summary.xml"/>
-      <outfile xil_pn:name="sms_tv_usage.xml"/>
+      <outfile xil_pn:name="sms_vga.pcf"/>
+      <outfile xil_pn:name="sms_vga_map.map"/>
+      <outfile xil_pn:name="sms_vga_map.mrp"/>
+      <outfile xil_pn:name="sms_vga_map.ncd"/>
+      <outfile xil_pn:name="sms_vga_map.ngm"/>
+      <outfile xil_pn:name="sms_vga_map.xrpt"/>
+      <outfile xil_pn:name="sms_vga_summary.xml"/>
+      <outfile xil_pn:name="sms_vga_usage.xml"/>
     </transform>
-    <transform xil_pn:end_ts="1335989501" xil_pn:in_ck="-423735468492760200" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="93661965788626211" xil_pn:start_ts="1335989449">
+    <transform xil_pn:end_ts="1336076688" xil_pn:in_ck="-4109605380732148868" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="93661965788626211" xil_pn:start_ts="1336076636">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_xmsgs/par.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.ncd"/>
-      <outfile xil_pn:name="sms_tv.pad"/>
-      <outfile xil_pn:name="sms_tv.par"/>
-      <outfile xil_pn:name="sms_tv.ptwx"/>
-      <outfile xil_pn:name="sms_tv.unroutes"/>
-      <outfile xil_pn:name="sms_tv.xpi"/>
-      <outfile xil_pn:name="sms_tv_pad.csv"/>
-      <outfile xil_pn:name="sms_tv_pad.txt"/>
-      <outfile xil_pn:name="sms_tv_par.xrpt"/>
+      <outfile xil_pn:name="sms_vga.ncd"/>
+      <outfile xil_pn:name="sms_vga.pad"/>
+      <outfile xil_pn:name="sms_vga.par"/>
+      <outfile xil_pn:name="sms_vga.ptwx"/>
+      <outfile xil_pn:name="sms_vga.unroutes"/>
+      <outfile xil_pn:name="sms_vga.xpi"/>
+      <outfile xil_pn:name="sms_vga_pad.csv"/>
+      <outfile xil_pn:name="sms_vga_pad.txt"/>
+      <outfile xil_pn:name="sms_vga_par.xrpt"/>
     </transform>
-    <transform xil_pn:end_ts="1335989526" xil_pn:in_ck="8813371329053422750" xil_pn:name="TRANEXT_bitFile_spartan6" xil_pn:prop_ck="396117104113915555" xil_pn:start_ts="1335989501">
+    <transform xil_pn:end_ts="1336076722" xil_pn:in_ck="-1071305053071956961" xil_pn:name="TRANEXT_bitFile_spartan6" xil_pn:prop_ck="396117104113915555" xil_pn:start_ts="1336076696">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_xmsgs/bitgen.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.bgn"/>
-      <outfile xil_pn:name="sms_tv.bit"/>
-      <outfile xil_pn:name="sms_tv.drc"/>
-      <outfile xil_pn:name="sms_tv.ut"/>
+      <outfile xil_pn:name="sms_vga.bgn"/>
+      <outfile xil_pn:name="sms_vga.bit"/>
+      <outfile xil_pn:name="sms_vga.drc"/>
+      <outfile xil_pn:name="sms_vga.ut"/>
       <outfile xil_pn:name="usage_statistics_webtalk.html"/>
       <outfile xil_pn:name="webtalk.log"/>
       <outfile xil_pn:name="webtalk_pn.xml"/>
     </transform>
-    <transform xil_pn:end_ts="1335989501" xil_pn:in_ck="3975546891551719012" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416185" xil_pn:start_ts="1335989489">
+    <transform xil_pn:end_ts="1336076688" xil_pn:in_ck="-3035432200568586331" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416185" xil_pn:start_ts="1336076676">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>
-      <outfile xil_pn:name="sms_tv.twr"/>
-      <outfile xil_pn:name="sms_tv.twx"/>
+      <outfile xil_pn:name="sms_vga.twr"/>
+      <outfile xil_pn:name="sms_vga.twx"/>
     </transform>
   </transforms>
 
