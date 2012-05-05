@@ -76,6 +76,7 @@ architecture Behavioral of sms_vga is
 		j2_tl:		in		STD_LOGIC;
 		j2_tr:		inout	STD_LOGIC;
 		reset:		in		STD_LOGIC;
+		pause:		in		STD_LOGIC;
 
 		x:				in		UNSIGNED(8 downto 0);
 		y:				in		UNSIGNED(7 downto 0);
@@ -95,6 +96,7 @@ architecture Behavioral of sms_vga is
 	component vga_video is
 	port (
 		clk16:			in  std_logic;
+		dither:			in  std_logic;
 		x: 				out unsigned(8 downto 0);
 		y:					out unsigned(7 downto 0);
 		vblank:			out std_logic;
@@ -102,9 +104,9 @@ architecture Behavioral of sms_vga is
 		color:			in  std_logic_vector(5 downto 0);
 		hsync:			out std_logic;
 		vsync:			out std_logic;
-		red:				out std_logic;
-		green:			out std_logic;
-		blue:				out std_logic);
+		red:				out std_logic_vector(1 downto 0);
+		green:			out std_logic_vector(1 downto 0);
+		blue:				out std_logic_vector(1 downto 0));
 	end component;
 	
 	signal clk_cpu:			std_logic;
@@ -117,6 +119,9 @@ architecture Behavioral of sms_vga is
 	signal color:				std_logic_vector(5 downto 0);
 	signal audio:				std_logic;
 	
+	signal red_in:				std_logic_vector(1 downto 0);
+	signal green_in:			std_logic_vector(1 downto 0);
+	signal blue_in:			std_logic_vector(1 downto 0);
 	signal j2_tr:				std_logic;
 	
 begin
@@ -132,6 +137,7 @@ begin
 	video_inst: vga_video
 	port map (
 		clk16			=> clk16,
+		dither		=> '1',
 		x	 			=> x,
 		y				=> y,
 		vblank		=> vblank,
@@ -140,9 +146,13 @@ begin
 		
 		hsync			=> hsync,
 		vsync			=> vsync,
-		red			=> red,
-		green			=> green,
-		blue			=> blue);
+		red			=> red_in,
+		green			=> green_in,
+		blue			=> blue_in);
+		
+	red	<= red_in(1);
+	green	<= green_in(1);
+	blue	<= blue_in(1);
 
 	system_inst: system
 	port map (
@@ -170,6 +180,7 @@ begin
 		j2_tl			=> '1',
 		j2_tr			=> j2_tr,
 		reset			=> '1',
+		pause			=> '1',
 
 		x				=> x,
 		y				=> y,

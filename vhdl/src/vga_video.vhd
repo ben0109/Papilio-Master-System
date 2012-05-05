@@ -24,6 +24,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity vga_video is
 	port (
 		clk16:			in  std_logic;
+		dither:			in  std_logic;
 		x: 				out unsigned(8 downto 0);
 		y:					out unsigned(7 downto 0);
 		vblank:			out std_logic;
@@ -31,9 +32,9 @@ entity vga_video is
 		color:			in  std_logic_vector(5 downto 0);
 		hsync:			out std_logic;
 		vsync:			out std_logic;
-		red:				out std_logic;
-		green:			out std_logic;
-		blue:				out std_logic);
+		red:				out std_logic_vector(1 downto 0);
+		green:			out std_logic_vector(1 downto 0);
+		blue:				out std_logic_vector(1 downto 0));
 end vga_video;
 
 architecture Behavioral of vga_video is
@@ -93,27 +94,36 @@ begin
 	begin
 		if rising_edge(clk16) then
 			if visible then
-				pixel_n := std_logic_vector(hcount(0 downto 0))&std_logic_vector(vcount(0 downto 0));
-				pixel_n(0) := pixel_n(0) xor screen_n(0);
-				pixel_n(1) := pixel_n(1) xor screen_n(1);
-				case pixel_n is
-				when "00" =>
-					red	<= color(0);
-					green	<= color(2);
-					blue	<= color(4);
-				when "01" | "10" =>
-					red	<= color(1);
-					green	<= color(3);
-					blue	<= color(5);
-				when others =>
-					red	<= color(0) and color(1);
-					green	<= color(2) and color(3);
-					blue	<= color(4) and color(5);
-				end case;
+				if dither='1' then
+					pixel_n := std_logic_vector(hcount(0 downto 0))&std_logic_vector(vcount(0 downto 0));
+					pixel_n(0) := pixel_n(0) xor screen_n(0);
+					pixel_n(1) := pixel_n(1) xor screen_n(1);
+					case pixel_n is
+					when "00" =>
+						red(1)	<= color(0);
+						green(1)	<= color(2);
+						blue(1)	<= color(4);
+					when "01" | "10" =>
+						red(1)	<= color(1);
+						green(1)	<= color(3);
+						blue(1)	<= color(5);
+					when others =>
+						red(1)	<= color(0) and color(1);
+						green(1)	<= color(2) and color(3);
+						blue(1)	<= color(4) and color(5);
+					end case;
+					red(0)	<= '0';
+					green(0)	<= '0';
+					blue(0)	<= '0';
+				else
+					red	<= color(1 downto 0);
+					green	<= color(3 downto 2);
+					blue	<= color(5 downto 4);
+				end if;
 			else
-				red	<= '0';
-				green	<= '0';
-				blue	<= '0';
+				red	<= (others=>'0');
+				green	<= (others=>'0');
+				blue	<= (others=>'0');
 			end if;
 		end if;
 	end process;

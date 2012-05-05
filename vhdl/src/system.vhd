@@ -30,6 +30,7 @@ entity system is
 		j2_tl:		in		STD_LOGIC;
 		j2_tr:		inout	STD_LOGIC;
 		reset:		in		STD_LOGIC;
+		pause:		in		STD_LOGIC;
 
 		x:				in		UNSIGNED(8 downto 0);
 		y:				in		UNSIGNED(7 downto 0);
@@ -225,7 +226,7 @@ begin
 		CLKEN			=> '1',
 		WAIT_n		=> '1',
 		INT_n			=> IRQ_n,
-		NMI_n			=> '1',
+		NMI_n			=> pause,
 		BUSRQ_n		=> '1',
 		M1_n			=> open,
 		MREQ_n		=> open,
