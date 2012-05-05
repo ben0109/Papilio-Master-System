@@ -1,4 +1,4 @@
-TARGETS := sms_vga sms_tv
+TARGETS := sms_vga sms_tv sms_megawing
 
 MEM_FILE:=../bootloader/all.mem
 DUT      := xc6slx9tqg144-3
